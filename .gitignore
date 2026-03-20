@@ -1,0 +1,90 @@
+# Miscellaneous
+*.class
+*.log
+*.pyc
+*.swp
+.DS_Store
+.atom/
+.build/
+.buildlog/
+.history
+.svn/
+.swiftpm/
+migrate_working_dir/
+
+# IntelliJ related
+*.iml
+*.ipr
+*.iws
+.idea/
+
+# VS Code (descomente se não quiser versionar configurações de launch/tasks)
+#.vscode/
+
+# Flutter/Dart/Pub related
+**/doc/api/
+**/ios/Flutter/.last_build_id
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.pub-cache/
+.pub/
+/build/
+/coverage/
+
+# Metadados do Flutter (gerados automaticamente, não precisam de versionamento)
+.metadata
+
+# Symbolication related
+app.*.symbols
+
+# Obfuscation related
+app.*.map.json
+
+# Android Studio will place build artifacts here
+/android/app/debug
+/android/app/profile
+/android/app/release
+
+# Android — configurações locais de máquina (caminhos do SDK variam por dev)
+android/local.properties
+
+# Android — chave de assinatura (NUNCA versionar!)
+android/key.properties
+*.jks
+*.keystore
+
+# Variáveis de ambiente de build (VPS IP, PINs, tokens)
+.env
+.env.local
+.env.production
+
+# Claude Code — histórico de conversas (pode conter contexto sensível)
+.claude/
+
+# Hub Next.js
+hub/node_modules/
+hub/.next/
+hub/.env
+hub/.env.local
+hub/.env.production
+hub/out/
+
+# Screenshots de testes (grandes demais para git)
+screenshots/
+screenshots_claudia/
+
+# Artefatos locais de desenvolvimento
+images_teste/
+*.zip
+
+# Documentos operacionais internos (contêm IPs e instruções de infra)
+ANTIGRAVITY_PROMPT_HUB_V2.1.md
+HUB_PLACES_MONITORING_SPEC.md
+VPS_POCKETBASE_SETUP_V2.1.md
+VPS_FLUTTER_UPDATE_PROMPT.md
+VPS_UPDATE_PROMPT_V2.md
+POCKETBASE_GESTOR_SETUP.md
+E2E_TEST_PROCEDURE.md
+IMPLEMENTATION_CHECKLIST_V2.1.md
+DATA_COLLECTION_METHODOLOGY_V2.1.md

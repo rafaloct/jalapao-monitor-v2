@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Permite tráfego HTTP cleartext apenas para o servidor PocketBase.
+  Necessário porque Android API 28+ bloqueia HTTP por padrão.
+  Em produção: migrar PocketBase para HTTPS e remover este arquivo.
+-->
+<network-security-config>
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="false">92.112.179.111</domain>
+    </domain-config>
+</network-security-config>

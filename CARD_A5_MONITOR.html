@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Card A5 — Monitor Jalapão</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,600;0,700;0,800;1,400&family=Montserrat:wght@800;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --orange:  #D35400;
+    --blue:    #2471A3;
+    --green:   #1E8449;
+    --purple:  #7D3C98;
+    --red:     #B03A2E;
+    --gold:    #B7950B;
+    --teal:    #117A65;
+    --text:    #1C2833;
+    --muted:   #717D7E;
+    --border:  #E5E8E8;
+    --r:       5px;
+  }
+  @page { size: A5; margin: 0; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Inter', sans-serif;
+    font-size: 8.2pt;
+    color: var(--text);
+    background: #fff;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* ── Card (= 1 face A5) ── */
+  .card {
+    width: 148mm;
+    min-height: 210mm;
+    padding: 7mm 8mm 6mm;
+    page-break-after: always;
+    display: flex;
+    flex-direction: column;
+    gap: 3.5mm;
+  }
+
+  /* ── Header ── */
+  .hdr {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    border-bottom: 2.5px solid var(--orange);
+    padding-bottom: 2.5mm;
+  }
+  .hdr h1 {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 14pt;
+    font-weight: 900;
+    color: var(--orange);
+    letter-spacing: -0.4pt;
+    line-height: 1;
+  }
+  .hdr .sub { font-size: 7pt; color: var(--muted); text-align: right; line-height: 1.3; font-weight: 600; }
+
+  /* ── Section ── */
+  .sec { display: flex; flex-direction: column; gap: 1.5mm; }
+
+  /* Section title badge */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 2mm;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 7.5pt;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.6pt;
+    color: #fff;
+    padding: 1.2mm 3.5mm;
+    border-radius: var(--r) var(--r) 0 0;
+  }
+  .badge.green  { background: var(--green); }
+  .badge.blue   { background: var(--blue); }
+  .badge.teal   { background: var(--teal); }
+  .badge.purple { background: var(--purple); }
+  .badge.red    { background: var(--red); }
+  .badge.gold   { background: var(--gold); }
+  .badge.orange { background: var(--orange); }
+
+  /* Content box */
+  .box {
+    background: #FDFEFE;
+    border: 1px solid var(--border);
+    border-radius: 0 var(--r) var(--r) var(--r);
+    padding: 2mm 3mm;
+  }
+  .box.info   { border-left: 3px solid var(--blue);   background: #EBF5FB; }
+  .box.warn   { border-left: 3px solid var(--red);    background: #FDEDEC; }
+  .box.ok     { border-left: 3px solid var(--green);  background: #EAFAF1; }
+  .box.gold   { border-left: 3px solid var(--gold);   background: #FEF9E7; }
+
+  /* ── Event rows ── */
+  table.ev { width: 100%; border-collapse: collapse; }
+  table.ev td { padding: 1.2mm 0; vertical-align: top; line-height: 1.35; }
+  table.ev td.ic { width: 6mm; font-size: 9.5pt; padding-right: 1.5mm; }
+  table.ev td.lbl { font-weight: 700; width: 21mm; font-size: 7.8pt; color: var(--text); padding-right: 1.5mm; }
+  table.ev td.desc { font-size: 7.8pt; color: #2C3E50; }
+  table.ev tr + tr td { border-top: 0.5px solid #F2F3F4; }
+
+  /* ── Kbd-style button labels ── */
+  kbd {
+    display: inline;
+    font-family: 'Inter', sans-serif;
+    font-size: 7pt;
+    font-weight: 800;
+    background: #EBF5FB;
+    color: var(--blue);
+    border: 1px solid #AED6F1;
+    border-radius: 3px;
+    padding: 0 2.5px;
+    white-space: nowrap;
+  }
+  kbd.o { background: #FDF2E9; color: var(--orange); border-color: #F5CBA7; }
+  kbd.g { background: #EAFAF1; color: var(--green);  border-color: #A9DFBF; }
+  kbd.p { background: #F5EEF8; color: var(--purple); border-color: #D2B4DE; }
+  kbd.t { background: #E8F8F5; color: var(--teal);   border-color: #A2D9CE; }
+
+  /* ── Pills ── */
+  .pill {
+    display: inline-block;
+    padding: 0.5px 4px;
+    border-radius: 3px;
+    font-size: 6.8pt;
+    font-weight: 800;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  .pill.f { background: #FDF2E9; color: #B9770E; border: 1px solid #F5CBA7; }
+  .pill.a { background: #D6EAF8; color: #21618C; border: 1px solid #85C1E9; }
+  .pill.s { background: #D4EFDF; color: #1D8348; border: 1px solid #82E0AA; }
+
+  /* ── 2-col loc grid ── */
+  .locs { display: grid; grid-template-columns: 1fr 1fr; gap: 1mm; margin-top: 1.5mm; }
+  .loc  { background: #F2F3F4; border-radius: 3px; padding: 0.8mm 2mm; font-size: 7.2pt; color: var(--muted); font-weight: 600; }
+
+  /* ── Inline divider ── */
+  hr { border: none; border-top: 0.5px solid var(--border); margin: 0; }
+
+  /* ── Footer widgets ── */
+  .foot { margin-top: auto; display: flex; gap: 3mm; align-items: stretch; }
+  .qr   {
+    width: 18mm; height: 18mm; flex-shrink: 0;
+    background: #E8E8E8; border: 1.5px dashed #bbb;
+    border-radius: 4px; display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    font-size: 5.5pt; color: #aaa; text-align: center; gap: 1mm;
+  }
+  .pin-block {
+    flex: 1; background: #FEF9E7; border: 1px dashed #F7DC6F;
+    border-radius: var(--r); padding: 2mm 3mm;
+  }
+  .pin-block .lbl { font-size: 6.5pt; font-weight: 700; color: #9A7D0A; text-transform: uppercase; letter-spacing: 0.5pt; }
+  .pin-block code { display: block; font-size: 10.5pt; font-weight: 900; color: #7D6608; letter-spacing: 2pt; margin: 0.5mm 0; }
+  .pin-block .url { font-size: 6.8pt; font-family: monospace; color: var(--blue); }
+
+  .cap { font-size: 6.5pt; color: var(--muted); text-align: center; margin-top: 1mm; }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════ FACE A — FRENTE ══════════════════════════ -->
+<div class="card">
+  <div class="hdr">
+    <h1>🌵 Jalapão Monitor</h1>
+    <div class="sub">Guia do Monitor de Campo<br>Temporada 2026</div>
+  </div>
+
+  <!-- INÍCIO -->
+  <div class="sec">
+    <span class="badge green">▶ Início do turno</span>
+    <div class="box ok">
+      <table class="ev">
+        <tr>
+          <td class="ic">①</td>
+          <td class="desc">Ligue o tablet → abra <strong>Jalapão Monitor</strong>.</td>
+        </tr>
+        <tr>
+          <td class="ic">②</td>
+          <td class="desc">Na tela <strong>"Selecionar Local de Monitoramento"</strong>, toque no local onde você está posicionado hoje.</td>
+        </tr>
+        <tr>
+          <td class="ic">③</td>
+          <td class="desc">A tela correta abre automaticamente. <em>Nuvem cortada no topo = sem internet — continue normalmente, dados sincronizam sozinhos.</em></td>
+        </tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- FERVEDOURO -->
+  <div class="sec">
+    <span class="badge blue">🌊 Fervedouro — todos os eventos</span>
+    <div class="box">
+      <p style="font-size:7.5pt;margin-bottom:1.5mm;">
+        Fluxo: <span class="pill f">Fila de Espera</span> → <span class="pill a">Na Água</span> → <span class="pill s">Concluído</span>
+      </p>
+      <table class="ev">
+        <tr>
+          <td class="ic">➕</td>
+          <td class="lbl">Novo grupo</td>
+          <td class="desc">Toque em <kbd class="o">+ NOVO GRUPO</kbd>. Dialog <em>"CHEGADA DE GRUPO"</em>: ajuste pax no grid, toque <kbd class="o">CONFIRMAR FILA</kbd>. Grupo entra na <span class="pill f">Fila</span>.</td>
+        </tr>
+        <tr>
+          <td class="ic">💧</td>
+          <td class="lbl">Entrar na água</td>
+          <td class="desc">Toque no card do grupo na <span class="pill f">Fila</span>. Dialog <em>"ENTRAR NO FERVEDOURO"</em>: ajuste pax que mergulha, toque <kbd class="t">ENTRAR NA ÁGUA</kbd>.</td>
+        </tr>
+        <tr>
+          <td class="ic">⏱</td>
+          <td class="lbl">Timer na água</td>
+          <td class="desc">Card azul mostra tempo decorrido. Ciclo de banho: 20 min. Quando tempo esgotar, libere o grupo.</td>
+        </tr>
+        <tr>
+          <td class="ic">✅</td>
+          <td class="lbl">Saída da água</td>
+          <td class="desc">Toque no card azul em <span class="pill a">NA ÁGUA</span> e confirme a saída. Status vira <span class="pill s">Concluído</span>.</td>
+        </tr>
+        <tr>
+          <td class="ic">🔢</td>
+          <td class="lbl">Ajustar capacidade</td>
+          <td class="desc"><em>Segure</em> o contador <strong>N/6</strong> no canto superior direito → dialog <em>"Capacidade do Fervedouro"</em> → <kbd>+</kbd>/<kbd>−</kbd> → <kbd class="t">SALVAR</kbd>.</td>
+        </tr>
+        <tr>
+          <td class="ic">📋</td>
+          <td class="lbl">Histórico do dia</td>
+          <td class="desc">Toque no ícone 🕐 no topo → <em>"Histórico de Hoje"</em>: lista todos os registros com horário e status. Botão <kbd class="g">PORTAR CSV</kbd> exporta os dados.</td>
+        </tr>
+      </table>
+      <div class="locs" style="margin-top:2mm;">
+        <div class="loc">Fervedouro da Ceiça</div>
+        <div class="loc">Fervedouro do Encanto</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CACHOEIRA / ATRATIVO -->
+  <div class="sec">
+    <span class="badge teal">⏱ Cachoeiras e Atrativos — todos os eventos</span>
+    <div class="box">
+      <table class="ev">
+        <tr>
+          <td class="ic">➕</td>
+          <td class="lbl">Registrar entrada</td>
+          <td class="desc">No painel esquerdo, ajuste o contador <kbd class="g">+</kbd>/<kbd class="g">−</kbd> até o nº de pessoas. Toque <kbd class="g">CHEGOU — N pessoas</kbd>. Dialog <em>"Confirmar chegada"</em>: preencha <em>Nome do grupo</em> e <em>Cidade de origem</em> (ambos opcionais mas importantes) → <kbd class="g">CONFIRMAR</kbd>.</td>
+        </tr>
+        <tr>
+          <td class="ic">✅</td>
+          <td class="lbl">Registrar saída</td>
+          <td class="desc">No painel direito, localize o grupo na lista. Toque no card → <strong>Registrar Saída</strong>. Duração calculada automaticamente.</td>
+        </tr>
+        <tr>
+          <td class="ic">↔️</td>
+          <td class="lbl">Trocar local</td>
+          <td class="desc">Ícone <strong>↔</strong> no canto superior direito retorna à seleção de locais.</td>
+        </tr>
+      </table>
+      <div class="locs">
+        <div class="loc">Cachoeira da Formiga</div>
+        <div class="loc">Museu do Capim Dourado</div>
+        <div class="loc">Loja Artesanato Jalapão</div>
+        <div class="loc">Chácara Rio Sono</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="cap">Jalapão Monitor v2.2 · FAPT/SEPLAN/UFT · frente ▶</div>
+</div>
+
+
+<!-- ══════════════════════════ FACE B — VERSO ══════════════════════════ -->
+<div class="card">
+  <div class="hdr">
+    <h1>🌵 Jalapão Monitor</h1>
+    <div class="sub">Suporte e Gestão<br>Temporada 2026</div>
+  </div>
+
+  <!-- POUSADA / RESTAURANTE -->
+  <div class="sec">
+    <span class="badge purple">🏨 Pousadas e Restaurantes — todos os eventos</span>
+    <div class="box">
+      <p style="font-size:7.5pt;margin-bottom:1.5mm;">
+        Painel esquerdo: <strong>RESERVAS (Hoje)</strong> · Painel direito: <strong>NO LOCAL</strong>
+      </p>
+      <table class="ev">
+        <tr>
+          <td class="ic">⚡</td>
+          <td class="lbl">Chegada sem reserva</td>
+          <td class="desc">Toque <kbd class="t">ENTRADA RÁPIDA</kbd>. Dialog: ajuste pax no grid → <kbd class="t">REGISTRAR ENTRADA</kbd>. Grupo aparece em <strong>NO LOCAL</strong>.</td>
+        </tr>
+        <tr>
+          <td class="ic">📅</td>
+          <td class="lbl">Nova reserva futura</td>
+          <td class="desc">Toque <kbd class="o">NOVA RESERVA COM HORÁRIO</kbd>. Dialog <em>"NOVA RESERVA"</em>: selecione data e hora, ajuste pax no grid, preencha <em>Nome do responsável</em> → confirme. Reserva aparece em <strong>RESERVAS (Hoje)</strong>.</td>
+        </tr>
+        <tr>
+          <td class="ic">🏁</td>
+          <td class="lbl">Check-in de reserva</td>
+          <td class="desc">Toque na reserva na lista esquerda → <strong>Check-in</strong>. Grupo move para <strong>NO LOCAL</strong>.</td>
+        </tr>
+        <tr>
+          <td class="ic">🚪</td>
+          <td class="lbl">Saída / Check-out</td>
+          <td class="desc">Toque no grupo em <strong>NO LOCAL</strong> → <strong>Registrar Saída</strong>. Vaga liberada.</td>
+        </tr>
+        <tr>
+          <td class="ic">↔️</td>
+          <td class="lbl">Trocar local</td>
+          <td class="desc">Ícone <strong>↔</strong> no canto superior esquerdo.</td>
+        </tr>
+      </table>
+      <div class="locs">
+        <div class="loc">Pousada Jalapão Dreams</div>
+        <div class="loc">Pousada Serra do Espírito</div>
+        <div class="loc">Restaurante Mirela</div>
+        <div class="loc">Restaurante Sabor do Sertão</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BOAS PRÁTICAS -->
+  <div class="sec">
+    <span class="badge gold">⭐ Boas práticas de coleta</span>
+    <div class="box gold">
+      <table class="ev">
+        <tr>
+          <td class="ic">📍</td>
+          <td class="desc"><strong>Imediatez:</strong> registre a chegada no momento exato — não acumule grupos para depois.</td>
+        </tr>
+        <tr>
+          <td class="ic">🏙</td>
+          <td class="desc"><strong>Cidade de origem:</strong> pergunte sempre (Palmas, Brasília, Goiânia…). Dado central para o Plano de Manejo.</td>
+        </tr>
+        <tr>
+          <td class="ic">🚦</td>
+          <td class="desc"><strong>Capacidade:</strong> contador vermelho = lotação atingida. Não mova grupos para a água além do limite.</td>
+        </tr>
+        <tr>
+          <td class="ic">🚫</td>
+          <td class="desc"><strong>Não apague registros</strong> — mesmo se errou, avise o coordenador. O histórico é recuperável.</td>
+        </tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- PROBLEMAS -->
+  <div class="sec">
+    <span class="badge red">🆘 Resolução de problemas</span>
+    <div class="box warn">
+      <table class="ev">
+        <tr>
+          <td class="ic">☁️</td>
+          <td class="lbl">Sem sinal</td>
+          <td class="desc">Normal no Jalapão. Continue registrando — sync automático quando o sinal voltar.</td>
+        </tr>
+        <tr>
+          <td class="ic">🔄</td>
+          <td class="lbl">Tela travada</td>
+          <td class="desc">Feche e reabra o app. Dados salvos pelo Hive — nenhuma perda.</td>
+        </tr>
+        <tr>
+          <td class="ic">📍</td>
+          <td class="lbl">Local errado</td>
+          <td class="desc">Toque no ícone <strong>↔</strong> no topo para voltar à seleção.</td>
+        </tr>
+        <tr>
+          <td class="ic">🔋</td>
+          <td class="lbl">Bateria baixa</td>
+          <td class="desc">Dados já estão salvos. Carregue e reabra — retorna ao ponto exato.</td>
+        </tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- GESTOR + HUB -->
+  <div class="foot">
+    <div class="qr">
+      <span style="font-size:18pt;">▣</span>
+      <span>QR → Hub</span>
+    </div>
+    <div class="pin-block">
+      <div class="lbl">🔑 PIN — Acesso Gestor</div>
+      <code>jalapao2026</code>
+      <div class="lbl" style="margin-top:1.5mm;">📊 Hub de monitoramento</div>
+      <div class="url">http://92.112.179.111:3000 · senha: jalapao2026</div>
+    </div>
+  </div>
+
+  <div class="cap">Jalapão Monitor v2.2 · Rafael · FAPT/SEPLAN/UFT 2026 · ◀ verso</div>
+</div>
+
+</body>
+</html>
