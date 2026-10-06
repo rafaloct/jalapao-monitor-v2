@@ -15,8 +15,25 @@
 
 ## 1. Contexto
 
-O Jalapão Monitor coleta fluxo turístico em ~10 atrativos com tablets em área de
-**conectividade irregular**. A arquitetura observada é offline-first:
+O Jalapão Monitor é o componente tecnológico do projeto *"O uso da inteligência
+artificial e os desafios no gerenciamento do fluxo de visitantes em áreas de
+interesse turístico no Jalapão"* — pesquisa e extensão universitária no contexto
+**UFT/NERUDS**, Edital nº 02/2024 FAPT/SEPLAN, Projeto **REDE DESER**, com atuação
+em **Mateiros e São Félix do Tocantins** (orientação acadêmica: Cleiton Milagres).
+O histórico do projeto registra **duas frentes com requisitos distintos**:
+
+- **Monitoramento turístico:** registros de visitação/movimentação, carga e
+  ocupação dos atrativos — escopo desta ADR.
+- **Cartografia social / Diagnóstico Rural Participativo:** atividades mediadas
+  por pesquisadores e facilitadores com comunidades — domínio separado (§8),
+  cujos requisitos ficam identificados aqui sem serem cobertos por esta ADR:
+  uso em grupos, registros de campo consolidados posteriormente e **necessidade
+  histórica de operação offline**. O planejamento de ~6 tablets para cartografia
+  **não comprova** que os mesmos equipamentos estejam distribuídos ou operando
+  permanentemente nos atrativos turísticos.
+
+Em ambas as frentes a conectividade é irregular e interrupções precisam entrar
+nos cenários de planejamento e validação. A arquitetura observada é offline-first:
 
 - **App Flutter** (`lib/`) persiste tudo em **Hive** e sincroniza a cada 30 s com
   **PocketBase** (`sync_service.dart`, `place_provider.dart`).
@@ -115,12 +132,24 @@ grandeza; o orçamento exato é decisão pendente (§10).
 
 ### Recomendação registrada para avaliação
 
-**Opção C (FastAPI + Postgres)** é a recomendada para avaliação: é a única que
-torna explícitos, no próprio contrato, os requisitos críticos da #2 (comandos,
-idempotência, deduplicação, confirmação server-side), alinha-se ao contrato
-canônico da #23 e à matriz da #19 sem depender de regras de collection. A Opção A
-é o caminho de menor custo/prazo se o piloto exigir rapidez — os requisitos seriam
-atendidos via `pb_hooks` versionados. **A escolha final é decisão humana na #2.**
+**Recomendada: Opção C — API própria em FastAPI sobre PostgreSQL**
+(FastAPI servindo comandos REST/OpenAPI + SSE; Postgres como store autoritativo,
+self-hosted no VPS existente ou gerenciado). Justificativa nos cinco eixos
+exigidos pelo mantenedor:
+
+| Eixo | Análise da recomendação |
+|---|---|
+| Funcionamento nas condições reais de campo | É a única opção que torna explícito, no contrato, o modelo de falhas F1–F7 (comandos, `idempotency_key`, dedup, consulta de resultado, confirmação server-side) — requisito da #2 e condição para UX honesta sob conectividade irregular. |
+| Custos de implantação e manutenção | ~US$ 6,49–12/mês self-managed no VPS (incremental ~zero) ou ~US$ 21–28 com PG gerenciado — tabela acima. Orçamento global do projeto **não é** autorização de infraestrutura; aprovação específica é pré-condição. |
+| Capacidade da equipe de operar | Maior superfície operacional (auth, realtime, backups próprios); mitigada por provisionamento versionado e pelo conhecimento prévio da equipe em FastAPI/Postgres (propostas anteriores do projeto). Se a capacidade for o gargalo, a Opção A é o fallback honesto. |
+| Migração e preservação dos dados | Fases 0–3 da §7 preservam Hive/PocketBase até cutover; exportação UTC e modo-leitura garantem reversibilidade e continuidade da série histórica da pesquisa. |
+| Continuidade após a etapa de pesquisa | Contrato OpenAPI + Postgres aberto permitem operação, exportação e transição institucional sem depender de BaaS ou do mantenedor atual — relevante para um projeto acadêmico com rotatividade. |
+
+A **Opção A — PocketBase self-hosted endurecido** é o caminho de menor custo e
+prazo se o piloto exigir rapidez: os mesmos requisitos seriam atendidos via
+`pb_hooks` versionados + regras fechadas, com contrato implícito no SDK como
+consequência assumida. **A escolha final é decisão humana na #2** — propostas
+anteriores do histórico não constituem aprovação de migração.
 
 ## 4. Cliente sem banco local e cache transitório
 
@@ -137,6 +166,38 @@ atendidos via `pb_hooks` versionados. **A escolha final é decisão humana na #2
 - **UX honesta:** comandos pendentes exibem estado `pendente de confirmação`
   (nunca "salvo"); operação sem confirmação não altera contadores definitivos nem
   aparece em relatórios do cliente.
+
+### 4.1 Respostas às perguntas de campo da restrição
+
+Perguntas do mantenedor (inputs de 2026-10-06) respondidas para a arquitetura
+alvo desta proposta — a tolerância concreta a interrupções ainda exige validação
+com a equipe de campo (§10, item 9):
+
+| Pergunta | Resposta sob a restrição "sem banco local" |
+|---|---|
+| Quais atividades sem conexão? | Visualizar catálogo já carregado em memória (`places`), preencher formulários e preparar comandos. Tudo que exija estado autoritativo — abrir sessão, confirmar registros, ver contagens oficiais — depende de conexão (F1). |
+| Quais dependem do servidor? | Autenticação do dispositivo/ator, confirmação de qualquer comando, consulta de resultado, atualização de catálogo, dados do Hub/TV. |
+| Queda durante o preenchimento? | O rascunho permanece em memória como `pendente`; se enviado sem conexão fica `pendente de confirmação` (F1/F2); o app permite continuar editando e tentando enviar. |
+| App fecha ou tablet reinicia? | Todo o estado em memória é descartado: **rascunhos não enviados se perdem**; comandos enviados não confirmados são recuperáveis via consulta de resultado por `idempotency_key`/chave natural (F4). |
+| Como o usuário sabe que o registro chegou? | Somente o envelope `applied\|duplicate` do servidor move o item para `confirmado`; a UI exibe estado individual e lista de pendências — nenhum contador mostra "salvo" sem ACK. |
+
+### 4.2 Consequência explícita da restrição
+
+Se a validação de campo demonstrar que a janela de interrupção tolerada exige
+sobreviver a restart do app/tablet, **algum armazenamento persistente no
+dispositivo será necessário** — e chamar esse armazenamento de "cache" ou "fila"
+não resolve o significado da restrição: ele seria, funcionalmente, um banco local.
+As saídas honestas são:
+
+- **Interpretação estrita (padrão desta proposta):** nenhuma persistência; perda
+  de rascunhos em restart é aceita; continuidade vem da confirmação server-side.
+- **Exceção nomeada:** um store local delimitado (ex.: fila de saída com TTL e
+  visibilidade total ao usuário) passa a ser decisão explícita do mantenedor,
+  com escopo e critérios — **equivalente a redefinir a restrição da #2**.
+
+Esta ADR adota a interpretação estrita como padrão até que dados de campo
+indiquem o contrário; a redefinição, se ocorrer, registra-se nesta ADR ou numa
+sucessora — nunca como implementação silenciosa.
 
 ## 5. Modelo de falhas de conectividade
 
@@ -228,10 +289,21 @@ reversa; por isso o modo leitura do PocketBase é mantido por janela acordada.
 6. Matriz de acesso (#19→#13) e modelo de provisionamento de credenciais (#24).
 7. Contrato canônico de sessão/eventos (#23).
 8. Requisito de continuidade mínima offline — inclui o teste de campo da restrição
-   "sem banco local" conforme a tensão bibliográfica da #2.
+   "sem banco local" conforme a tensão bibliográfica da #2 e a bifurcação da §4.2.
+9. Tolerância concreta a interrupções — depende do inventário de campo (#15):
+   cobertura real por atrativo, duração típica das interrupções e rotina de
+   sincronização dos operadores; itens sem evidência nas fontes acessíveis ficam
+   como perguntas territoriais para a equipe.
+10. Requisitos da frente de cartografia social — permanecem fora do escopo desta
+    ADR; uma ADR própria deverá avaliá-la, pois a necessidade histórica de
+    operação offline dessa frente pode divergir da interpretação estrita.
 
 ## 11. Validação desta entrega
 
 - Links internos revisados; diagrama referenciado: [`0001-c4-container.md`](./0001-c4-container.md).
 - Tabela de cenários de falha em §5; nenhuma chamada a ambiente operacional.
 - Status `PROPOSED`; nenhuma mudança funcional, de schema ou de credencial foi feita.
+- Revisão 2026-10-06: incorporados inputs do mantenedor — contexto institucional
+  (NERUDS/UFT, REDE DESER, Mateiros/São Félix), duas frentes do projeto,
+  respostas às perguntas de campo (§4.1), consequência explícita da restrição
+  (§4.2) e recomendação nomeada por componentes nos cinco eixos (§3).
