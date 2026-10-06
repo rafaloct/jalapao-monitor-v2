@@ -11,7 +11,13 @@ Aplicativo para tablets Android que permite monitorar em tempo real a entrada e 
 grupos de turistas em atrativos do Jalapão (fervedouros, cachoeiras, pousadas, restaurantes etc.).
 Os dados são sincronizados com um backend central (PocketBase) e visualizados em um painel web (Hub).
 
-## Arquitetura
+## Estado do desenvolvimento
+
+O código abaixo descreve o legado versionado. A evolução vNext segue o [roadmap #1](https://github.com/rafaloct/jalapao-monitor-v2/issues/1) e os [milestones](https://github.com/rafaloct/jalapao-monitor-v2/milestones). O alvo sem banco local depende da ADR da #2; nenhuma migração é presumida.
+
+Consulte [AGENTS.md](AGENTS.md), [baseline observado](docs/operations/REPOSITORY_BASELINE.md) e [início para Devin/Cursor](docs/operations/AGENT_START.md). Builds, deploy e testes de campo precisam de evidências próprias.
+
+## Arquitetura atual
 
 ```
 Tablet (Flutter)  ──sync 30s──▶  PocketBase (VPS)  ──REST──▶  Hub Next.js
@@ -66,15 +72,17 @@ offline-first                    :8090 · UTC                   :3000 · BRT
 flutter run --dart-define=PB_URL=http://<PB_HOST>:8090
 
 # Hub
-cd hub && npm install && npm run dev
+# O scaffold ainda precisa ser recuperado na Issue #22.
+# Não há package.json/lockfile no baseline auditado.
 ```
 
 Ver [`docs/DEVELOPMENT.md`](docs/DEVELOPMENT.md) para instruções completas.
 
 ## Para agentes AI
 
-Leia [`CLAUDE.md`](CLAUDE.md) — contém arquitetura, regras invioláveis, schema completo
-e fluxo de desenvolvimento. É o ponto de entrada para qualquer continuação do projeto.
+Leia primeiro [AGENTS.md](AGENTS.md) e o [protocolo de coordenação](docs/operations/AGENT_COORDINATION.md). A issue determina escopo, dependências e aceite. [CLAUDE.md](CLAUDE.md) preserva o contexto técnico do legado.
+
+A primeira tarefa preparada é a [#17](https://github.com/rafaloct/jalapao-monitor-v2/issues/17), condicionada ao estado live e ao claim exclusivo. Um agente entrega uma tarefa por draft PR; revisão e integração ficam com o mantenedor.
 
 ## Tecnologias
 

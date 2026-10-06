@@ -1,0 +1,9 @@
+---
+description: Contrato comum de execução do Jalapão Monitor
+alwaysApply: true
+---
+
+Leia e siga o AGENTS.md da raiz e docs/operations/AGENT_COORDINATION.md.
+Leia a issue completa no GitHub e confirme dependências, gate e claim.
+Uma tarefa, uma branch isolada, um draft PR. MERGE_ALLOWED=NO.
+Não duplicar o contrato aqui; propor alterações em AGENTS.md por PR.

@@ -1,3 +1,5 @@
+> Documento histórico. A fila atual e as decisões estão nas [Issues](https://github.com/rafaloct/jalapao-monitor-v2/issues/1), nos milestones e em [AGENTS.md](AGENTS.md). Este plano não libera implementação nem substitui a ADR da #2.
+
 # Plano de Melhorias — Jalapão Monitor v2.2
 > Gerado em 2026-03-19. Executar em sessão dedicada.
 

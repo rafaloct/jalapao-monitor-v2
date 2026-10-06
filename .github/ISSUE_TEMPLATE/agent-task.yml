@@ -1,0 +1,85 @@
+name: Tarefa para agente
+description: Uma entrega delimitada, com escopo, aceite e evidência.
+title: "[TASK] "
+labels: ["type:task", "agent:backlog", "agent:executor:any"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        A criação não libera execução. O mantenedor revisa escopo, dependências
+        e gate antes de aplicar agent:ready. Um agente atende uma tarefa por PR.
+  - type: textarea
+    id: objective
+    attributes:
+      label: Objetivo único e problema
+      description: Explique o resultado observável e a issue/épico de origem.
+      placeholder: "Filha de #N. Ao concluir, será possível..."
+    validations:
+      required: true
+  - type: textarea
+    id: allowed_scope
+    attributes:
+      label: Arquivos e ações permitidos
+      description: Liste paths e ações específicas. Leitura geral não autoriza edição geral.
+    validations:
+      required: true
+  - type: textarea
+    id: excluded_scope
+    attributes:
+      label: Fora do escopo
+      description: Limites funcionais, infraestrutura e dados que não serão alterados.
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Critérios de aceite
+      description: Resultados verificáveis; não apenas uma lista de arquivos.
+      placeholder: "- [ ] Cenário de sucesso...\n- [ ] Cenário de falha..."
+    validations:
+      required: true
+  - type: textarea
+    id: validation
+    attributes:
+      label: Testes e evidências
+      description: Comandos, ambiente isolado e evidência de conclusão. Para docs, validações documentais.
+    validations:
+      required: true
+  - type: textarea
+    id: dependencies
+    attributes:
+      label: Dependências e aprovações
+      description: Issues/ADRs/PRs e a condição exata. Registrar NONE somente se não houver dependência.
+      placeholder: "DEPENDS_ON=#N; aprovação da ADR no commit..."
+    validations:
+      required: true
+  - type: dropdown
+    id: human_gate
+    attributes:
+      label: HUMAN_GATE
+      description: NO permite preparar a tarefa; nunca autoriza merge ou produção.
+      options:
+        - "YES"
+        - "NO"
+    validations:
+      required: true
+  - type: textarea
+    id: gate_detail
+    attributes:
+      label: Decisão humana necessária
+      description: Se YES, indicar decisão, responsável e origem. Se NO, escrever não aplicável.
+    validations:
+      required: true
+  - type: checkboxes
+    id: execution_limits
+    attributes:
+      label: Contrato de execução
+      options:
+        - label: "Uma tarefa, uma branch/worktree isolada e um draft PR."
+          required: true
+        - label: "MERGE_ALLOWED=NO e PRODUCTION_ALLOWED=NO para o executor."
+          required: true
+        - label: "Não usar bypass, force-push, secrets ou dados reais em evidências."
+          required: true
+        - label: "A tarefa entra em backlog; somente o mantenedor pode liberá-la como ready."
+          required: true

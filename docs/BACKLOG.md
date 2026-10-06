@@ -1,3 +1,5 @@
+> Registro histórico de observações. A fila executável está nas [Issues e no roadmap #1](https://github.com/rafaloct/jalapao-monitor-v2/issues/1). Antes de implementar um item abaixo, vinculá-lo a uma tarefa com escopo, dependências, aceite e gate conforme [AGENTS.md](../AGENTS.md). Um checkbox aqui não comprova execução ou autorização.
+
 # Backlog — Melhorias Pós-Teste de Campo
 
 Este arquivo documenta melhorias identificadas antes e durante o desenvolvimento.
