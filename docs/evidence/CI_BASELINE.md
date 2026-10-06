@@ -36,7 +36,7 @@ declarada, não validação. Distinção exigida pelo aceite da #20.
 | # | Item | Tipo | Tratamento proposto no plano |
 |---|---|---|---|
 | B1 | `flutter analyze` exit 1 (104 achados) | Falha pré-existente | Job executa e reporta; ratchet falha se contagem **aumentar**; gate obrigatório só após dívida zerada em tarefa delimitada — sem `continue-on-error` |
-| B2 | `pubspec.lock` re-resolve sob SDK divergente | Reprodutibilidade | Pin do SDK testado; verificação de lock imutável (`pub get` + diff) vira gate **após** tarefa de reconciliação lock×SDK — hoje falharia legitimamente |
+| B2 | `pubspec.lock` re-resolve sob SDK divergente (~10 pins transitivos sob Dart 3.12.2) | Reprodutibilidade | Duas vias delimitadas no CI_PLAN §4.5: pinar o SDK que gerou o lock (Via A, preferida) ou reconciliação do lock em tarefa própria com diff revisado (Via B); gate de imutabilidade só após prova — hoje falharia legitimamente |
 | B3 | Android SDK + wrappers `gradlew*` ausentes | Bloqueio ambiente/checkout | Android fora do gate até bootstrap versionado |
 | B4 | Hub sem `package.json`/lockfile/tsconfig | Lacuna checkout | Hub fora do gate até #22 |
 | B5 | `integration_test/` sem isolamento | Risco de falso verde | Só com backend/armazenamento efêmero, assertions e limites (CI_PLAN §5) |

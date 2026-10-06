@@ -119,6 +119,36 @@ Nomes únicos e estáveis (o nome do check é o do job): `ci/flutter-unit`,
 `ci/integration-ephemeral`. Check obrigatório só é configurado para nome
 **observado rodando** no evento correto — nenhum required check fictício (§6).
 
+### 4.5 Reconciliação SDK × `pubspec.lock` (alinhamento com a #21)
+
+A #21 exige **lock preservado** — o CI não pode reescrever `pubspec.lock`
+silenciosamente. A evidência da #17 mostra que o SDK testado (Flutter 3.44.9 /
+Dart 3.12.2) **re-resolve ~10 pins transitivos** ao rodar `flutter pub get`:
+hoje, portanto, não existe combinação SDK×lock comprovadamente reproduzível.
+Duas vias delimitadas resolvem isso; a #21 não implementa gate de lock sem uma
+delas comprovada:
+
+- **Via A — pinar o SDK que gerou o lock (preferida).** Identificar a versão de
+  Flutter com a qual o `pubspec.lock` versionado foi produzido (candidata:
+  linha 3.29.x compatível com Dart ≥3.7) e fixá-la no runner. Prova exigida:
+  job executando `flutter pub get && git diff --exit-code pubspec.lock` com
+  **exit 0 e diff vazio**, evidência registrada na tarefa da #21.
+- **Via B — reconciliação delimitada do lock.** Se nenhum SDK disponível mantiver
+  o lock estável, uma **tarefa própria** regenera `pubspec.lock` sob o SDK
+  pinado (3.44.9), entrega o diff dos ~10 pins transitivos como PR de evidência
+  revisado pelo mantenedor, e só então a verificação de imutabilidade passa a
+  compor o gate.
+
+Condição na #21: `ci/flutter-unit` pode nascer com `flutter pub get` + testes (a
+resolução ocorre de qualquer forma), mas o passo `git diff --exit-code
+pubspec.lock` só entra no gate após Via A **ou** Via B comprovadas — nunca como
+comando mascarado. `dart pub get --enforce-lockfile` é alternativa avaliável na
+implementação se suportada pela versão pinada.
+
+Componentes que permanecem bloqueados e fora de qualquer gate: Android build
+(wrapper/SDK ausentes — B3), Hub (scaffold — B4, #22), integração (backend
+efêmero — B5), contratos (aguardam #18/#19/#23).
+
 ## 5. Integração: bloqueio atual e caminho para habilitar
 
 Os quatro cenários atuais de `integration_test/` iniciam o aplicativo com Hive e providers reais. Há sincronização ao iniciar, chamadas a `pumpAndSettle` e poucos resultados verificados por assertions. Os scripts e guias também referenciam backend existente.
