@@ -134,12 +134,28 @@ grandeza; o orçamento exato é decisão pendente (§10).
 
 **Recomendada: Opção C — API própria em FastAPI sobre PostgreSQL**
 (FastAPI servindo comandos REST/OpenAPI + SSE; Postgres como store autoritativo,
-self-hosted no VPS existente ou gerenciado). Justificativa nos cinco eixos
-exigidos pelo mantenedor:
+self-hosted no VPS existente ou gerenciado). A comparação acima reconhece que a
+Opção A **também** pode cumprir os requisitos da #2 (via `pb_hooks` versionados);
+a preferência por C não se apoia em unicidade, mas em vantagens concretas:
+
+- **Contrato como artefato:** OpenAPI versionado e revisionável documenta e
+  testa o protocolo de comandos; em A, a semântica ficaria distribuída entre SDK
+  e hooks difíceis de auditar fora do servidor.
+- **Idempotência e confirmação como endpoints de primeira classe:** dedup,
+  consulta de resultado e reconciliação pós-restart (§4.3) são parte da API,
+  não comportamento de hook.
+- **Independência de BaaS:** realtime (SSE), auth e auditoria não herdam lock-in
+  nem limites do PocketBase; Postgres puro oferece RLS, auditoria e exportação
+  direta para a frente de pesquisa (#11).
+- **Continuidade institucional:** OpenAPI + Postgres abertos permitem operação
+  e transição por outra equipe sem o BaaS original — relevante em projeto
+  acadêmico com rotatividade.
+
+Justificativa nos cinco eixos exigidos pelo mantenedor:
 
 | Eixo | Análise da recomendação |
 |---|---|
-| Funcionamento nas condições reais de campo | É a única opção que torna explícito, no contrato, o modelo de falhas F1–F7 (comandos, `idempotency_key`, dedup, consulta de resultado, confirmação server-side) — requisito da #2 e condição para UX honesta sob conectividade irregular. |
+| Funcionamento nas condições reais de campo | Torna explícito, no contrato OpenAPI versionado, o modelo de falhas F1–F7 (comandos, `idempotency_key`, dedup, consulta de resultado, confirmação server-side) — requisito da #2 e condição para UX honesta sob conectividade irregular. A Opção A pode atender aos mesmos requisitos funcionais via `pb_hooks`; a vantagem de C é que o contrato é artefato versionado e testável, não convenção embutida no SDK/hooks. |
 | Custos de implantação e manutenção | ~US$ 6,49–12/mês self-managed no VPS (incremental ~zero) ou ~US$ 21–28 com PG gerenciado — tabela acima. Orçamento global do projeto **não é** autorização de infraestrutura; aprovação específica é pré-condição. |
 | Capacidade da equipe de operar | Maior superfície operacional (auth, realtime, backups próprios); mitigada por provisionamento versionado e pelo conhecimento prévio da equipe em FastAPI/Postgres (propostas anteriores do projeto). Se a capacidade for o gargalo, a Opção A é o fallback honesto. |
 | Migração e preservação dos dados | Fases 0–3 da §7 preservam Hive/PocketBase até cutover; exportação UTC e modo-leitura garantem reversibilidade e continuidade da série histórica da pesquisa. |
@@ -158,11 +174,13 @@ anteriores do histórico não constituem aprovação de migração.
 - **Proibido:** qualquer store durável no cliente (Hive/SQLite/arquivo). Se uma
   janela de continuidade operacional for exigida no piloto, ela vira decisão
   explícita — não workaround silencioso.
-- **Perda de estado ao reiniciar (consequência assumida):** comandos enviados e
-  não confirmados são esquecidos pelo cliente. A recuperação é **server-side**:
-  o cliente consulta o estado autoritativo por chave natural (ex.: visita aberta
-  da sessão/grupo, reserva do dia) e reconfirma; um comando reenviado com a mesma
-  `idempotency_key` retorna a confirmação original sem duplicar efeito (§6).
+- **Perda de estado ao reiniciar (consequência assumida):** todo o estado em
+  memória é descartado — **inclusive as `idempotency_key`s geradas pelo
+  cliente**. A recuperação distingue três casos (detalhe em §4.3):
+  rascunhos não enviados se perdem; registros confirmados reaparecem na próxima
+  leitura; envios com resultado incerto só são recuperáveis por consulta
+  server-side por **chave natural** — a chave de idempotência esquecida não pode
+  ser reutilizada nem reconstruída pelo cliente (§6).
 - **UX honesta:** comandos pendentes exibem estado `pendente de confirmação`
   (nunca "salvo"); operação sem confirmação não altera contadores definitivos nem
   aparece em relatórios do cliente.
@@ -178,7 +196,7 @@ com a equipe de campo (§10, item 9):
 | Quais atividades sem conexão? | Visualizar catálogo já carregado em memória (`places`), preencher formulários e preparar comandos. Tudo que exija estado autoritativo — abrir sessão, confirmar registros, ver contagens oficiais — depende de conexão (F1). |
 | Quais dependem do servidor? | Autenticação do dispositivo/ator, confirmação de qualquer comando, consulta de resultado, atualização de catálogo, dados do Hub/TV. |
 | Queda durante o preenchimento? | O rascunho permanece em memória como `pendente`; se enviado sem conexão fica `pendente de confirmação` (F1/F2); o app permite continuar editando e tentando enviar. |
-| App fecha ou tablet reinicia? | Todo o estado em memória é descartado: **rascunhos não enviados se perdem**; comandos enviados não confirmados são recuperáveis via consulta de resultado por `idempotency_key`/chave natural (F4). |
+| App fecha ou tablet reinicia? | Todo o estado em memória é descartado: **rascunhos não enviados se perdem**; confirmados reaparecem na próxima leitura; envios com resultado incerto são recuperáveis **somente por chave natural** — a `idempotency_key` era estado de memória e se perdeu junto (F4, §4.3). |
 | Como o usuário sabe que o registro chegou? | Somente o envelope `applied\|duplicate` do servidor move o item para `confirmado`; a UI exibe estado individual e lista de pendências — nenhum contador mostra "salvo" sem ACK. |
 
 ### 4.2 Consequência explícita da restrição
@@ -199,6 +217,27 @@ Esta ADR adota a interpretação estrita como padrão até que dados de campo
 indiquem o contrário; a redefinição, se ocorrer, registra-se nesta ADR ou numa
 sucessora — nunca como implementação silenciosa.
 
+### 4.3 Recuperação após reinício — identificação por tipo de operação
+
+Após restart, o cliente não possui mais a `idempotency_key` de envios anteriores
+(era estado de memória). A reconciliação ocorre **exclusivamente por consulta
+server-side sobre chaves naturais**, definidas por tipo de operação:
+
+| Tipo de operação | Não enviado (rascunho) | Confirmado | Enviado com resultado incerto |
+|---|---|---|---|
+| `session.open` | Perdido; operador reabre sessão | Sessão ativa aparece na leitura | Consulta: sessão **aberta** para `device_id + actor` — se existir, o envio foi aplicado; se não, reenviar com chave nova |
+| `visit.entry`/`visit.queued` | Perdido; grupo precisa ser re-registrado | Visita aberta aparece na fila/em campo | Consulta: visita **aberta** (`queued|visiting`) para `session + grupo` (chave natural única por sessão+grupo) |
+| `visit.exit` | Perdido | Visita consta `exited` | Consulta: estado da visita aberta do grupo — se ainda `visiting`, o exit não foi aplicado; reenviar |
+| `reservation.check_in`/`check_out` | Perdido | Reserva consta com novo estado | Consulta: reserva do dia para `place + grupo/hóspede`; estado servidor é a verdade |
+| `place.update` (gestor/coordenador) | Perdido | Valor servidor prevalece | Consulta: recurso pelo `place_id` + comparação de `updated_at`/versão |
+| `device.pair` | Perdido | Dispositivo consta pareado | Consulta: dispositivo por `device_id`; se não pareado, novo código |
+
+Requisito derivado para o contrato (#23): **todo comando deve declarar uma chave
+natural consultável** (`GET` por chave natural por tipo) — não basta a consulta
+por `idempotency_key`, que só serve a retries dentro da mesma sessão de memória
+(F3). Sem chave natural definida, um tipo de operação não é recuperável pós-
+restart e isso deve constar como limitação explícita do contrato.
+
 ## 5. Modelo de falhas de conectividade
 
 Estados do cliente (transições observáveis e exibidas na UI):
@@ -213,7 +252,7 @@ CONECTADO ⇄ DEGRADADO → OFFLINE → RECONEXÃO → CONECTADO
 | F1 | Offline antes de enviar | Sem socket/timeout imediato | Enfileira em memória como `pendente`; não inventa resposta | Não recebe nada | Banner "offline"; ação marcada pendente |
 | F2 | Degradado (latência/perda) | Timeout parcial, retries esgotados | Mantém `pendente`, backoff exponencial com jitter, limite de tentativas | Idem | Banner "conexão instável"; pendente visível |
 | F3 | **Timeout após envio** | ACK não recebido; servidor pode ter aplicado | **Não assume falha nem sucesso**: reenvia o mesmo comando com a mesma `idempotency_key` | Dedup por `idempotency_key`: se já aplicado, retorna a confirmação original | Estado permanece `pendente` até confirmação; nunca "salvo" |
-| F4 | Restart com pendentes | Fila vazia após boot | Consulta resultado por chave natural/idempotency conhecida | Responde estado real do recurso | Lista reflete só o confirmado; operador re-submete o que faltar |
+| F4 | Restart com pendentes | Fila e `idempotency_key`s vazias após boot | Consulta resultado **por chave natural** conforme §4.3 (a chave de idempotência foi esquecida) | Responde estado real do recurso | Lista reflete só o confirmado; operador re-submete o que faltar |
 | F5 | Resposta de conflito (estado mudou) | 409/erro de validação | Exibe conflito; não reaplica cegamente | Rejeita com motivo estruturado | Mensagem clara + estado real do servidor |
 | F6 | Offline prolongado | Contagem/idade dos pendentes | Sobe nível de alerta; decisão de continuar coletando é política (§10) | — | Indicador persistente; dados pendentes listáveis |
 | F7 | Reconexão | Primeiro request bem-sucedido | Reenvia pendentes em ordem, um round de sync | Aplica idempotente; emite eventos | Pendentes viram `confirmado` individualmente |
@@ -231,8 +270,9 @@ nenhuma chamada a ambiente operacional foi feita (escopo da #18).
   operação, **antes** do primeiro envio; retry usa a mesma chave. O servidor
   garante unicidade (`idempotency_key` única por ator+dispositivo) e chaves
   naturais únicas (ex.: uma visita aberta por sessão+grupo) como segunda linha.
-- **Consulta de resultado:** `GET` por `idempotency_key` e por chave natural —
-  necessária no F3/F4.
+- **Consulta de resultado:** `GET` por `idempotency_key` (retries na mesma
+  sessão de memória — F3) **e** por chave natural (obrigatória para o F4, pois o
+  cliente esquece a chave de idempotência ao reiniciar — §4.3).
 - **Realtime:** SSE (unidirecional, simples, atravessa proxies) para estados
   operacionais do Hub/TV; WebSocket como alternativa se exigir bidirecional —
   decisão pendente (§10).
@@ -248,12 +288,22 @@ migração é faseada e reversível.
 |---|---|---|
 | 0 — Preservação | Código atual intacto; novo backend provisionado em ambiente descartável (nunca o PocketBase real) | Provisionamento versionado; CI do novo backend verde |
 | 1 — Sombra | App novo escreve no novo backend; PocketBase/Hive continuam operando; comparadores verificam paridade de contagens | Diferenças explicadas em evidência de teste |
-| 2 — Piloto | Um atrativo no novo backend; dados históricos migrados de `visits`/`place_visits`/`reservations` via export (UTC preservado) | Piloto com critérios de aceite de campo definidos em tarefa própria |
+| 2 — Piloto | Um atrativo no novo backend; dados históricos migrados de `visits`/`place_visits`/`reservations` via export (UTC preservado) | Piloto com critérios de aceite de campo definidos em tarefa própria; **caminho de reconciliação piloto→PocketBase testado antes da entrada** (rollback abaixo) |
 | 3 — Cutover | Demais atrativos; PocketBase entra em modo leitura | Nenhum registro divergente por período acordado |
 
-**Rollback:** em qualquer fase ≤2, voltar é ligar de novo o caminho Hive→PocketBase
-(dados nunca deixaram de existir lá). Após cutover, rollback exige exportação
-reversa; por isso o modo leitura do PocketBase é mantido por janela acordada.
+**Rollback — promessa limitada ao que tem caminho definido:**
+
+- **Fases 0–1 (sombra):** totalmente reversível — os registros no backend novo
+  são dados de comparação, descartáveis por desenho; basta religar
+  Hive→PocketBase.
+- **Fase 2 (piloto):** reversível **somente** porque existe caminho de
+  reconciliação definido: exportação dos registros produzidos no backend novo
+  → reimportação no PocketBase/Hive com mapeamento de chaves e UTC preservado,
+  com evidência de contagem reconciliada. **Esse caminho precisa ser construído
+  e testado antes do piloto entrar** — sem ele, a promessa de reversibilidade
+  não vale para a fase 2 e o piloto não deve começar.
+- **Fase 3 (após cutover):** rollback exige exportação reversa completa; por
+  isso o modo leitura do PocketBase é mantido por janela acordada.
 
 ## 8. Contrato de APIs e eventos (esboço, a detalhar na #23)
 
@@ -281,28 +331,33 @@ reversa; por isso o modo leitura do PocketBase é mantido por janela acordada.
 
 ## 10. Decisões pendentes (para aprovação na #2 e correlatas)
 
-1. Opção de backend (A/B/C) e orçamento mensal aprovado.
-2. Política offline: tamanho/limite da fila transitória e comportamento em F6.
-3. Transporte realtime: SSE × WebSocket.
-4. Região/provedor se Postgres gerenciado.
-5. Janela de migração, período de sombra e de modo-leitura do PocketBase.
-6. Matriz de acesso (#19→#13) e modelo de provisionamento de credenciais (#24).
-7. Contrato canônico de sessão/eventos (#23).
-8. Requisito de continuidade mínima offline — inclui o teste de campo da restrição
-   "sem banco local" conforme a tensão bibliográfica da #2 e a bifurcação da §4.2.
-9. Tolerância concreta a interrupções — depende do inventário de campo (#15):
-   cobertura real por atrativo, duração típica das interrupções e rotina de
-   sincronização dos operadores; itens sem evidência nas fontes acessíveis ficam
-   como perguntas territoriais para a equipe.
-10. Requisitos da frente de cartografia social — permanecem fora do escopo desta
-    ADR; uma ADR própria deverá avaliá-la, pois a necessidade histórica de
-    operação offline dessa frente pode divergir da interpretação estrita.
+Decisões **separadas** — cada uma pode ser aprovada/rejeitada isoladamente;
+
+a integração deste documento `PROPOSED` não aprova nenhuma delas:
+
+| # | Decisão | Conteúdo a aprovar | Consequência de cada via |
+|---|---|---|---|
+| D-A | **Escolha da arquitetura** | Opção A/B/C conforme §3 | A: menor custo/prazo, contrato implícito; B: durabilidade gerenciada, custo contínuo e latência por região; C (recomendada): contrato explícito e continuidade, mais superfície operacional |
+| D-B | **Comportamento durante interrupções** | Política F1–F7: fila transitória em memória, limites de retry/backoff e comportamento em F6 | Aprovar: pendências nunca parecem salvas; rejeitar/alterar: redefine UX de campo |
+| D-C | **Aceitação operacional da perda de rascunhos** | Interpretação estrita da §4.2: restart perde rascunhos/pendentes; recuperação só por chave natural (§4.3) | Aprovar: restrição mantida integralmente; escolher exceção nomeada: redefine a restrição "sem banco local" antes de qualquer código |
+| D-D | **Orçamento e provedor** | Teto mensal e provedor/região (tabela de custos §3) | Orçamento do projeto não autoriza; sem aprovação específica, nenhum provisionamento ocorre |
+| D-E | **Autorização de provisionamento/migração** | Início das fases 0–3 da §7 em ambiente descartável; piloto só com reconciliação testada | Autorizar: trabalho de implementação pode começar na fase 0; negar/adiar: sistema segue no baseline |
+| D-F | Transporte realtime | SSE × WebSocket (§6) | SSE recomendado por simplicidade/proxy; WS se exigir bidirecional |
+| D-G | Janelas de migração | Período de sombra, de piloto e de modo-leitura do PocketBase | Define cronograma de cutover e janela de rollback |
+| D-H | Tolerância concreta a interrupções | Depende do inventário de campo (#15): cobertura real, duração das interrupções, rotina de sync — itens sem evidência seguem como perguntas territoriais para a equipe | Alimenta D-C e os critérios de aceite do piloto |
+| D-I | Frente de cartografia social | Fora do escopo desta ADR; exige ADR própria (necessidade histórica offline pode divergir da interpretação estrita) | Mantém domínios separados conforme governança |
+
+Decisões transversais em outras issues: matriz de acesso (#19→#13), provisionamento de credenciais (#24), contrato canônico de sessão/eventos (#23) — este último deve incorporar a exigência de chave natural consultável por operação (§4.3).
 
 ## 11. Validação desta entrega
 
 - Links internos revisados; diagrama referenciado: [`0001-c4-container.md`](./0001-c4-container.md).
 - Tabela de cenários de falha em §5; nenhuma chamada a ambiente operacional.
 - Status `PROPOSED`; nenhuma mudança funcional, de schema ou de credencial foi feita.
+- Revisão 2026-10-06 (2ª rodada): recuperação pós-restart corrigida para chave
+  natural por tipo de operação (§4.3) — a idempotency_key se perde com a memória;
+  rollback do piloto condicionado a reconciliação testada (§7); decisões
+  separadas D-A–D-I (§10); justificativa da recomendação sem "única opção".
 - Revisão 2026-10-06: incorporados inputs do mantenedor — contexto institucional
   (NERUDS/UFT, REDE DESER, Mateiros/São Félix), duas frentes do projeto,
   respostas às perguntas de campo (§4.1), consequência explícita da restrição
