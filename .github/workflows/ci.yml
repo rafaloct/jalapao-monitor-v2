@@ -1,0 +1,91 @@
+# CI minimo — issue #21, conforme plano aprovado (CI_PLAN §4, issue #3).
+# Flutter 3.29.3 pinado: unica combinacao SDK/lock comprovada (Via A):
+# `flutter pub get` deixa pubspec.lock imutavel e 35/35 testes passam.
+# Ratchets de analyze/format sao limiares explicitos versionados, nao
+# continue-on-error. Nenhum check se autodeclara obrigatorio: nomes/origem
+# sao documentados em tooling/ci/README.md para exigencia administrativa.
+name: ci
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  flutter-unit:
+    name: ci/flutter-unit
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.29.3'
+          channel: stable
+          cache: true
+      - name: deps reproduziveis — lock imutavel (Via A)
+        run: ./tooling/ci/lock_check.sh
+      - name: testes unitarios de modelos
+        run: flutter test test/models
+
+  flutter-analyze:
+    name: ci/flutter-analyze
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.29.3'
+          channel: stable
+          cache: true
+      - run: flutter pub get
+      - name: analyze com ratchet (baseline 103)
+        run: ./tooling/ci/analyze_ratchet.sh
+
+  dart-format:
+    name: ci/dart-format
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.29.3'
+          channel: stable
+          cache: true
+      - run: flutter pub get
+      - name: format com ratchet (baseline 24 arquivos)
+        run: ./tooling/ci/format_ratchet.sh
+
+  docs-integrity:
+    name: ci/docs-integrity
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: diff sem erros de whitespace
+        run: git diff --check origin/main...HEAD
+
+  secrets-scan:
+    name: ci/secrets-scan
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: gitleaks/gitleaks-action@v2
+        env:
+          GITLEAKS_ENABLE_COMMENTS: 'false'
+          GITLEAKS_ENABLE_SUMMARY: 'false'
