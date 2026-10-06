@@ -51,8 +51,8 @@ Legenda de ações: `C`=criar, `R`=ler, `U`=atualizar, `X`=excluir, `A`=aprovar/
 | `place_visits`/`visits` registrar fluxo | C,U(atr) T1 | — | R(ter) T3 | — | — | — | — | R(ter) |
 | `place_visits`/`visits` ler operacional | R(atr) T1 | R(emp) T2 | R(ter) T3 | R(agg) T4 | — | R(agg,atr) T6 | — | R(ter) |
 | `reservations` criar/check-in/out | C,U(atr) T1 | C,U(emp) T2 | R(ter) T3 | — | C,U(self) T5 | — | R(self) T7 | R(ter) |
-| `reservations` PII (nome/telefone) | R(atr) T1 | R(emp) T2 | R(ter) T3 | — | R(self) T5 | — | — T7 | R(ter) |
-| API de comandos (alvo #18) | executar(atr) T1 | executar(emp) T2 | R(ter) | — | executar(self) T5 | — | executar(self) T7 | R(ter) |
+| `reservations` PII (nome/telefone) | R(atr) T1 | R(emp) T2 | R(ter) T3 | — | R(self)¹ T5 | — | — T7 | R(ter) |
+| API de comandos (alvo #18) | executar(atr) T1 | executar(emp) T2 | R(ter) | — | executar(self) T5 | — | — (auto-serviço só após desenho do #5 — D7) | R(ter) |
 | Eventos realtime operacionais | S(atr) T1 | S(emp) T2 | S(ter) T3 | — | — | S(agg,atr) T6 | — | S(ter) |
 | Hub dashboard | — | R(emp) T2 | R(ter) T3 | — | — | — | — | R(ter) |
 | Exportação CSV completa (D:operacional+pii) | — | E(emp) T2 | E(ter) T3 | — | — | — | — | E(ter) |
@@ -61,7 +61,12 @@ Legenda de ações: `C`=criar, `R`=ler, `U`=atualizar, `X`=excluir, `A`=aprovar/
 | QR/voucher (futuro #5) | emitir(atr) | emitir(emp) | R(ter) | — | emitir(emp) T5 | — | apresentar(self) T7 | R(ter) |
 | Impressora térmica (futuro #6) | imprimir(atr) T1 | imprimir(emp) | — | — | — | — | receber via operador T7 | — |
 | Mídia/snapshots (futuro #10) | capturar sob consentimento | — | R(ter, política) | R(minimizada) | — | — | consultar própria (direito) | administrar retenção |
+| `devices` cadastro/pareamento/revogação | — | — | C,U(ter) T9 | — | — | — | — | A(ter) T9 |
 | Administração backend (regras, backups, usuários) | — | — | — | — | — | — | — | A(ter) T8 |
+
+¹ `R(self)` na linha de PII restringe-se a nome/telefone **dentro das reservas
+criadas pela própria agência/guia** (dado que ela mesma informou no ato da
+reserva). PII fora desse escopo é proibida — ver N3.
 
 ## 4. Casos negativos explícitos
 
@@ -69,7 +74,7 @@ Legenda de ações: `C`=criar, `R`=ler, `U`=atualizar, `X`=excluir, `A`=aprovar/
 |---|---|---|
 | N1 | Operador lê/escreve atrativo que não é o seu | T1 |
 | N2 | Gerente acessa dados de outro empreendimento | T2 |
-| N3 | Turista/agência/TV recebe `guest_name`, `contact_phone` ou `owner_phone` | T5–T7 |
+| N3 | Turista/TV recebe qualquer PII; agência recebe `guest_name`/`contact_phone` **fora** das reservas próprias (`self`) | T5–T7 |
 | N4 | Pesquisador exporta PII operacional | T4 |
 | N5 | Agência edita reserva que não é sua (`self`) | T5 |
 | N6 | Display/TV recebe registro individual ou PII | T6 |
@@ -120,7 +125,7 @@ Proposta para substituir o modelo atual — nada embarcado no APK concede privil
 | T6 | TV assina feed do atrativo; feed não contém registro individual nem PII | linha display_tv; N6 |
 | T7 | Turista via token de voucher lê próprio status; enumera tokens alheios e endpoints internos | linha turista; N3, N7, N9 |
 | T8 | Dispositivo sem token válido tenta escrever; papel comum tenta alterar regra/backup | linha admin; N8, N10 |
-| T9 | Tablet pareado é revogado; token seguinte é rejeitado e re-pareamento emite novo | §5 provisionamento |
+| T9 | Coordenador/admin cadastra dispositivo e emite código de pareamento; tablet pareado é revogado; token seguinte é rejeitado e re-pareamento emite novo | linha `devices`; §5 provisionamento |
 | T10 | Operação em modo offline nunca marca item como salvo sem confirmação (cruza com ADR §5) | integridade transacional |
 
 ## 8. Decisões pendentes que exigem responsável (sem aprovação inventada)
