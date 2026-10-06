@@ -64,6 +64,61 @@ Os comandos abaixo são **candidatos**, sujeitos à reprodução e ao ajuste de 
 
 Build debug ou release com chave debug serve apenas ao objetivo de validação declarado. Não comprova assinatura de distribuição nem prontidão de produção.
 
+### 4.1 Matriz concreta de verificações (fechamento da #20)
+
+Comandos, triggers, ambientes e evidência real — fundamentação em
+[`docs/evidence/CI_BASELINE.md`](../evidence/CI_BASELINE.md) e no baseline
+executado da #17 (PR #27). "Gate" = obrigatório somente após execução comprovada
+e configuração lida de volta (§6).
+
+| Componente | Comando real | Trigger proposto | Ambiente | Evidência | Estado/condição |
+|---|---|---|---|---|---|
+| Flutter, deps | `flutter pub get` | `pull_request`, `push→main` | `ubuntu-latest` + Flutter 3.44.9 pinado | Exit 0 (PR #27) | Pronto — compõe gate 1 |
+| Flutter, unidade | `flutter test test/models` | `pull_request`, `push→main` | idem | 35/35 PASS (PR #27) | **Gate 1** — candidato a check obrigatório `ci/flutter-unit` |
+| Flutter, análise | `flutter analyze` | `pull_request` | idem | Exit 1, 104 achados pré-existentes | Job real sem `continue-on-error`; ratchet falha se achados >104; obrigatório após dívida zerada |
+| Flutter, formato | `dart format --output=none --set-exit-if-changed lib test integration_test` | `pull_request` | idem | `NOT_RUN`; dívida presumida | Mesmo regime do analyze |
+| Flutter, reprodutibilidade do lock | `flutter pub get && git diff --exit-code pubspec.lock` | `pull_request` | idem | Falharia hoje (re-resolve 10 pins) | Só após tarefa de reconciliação lock×SDK |
+| Documentação/diff | `git diff --check` + checagem de links locais | `pull_request` | `ubuntu-latest` | `diff --check` observado limpo | Gate simples na #21; ferramenta de links a definir (candidato: lychee) |
+| Segurança, secrets | `gitleaks detect` (candidato) | `pull_request` | `ubuntu-latest` | Pendente | Adoção na #21 com política de saída sanitizada |
+| Android, build | `./gradlew assembleDebug` (após wrapper versionado) | `pull_request` | Runner com Android SDK | `BLOCKED` | Condição: wrapper e SDK reproduzíveis |
+| Hub | `npm ci && npm run lint/typecheck/test/build` (conforme scripts reais) | `pull_request` | `ubuntu-latest` + Node 24 | `BLOCKED` | Só após #22 recuperar scaffold; não inventar scripts |
+| Contratos | Validação de schema/OpenAPI + exemplos | `pull_request` | `ubuntu-latest` | Pendente | Após #18/#19/#23 aprovadas |
+| Integração | Cenários isolados c/ backend efêmero | `pull_request` (estágio posterior) | Container PocketBase descartável + dados sintéticos | `BLOCKED` | Condições do §5; assertions e timeout explícitos; nenhum endpoint operacional |
+
+Nenhum `continue-on-error`, check vazio ou exclusão de teste para encobrir falha.
+Falha pré-existente vira tarefa delimitada própria — nunca é "corrigida de
+escondido" dentro de outro PR.
+
+### 4.2 Tratamento de falhas preexistentes e ratchet
+
+- Jobs de analyze/format executam de verdade (exit code real registrado em log),
+  mas só viram **checks obrigatórios** quando a dívida estiver zerada ou o
+  mantenedor aprovar o regime de ratchet.
+- Ratchet = o job falha se o número de achados exceder o baseline registrado
+  (hoje 104). Não é `continue-on-error`: é limiar explícito, versionado e revisável.
+- `flutter analyze` **nunca** é substituído por subset ou `--no-fatal-*` para
+  fingir verde; a dívida aparece no relatório do job.
+
+### 4.3 Política de segurança de Actions
+
+- `permissions:` no topo do workflow com `contents: read`; escopo elevado só por
+  job e quando justificado.
+- `pull_request` (não `pull_request_target`) para executar código de PR — token
+  sem privilégio de escrita no contexto de PR.
+- Nenhum secret de produção em jobs; ambiente de teste usa apenas credenciais
+  sintéticas locais.
+- Ações de terceiros pinadas por SHA/tag estável (`subosito/flutter-action`,
+  `actions/checkout`, `gitleaks/gitleaks-action` conforme adoção).
+- `concurrency` por ref com `cancel-in-progress` e `timeout-minutes` por job.
+- Logs sanitizados: nenhum PIN/token/endpoint operacional impresso.
+
+### 4.4 Nomes de job e checks
+
+Nomes únicos e estáveis (o nome do check é o do job): `ci/flutter-unit`,
+`ci/flutter-analyze`, `ci/dart-format`, `ci/docs-integrity`, `ci/secrets-scan`,
+`ci/integration-ephemeral`. Check obrigatório só é configurado para nome
+**observado rodando** no evento correto — nenhum required check fictício (§6).
+
 ## 5. Integração: bloqueio atual e caminho para habilitar
 
 Os quatro cenários atuais de `integration_test/` iniciam o aplicativo com Hive e providers reais. Há sincronização ao iniciar, chamadas a `pumpAndSettle` e poucos resultados verificados por assertions. Os scripts e guias também referenciam backend existente.
@@ -116,3 +171,24 @@ Nunca registrar PINs, tokens, senhas, dumps reais ou logs integrais com dados pe
 A #20 pode fechar quando o baseline executado da #17 estiver registrado, os comandos iniciais e seus triggers estiverem definidos, os bloqueios do Hub/Android/integração estiverem explícitos e a #21 tiver escopo e aceite executáveis.
 
 A #21 só pode declarar CI entregue com workflows reais, execuções comprovadas e resultado verificado no GitHub. Proteção de branch, Projects, aprovação arquitetural e prontidão de produção são estados distintos e devem ser reportados separadamente.
+
+## 9. Estado do fechamento (#20) e promoção
+
+O fechamento da elaboração ficou assim — **o plano ainda exige aprovação humana
+antes de a #21 implementar workflows**:
+
+| Critério da #20 | Estado |
+|---|---|
+| Baseline da #17 registrado | Feito — [`docs/evidence/CI_BASELINE.md`](../evidence/CI_BASELINE.md) |
+| Comandos reais e triggers definidos | Feito — §4.1 |
+| Bloqueios Hub/Android/integração explícitos | Feito — §4.1, §5 e CI_BASELINE §3 |
+| Mínimo compatível × versão testada | Feito — CI_BASELINE §2 |
+| Tratamento de falha preexistente | Feito — §4.2 (ratchet; sem `continue-on-error`) |
+| Segurança de Actions | Feito — §4.3 |
+| Nomes únicos/estáveis de job | Feito — §4.4 |
+| Revisão humana do plano | **Pendente** — pré-condição da #21 |
+
+Critérios de promoção: o plano sai de proposta quando Rafael aprovar em revisão;
+o primeiro required check (`ci/flutter-unit`) só é configurado após execução
+verde comprovada no GitHub; cada componente bloqueado entra no gate quando a
+condição da sua linha em §4.1 for comprovada em tarefa própria — nunca antes.
