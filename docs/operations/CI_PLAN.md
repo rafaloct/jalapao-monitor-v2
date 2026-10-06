@@ -116,4 +116,3 @@ Nunca registrar PINs, tokens, senhas, dumps reais ou logs integrais com dados pe
 A #20 pode fechar quando o baseline executado da #17 estiver registrado, os comandos iniciais e seus triggers estiverem definidos, os bloqueios do Hub/Android/integração estiverem explícitos e a #21 tiver escopo e aceite executáveis.
 
 A #21 só pode declarar CI entregue com workflows reais, execuções comprovadas e resultado verificado no GitHub. Proteção de branch, Projects, aprovação arquitetural e prontidão de produção são estados distintos e devem ser reportados separadamente.
-
