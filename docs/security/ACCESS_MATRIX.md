@@ -134,3 +134,12 @@ Proposta para substituir o modelo atual — nada embarcado no APK concede privil
 | D5 | Aprovação desta matriz (versão/commit) e do modelo de provisionamento §5 | #13, depois #24 |
 | D6 | MFA para `admin`/`coordenador`; política de sessão/token | #13 |
 | D7 | Prazo de validade e escopo dos tokens públicos (QR); turista é leitura `self` — auto-reserva via QR (epic #5) só após desenho com confirmação do operador | #5 |
+
+**Contexto institucional (inputs do mantenedor, 2026-10-06):** o projeto atua no
+âmbito UFT/NERUDS (Edital 02/2024 FAPT/SEPLAN, REDE DESER), com referência
+acadêmica de Cleiton Milagres. **Nenhuma das decisões D1–D4 foi atribuída
+automaticamente** a pesquisador ou orientador: a atribuição formal de
+responsabilidade por proteção de dados, a base legal e os prazos de retenção
+exigem validação da instância competente (UFT/NERUDS e, se aplicável, assessoria
+jurídica). O agente pode preparar a minuta de perguntas e organizar finalidades
+e categorias de dados; a aprovação é humana e institucional.
