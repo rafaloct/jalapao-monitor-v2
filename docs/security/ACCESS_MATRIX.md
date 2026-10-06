@@ -28,7 +28,7 @@
 |---|---|---|
 | `publico` | Nome do local, tipo, capacidade, ocupação/status agregado, horário | `places.name/type/capacity_total/operating_hours`, status de fila agregado |
 | `operacional` | Eventos de fluxo, tempos, pax, notas operacionais | `visits`, `place_visits`, `reservations` (sem contato) |
-| `pii` | Identificadores de pessoa | `reservations.guest_name`, `reservations.contact_phone`, `places.owner_name`, `places.contact_phone` |
+| `pii` | Identificadores de pessoa | `reservations.guest_name`, `reservations.contact_phone`, `places.owner_name`, `places.contact_phone`, `visits.group_name`, `place_visits.group_name`, `reservations.notes` (campos livres que **podem conter nomes/telefones** — tratar como PII até minimização declarada) |
 | `pesquisa` | Dados para estudo, preferencialmente agregados/anonimizados | `origin_city`, séries temporais agregadas |
 | `admin` | Credenciais, tokens, regras, backups | Secrets, tokens de sessão, exports completos |
 
@@ -45,11 +45,12 @@ Legenda de ações: `C`=criar, `R`=ler, `U`=atualizar, `X`=excluir, `A`=aprovar/
 | Recurso / ação | operador | gerente | coordenador | pesquisador | agencia_guia | display_tv | turista | admin |
 |---|---|---|---|---|---|---|---|---|
 | `places` catálogo público (D:publico) | R(atr) T1 | R(emp) T2 | R(ter) T3 | R(ter) T4 | R(agg) T5 | R(atr) T6 | R(atr) T7 | R(ter) |
-| `places` criar/editar cadastro | — | C,U(emp) T2 | A(ter) T3 | — | — | — | — | A(ter) |
+| `places` criar/editar cadastro | — | C,U(emp) **exceto `status`/`approved_at`** T2 | A(ter) T3 | — | — | — | — | A(ter) |
+| `places` alterar `status`/`approved_at` | — | — | A(ter) T3 | — | — | — | — | A(ter) |
 | `places` aprovar/rejeitar | — | — | A(ter) T3 | — | — | — | — | A(ter) |
 | `place_visits`/`visits` registrar fluxo | C,U(atr) T1 | — | R(ter) T3 | — | — | — | — | R(ter) |
 | `place_visits`/`visits` ler operacional | R(atr) T1 | R(emp) T2 | R(ter) T3 | R(agg) T4 | — | R(agg,atr) T6 | — | R(ter) |
-| `reservations` criar/check-in/out | C,U(atr) T1 | C,U(emp) T2 | R(ter) T3 | — | C,U(self) T5 | — | C(self) T7 | R(ter) |
+| `reservations` criar/check-in/out | C,U(atr) T1 | C,U(emp) T2 | R(ter) T3 | — | C,U(self) T5 | — | R(self) T7 | R(ter) |
 | `reservations` PII (nome/telefone) | R(atr) T1 | R(emp) T2 | R(ter) T3 | — | R(self) T5 | — | — T7 | R(ter) |
 | API de comandos (alvo #18) | executar(atr) T1 | executar(emp) T2 | R(ter) | — | executar(self) T5 | — | executar(self) T7 | R(ter) |
 | Eventos realtime operacionais | S(atr) T1 | S(emp) T2 | S(ter) T3 | — | — | S(agg,atr) T6 | — | S(ter) |
@@ -132,4 +133,4 @@ Proposta para substituir o modelo atual — nada embarcado no APK concede privil
 | D4 | Direitos do titular (acesso/correção/exclusão) e prazo de resposta | #13 |
 | D5 | Aprovação desta matriz (versão/commit) e do modelo de provisionamento §5 | #13, depois #24 |
 | D6 | MFA para `admin`/`coordenador`; política de sessão/token | #13 |
-| D7 | Prazo de validade e escopo dos tokens públicos (QR) | #5 |
+| D7 | Prazo de validade e escopo dos tokens públicos (QR); turista é leitura `self` — auto-reserva via QR (epic #5) só após desenho com confirmação do operador | #5 |
