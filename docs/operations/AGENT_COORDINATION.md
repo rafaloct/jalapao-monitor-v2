@@ -22,7 +22,10 @@ Labels complementares não substituem o estado:
 
 - `human-gate`: decisão humana pendente, com pergunta exata, responsável e origem do requisito.
 - `agent:merge-candidate`: indicação de prontidão técnica/revisão, sem autorizar integração.
-- `agent:executor:any`: tarefa sem executor escolhido; depois do claim pode virar `agent:executor:devin` ou `agent:executor:cursor`.
+- `agent:executor:any`: tarefa sem executor escolhido; depois do claim pode virar `agent:executor:devin`, `agent:executor:cursor` ou `agent:executor:codex`.
+
+Coordenação multi-agente (Codex cloud, relay de entregas, invocação por `@codex`):
+[AGENT_A2A.md](AGENT_A2A.md).
 - `priority:p0`, `priority:p1`, `priority:p2`: ordenar dentro do milestone; não ignorar dependências.
 - `type:task`, `type:epic`, `type:decision`, `type:roadmap`: separar execução de planejamento.
 
