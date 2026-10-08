@@ -1,0 +1,27 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #FBE9E7;
+  --foreground: #3E2723;
+  --card: #FFFFFF;
+  --primary: #D87D4A;
+  --secondary: #00ACC1;
+  --border: #D7CCC8;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+}
+
+.premium-card {
+  @apply bg-white border border-[#D7CCC8] rounded-2xl shadow-lg transition-all hover:shadow-xl hover:border-[#D87D4A]/50;
+}
+
+.glass {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
