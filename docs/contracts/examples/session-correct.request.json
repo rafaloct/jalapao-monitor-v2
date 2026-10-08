@@ -1,0 +1,14 @@
+{
+  "schema_version": "1.0.0",
+  "command": "session.correct",
+  "idempotency_key": "4d5e6f7a-bbbb-4ccc-9ddd-333333333333",
+  "actor_id": "act_coord_synth",
+  "device_id": "dev_coord_synth",
+  "occurred_at": "2026-10-08T14:02:30Z",
+  "payload": {
+    "supersedes_event_id": "9a7c6d5e-1111-4eee-9fff-222222222222",
+    "field": "place_id",
+    "value": "plc_synth02",
+    "reason": "local selecionado incorreto na abertura"
+  }
+}

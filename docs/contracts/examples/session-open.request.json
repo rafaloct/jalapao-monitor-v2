@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.0.0",
+  "command": "session.open",
+  "idempotency_key": "3f8b2c1a-aaaa-4bbb-8ccc-111111111111",
+  "actor_id": "act_synth01",
+  "device_id": "dev_synth01",
+  "occurred_at": "2026-10-08T13:10:00Z",
+  "payload": {
+    "place_id": "plc_synth01",
+    "shift": "morning"
+  }
+}

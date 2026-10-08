@@ -1,0 +1,9 @@
+{
+  "event_id": "9a7c6d5e-1111-4eee-9fff-222222222222",
+  "status": "applied",
+  "server_timestamp": "2026-10-08T13:10:04Z",
+  "entity": "monitoring_session",
+  "entity_id": "ses_synth01",
+  "version": 1,
+  "error": null
+}

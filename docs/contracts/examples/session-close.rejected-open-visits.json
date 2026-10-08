@@ -1,0 +1,15 @@
+{
+  "event_id": "00000000-0000-4000-8000-000000000000",
+  "status": "rejected",
+  "server_timestamp": "2026-10-08T17:55:12Z",
+  "entity": "monitoring_session",
+  "entity_id": "ses_synth01",
+  "version": 1,
+  "error": {
+    "code": "SESSION_HAS_OPEN_VISITS",
+    "message": "Sessao possui visitas em aberto (queued|visiting)",
+    "details": {
+      "open_visit_ids": ["vis_synth07", "vis_synth09"]
+    }
+  }
+}
