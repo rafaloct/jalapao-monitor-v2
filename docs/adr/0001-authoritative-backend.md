@@ -6,9 +6,8 @@
 - **Data:** 2026-10-06
 - **Tarefa de elaboração:** [Issue #18](https://github.com/rafaloct/jalapao-monitor-v2/issues/18)
 - **Base de evidência:** `main @ a6d9bfe1507f9d75e6d4a872c17501c435204634`;
-  execução do baseline registrada em `docs/evidence/BASELINE_EXECUTION.md`
-  (entregue no [PR #27](https://github.com/rafaloct/jalapao-monitor-v2/pull/27),
-  ainda em revisão — não presume integração).
+  execução do baseline registrada em [`docs/evidence/BASELINE_EXECUTION.md`](../evidence/BASELINE_EXECUTION.md)
+  ([PR #27](https://github.com/rafaloct/jalapao-monitor-v2/pull/27), integrado).
 - **Decisões transversais pendentes:** matriz de acesso/ameaças (#19, aprovação na
   #13), contrato canônico de sessão (#23), remoção do fallback de credencial (#24),
   plano de CI (#20/#21).
@@ -48,11 +47,13 @@ backend a única fonte autoritativa, **sem esconder o risco da conectividade**.
 
 A revisão citada na #2 sustenta arquiteturas distribuídas e processamento próximo
 da fonte (Kumar & Vaishnava, 2025, DOI 10.1109/MRIE66930.2025.11156708;
-Hernández-Cabrera et al., 2024, DOI 10.1007/978-3-031-52607-7_13), mas **recomenda
-explicitamente considerar operação offline e sincronização posterior** em destinos
-remotos. Portanto "sem banco local" é tratado aqui como **restrição de produto a
-testar**, não como recomendação da literatura: esta ADR precisa demonstrar
-integridade transacional, UX honesta e continuidade operacional sob essa restrição.
+Hernández-Cabrera et al., 2024, DOI 10.1007/978-3-031-52607-7_13). A recomendação
+de operar offline com sincronização posterior **não consta dessas referências** —
+é uma exigência específica deste projeto, derivada das condições de conectividade
+do Jalapão e da frente de cartografia (§1). Portanto "sem banco local" é tratado
+aqui como **restrição de produto a testar**, não como recomendação da literatura:
+esta ADR precisa demonstrar integridade transacional, UX honesta e continuidade
+operacional sob essa restrição.
 
 ### Requisito crítico (da #2)
 
@@ -226,7 +227,7 @@ server-side sobre chaves naturais**, definidas por tipo de operação:
 | Tipo de operação | Não enviado (rascunho) | Confirmado | Enviado com resultado incerto |
 |---|---|---|---|
 | `session.open` | Perdido; operador reabre sessão | Sessão ativa aparece na leitura | Consulta: sessão **aberta** para `device_id + actor` — se existir, o envio foi aplicado; se não, reenviar com chave nova |
-| `visit.entry`/`visit.queued` | Perdido; grupo precisa ser re-registrado | Visita aberta aparece na fila/em campo | Consulta: visita **aberta** (`queued|visiting`) para `session + grupo` (chave natural única por sessão+grupo) |
+| `visit.entry`/`visit.queued` | Perdido; grupo precisa ser re-registrado | Visita aberta aparece na fila/em campo | Consulta: visita **aberta** (`queued|visiting`) para `session + group_id` — `group_id` é identificador estável, único e **visível ao operador**, atribuído na criação; o nome de exibição não serve de chave (ver §6) |
 | `visit.exit` | Perdido | Visita consta `exited` | Consulta: estado da visita aberta do grupo — se ainda `visiting`, o exit não foi aplicado; reenviar |
 | `reservation.check_in`/`check_out` | Perdido | Reserva consta com novo estado | Consulta: reserva do dia para `place + grupo/hóspede`; estado servidor é a verdade |
 | `place.update` (gestor/coordenador) | Perdido | Valor servidor prevalece | Consulta: recurso pelo `place_id` + comparação de `updated_at`/versão |
@@ -269,13 +270,33 @@ nenhuma chamada a ambiente operacional foi feita (escopo da #18).
 - **Idempotency:** o cliente gera `idempotency_key` (UUID v4) por intenção de
   operação, **antes** do primeiro envio; retry usa a mesma chave. O servidor
   garante unicidade (`idempotency_key` única por ator+dispositivo) e chaves
-  naturais únicas (ex.: uma visita aberta por sessão+grupo) como segunda linha.
+  naturais únicas como segunda linha.
+- **Chave natural de visita:** a identidade de recuperação de um grupo é
+  `session + group_id`, onde `group_id` é um identificador estável, único por
+  sessão e **visível ao operador** (ex.: código sequencial `G07` atribuído pelo
+  servidor na confirmação, ou UUID curto gerado na criação e exibido na UI).
+  O nome de exibição do grupo **não** é chave: pode ser vazio ou repetido — no
+  baseline, `PlaceProvider._randomGroupName` preenche nomes ausentes a partir
+  de apenas dez rótulos aleatórios, o que colidiria sob a regra de unicidade e
+  quebraria a recuperação F4. Esse fallback de rótulos não migra para o alvo.
 - **Consulta de resultado:** `GET` por `idempotency_key` (retries na mesma
   sessão de memória — F3) **e** por chave natural (obrigatória para o F4, pois o
   cliente esquece a chave de idempotência ao reiniciar — §4.3).
 - **Realtime:** SSE (unidirecional, simples, atravessa proxies) para estados
-  operacionais do Hub/TV; WebSocket como alternativa se exigir bidirecional —
+  operacionais do Hub; WebSocket como alternativa se exigir bidirecional —
   decisão pendente (§10).
+- **Projeção pública separada:** a TV/display público **não** assina o stream
+  operacional — o envelope de eventos (§8) carrega `actor`, `device_id` e
+  `idempotency_key`, que não são dados públicos. O servidor publica um feed
+  sanitizado com apenas ocupação/fila, **mais snapshot inicial** (`GET` da
+  projeção pública) ou cursor de replay, pois eventos são incrementais: um
+  display que conecta após registros existentes precisa reconstruir o estado
+  atual sem depender de mutações futuras.
+- **Exportação de pesquisa de-identificada:** o pesquisador não recebe acesso
+  à API geral — `places` e `reservations` contêm nomes e telefones de
+  proprietários/hóspedes. A exportação usa endpoint dedicado que projeta
+  agregados de-identificados; a fronteira de autorização segue a matriz #19
+  (gate #13).
 - **Confirmação server-side:** somente o `200`+envelope `applied|duplicate` move
   o item de `pendente` para `confirmado`.
 
@@ -288,7 +309,7 @@ migração é faseada e reversível.
 |---|---|---|
 | 0 — Preservação | Código atual intacto; novo backend provisionado em ambiente descartável (nunca o PocketBase real) | Provisionamento versionado; CI do novo backend verde |
 | 1 — Sombra | App novo escreve no novo backend; PocketBase/Hive continuam operando; comparadores verificam paridade de contagens | Diferenças explicadas em evidência de teste |
-| 2 — Piloto | Um atrativo no novo backend; dados históricos migrados de `visits`/`place_visits`/`reservations` via export (UTC preservado) | Piloto com critérios de aceite de campo definidos em tarefa própria; **caminho de reconciliação piloto→PocketBase testado antes da entrada** (rollback abaixo) |
+| 2 — Piloto | Um atrativo no novo backend; dados históricos migrados de `places`/`visits`/`place_visits`/`reservations` via export (UTC preservado), com mapeamento de IDs de `places` (referenciadas por `place_id`) e **deduplicação de pares `visits`↔`place_visits`** originados do mesmo registro legado (`DashboardScreen` cria `place_visit` a partir do `Visit` ao entrar na água — importar os dois datasets sem o mapeamento conta as mesmas pessoas duas vezes) | Piloto com critérios de aceite de campo definidos em tarefa própria; **caminho de reconciliação piloto→PocketBase testado antes da entrada** (rollback abaixo), incluindo evidência de que a deduplicação legado↔v2 fecha as contagens |
 | 3 — Cutover | Demais atrativos; PocketBase entra em modo leitura | Nenhum registro divergente por período acordado |
 
 **Rollback — promessa limitada ao que tem caminho definido:**
@@ -313,6 +334,11 @@ migração é faseada e reversível.
   entered/exited`, `reservation.checked_in/out`, `place.updated` — envelope com
   `event_id`, `schema_version`, `occurred_at` (UTC), `actor`, `device_id`,
   `idempotency_key`.
+- **Projeções por audiência:** o envelope acima é o stream **operacional** (Hub,
+  app). A projeção **pública** (TV) exclui `actor`, `device_id` e
+  `idempotency_key` e oferece snapshot inicial + stream incremental ou cursor de
+  replay (§6). A exportação de **pesquisa** é endpoint dedicado com projeção
+  de-identificada — não é acesso geral à API (§6).
 - Autorização por papel conforme matriz #19 (pendente de aprovação na #13).
 - Contratos de **monitoramento** não cobrem cartografia — domínio separado.
 
@@ -354,6 +380,14 @@ Decisões transversais em outras issues: matriz de acesso (#19→#13), provision
 - Links internos revisados; diagrama referenciado: [`0001-c4-container.md`](./0001-c4-container.md).
 - Tabela de cenários de falha em §5; nenhuma chamada a ambiente operacional.
 - Status `PROPOSED`; nenhuma mudança funcional, de schema ou de credencial foi feita.
+- Revisão 2026-10-08 (3ª rodada, achados de revisão do PR #28): evidência de
+  baseline referenciada já integrada; atribuição à literatura corrigida —
+  operação offline é requisito do projeto, não das fontes citadas; chave
+  natural de visitas redefinida como `session + group_id` único e visível (o
+  fallback de dez rótulos aleatórios do baseline não serve de identidade);
+  fase 2 passa a incluir `places`, deduplicação `visits`↔`place_visits` e
+  reconciliação de contagens; §6/§8 definem projeção pública sanitizada com
+  snapshot inicial e exportação de pesquisa de-identificada.
 - Revisão 2026-10-06 (2ª rodada): recuperação pós-restart corrigida para chave
   natural por tipo de operação (§4.3) — a idempotency_key se perde com a memória;
   rollback do piloto condicionado a reconciliação testada (§7); decisões

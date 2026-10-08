@@ -15,7 +15,7 @@ C4Container
     Person(coord, "Coordenador territorial", "Dashboard Hub")
 
     Container(app, "App Flutter", "Flutter + Hive + Provider", "Offline-first: grava local, sync 30s")
-    ContainerDb(hive, "Hive", "Store local durável", "places, place_visits, reservations, config")
+    ContainerDb(hive, "Hive", "Store local durável", "places, visits (legado), place_visits, reservations, config")
     System_Boundary(vps, "VPS existente") {
         Container(pb, "PocketBase", "PocketBase :8090", "Collections abertas; auth _superusers; UTC")
         Container(hub, "Hub Next.js", "Next.js :3000", "Dashboard; merge visits + place_visits; BRT via tz.ts")
@@ -24,10 +24,17 @@ C4Container
     Rel(monitor, app, "Opera fila/contador/reservas")
     Rel(gestor, app, "Cadastra locais (PIN local + fallback)")
     Rel(app, hive, "Persiste antes de sincronizar")
-    Rel(app, pb, "Sync up/down a cada 30s (HTTP)")
+    Rel(app, pb, "Upload de pendências a cada 30s; download só de 'places' a cada 60s (HTTP)")
     Rel(hub, pb, "REST SDK")
-    Rel(coord, hub, "Visualiza (senha via middleware)")
+    Rel(coord, hub, "Visualiza (sem autenticação implementada no checkout)")
 ```
+
+> Assimetria observada: `SyncService` sobe pendências a cada 30 s; o download
+> periódico cobre apenas o catálogo `places` a cada 60 s
+> (`PlaceProvider._startSyncDownTimer`). `visits`, `place_visits` e
+> `reservations` **não têm** sync-down — registros operacionais são de escrita
+> unidirecional no baseline. O acesso ao Hub não tem middleware/senha no checkout
+> (`NEXT_PUBLIC_HUB_PASSWORD` consta apenas em documentação).
 
 ## Arquitetura alvo (proposta — Opção C referência)
 
@@ -47,7 +54,8 @@ C4Container
 
     System_Boundary(backend, "Backend autoritativo (Opção C: FastAPI + Postgres)") {
         Container(api, "API de comandos", "FastAPI / REST+OpenAPI", "Idempotency key, dedup, confirmação server-side")
-        Container(rt, "Realtime", "SSE (proposta)", "Estados operacionais p/ Hub e TV")
+        Container(rt, "Realtime operacional", "SSE (proposta)", "Eventos completos p/ Hub e app")
+        Container(rtpub, "Projeção pública", "SSE sanitizado + snapshot GET", "Só ocupação/fila; sem actor/device_id/idempotency_key; cursor de replay")
         ContainerDb(pg, "Postgres", "Store autoritativo", "UTC; RLS conforme matriz #19; auditoria")
     }
 
@@ -56,11 +64,12 @@ C4Container
     Rel(app, api, "POST comandos c/ idempotency_key; GET resultado", "HTTPS")
     Rel(api, pg, "Transações autoritativas")
     Rel(api, rt, "Publica eventos confirmados")
+    Rel(api, rtpub, "Publica projeção sanitizada")
     Rel(hub, api, "Leitura REST")
     Rel(hub, rt, "Assina eventos")
     Rel(coord, hub, "Dashboard")
-    Rel(tv, rt, "Visão pública (sem PII)")
-    Rel(pesq, api, "Exportações de pesquisa")
+    Rel(tv, rtpub, "Snapshot inicial + stream público")
+    Rel(pesq, api, "Exportação dedicada de-identificada", "HTTPS")
     Rel(admin, api, "Operação/auditoria")
 ```
 
