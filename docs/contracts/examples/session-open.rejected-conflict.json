@@ -1,0 +1,16 @@
+{
+  "event_id": "00000000-0000-4000-8000-000000000000",
+  "status": "rejected",
+  "server_timestamp": "2026-10-08T13:12:03Z",
+  "entity": "monitoring_session",
+  "entity_id": "ses_synth01",
+  "version": 1,
+  "error": {
+    "code": "SESSION_ALREADY_OPEN",
+    "message": "Ja existe sessao aberta neste dispositivo",
+    "details": {
+      "open_session_id": "ses_synth01",
+      "open_since": "2026-10-08T13:10:04Z"
+    }
+  }
+}

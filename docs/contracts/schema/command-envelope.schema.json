@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://jalapao-monitor/schemas/command-envelope.schema.json",
+  "title": "Command envelope (request/response) — monitoring-session v1",
+  "type": "object",
+  "oneOf": [
+    { "$ref": "#/$defs/commandRequest" },
+    { "$ref": "#/$defs/commandResponse" }
+  ],
+  "$defs": {
+    "commandRequest": {
+      "type": "object",
+      "required": ["schema_version", "command", "idempotency_key", "actor_id", "device_id", "occurred_at", "payload"],
+      "properties": {
+        "schema_version": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$" },
+        "command": { "type": "string", "pattern": "^[a-z_]+\\.[a-z_]+$" },
+        "idempotency_key": { "type": "string", "format": "uuid" },
+        "actor_id": { "type": "string", "minLength": 1 },
+        "device_id": { "type": "string", "minLength": 1 },
+        "occurred_at": { "type": "string", "format": "date-time" },
+        "payload": { "type": "object" }
+      },
+      "additionalProperties": false
+    },
+    "commandResponse": {
+      "type": "object",
+      "required": ["event_id", "status", "server_timestamp", "entity", "entity_id", "version", "error"],
+      "properties": {
+        "event_id": { "type": "string", "format": "uuid" },
+        "status": { "enum": ["applied", "duplicate", "rejected"] },
+        "server_timestamp": { "type": "string", "format": "date-time" },
+        "entity": { "type": "string", "minLength": 1 },
+        "entity_id": { "type": "string", "minLength": 1 },
+        "version": { "type": "integer", "minimum": 1 },
+        "error": {
+          "anyOf": [
+            { "type": "null" },
+            {
+              "type": "object",
+              "required": ["code", "message"],
+              "properties": {
+                "code": { "type": "string", "pattern": "^[A-Z_]+$" },
+                "message": { "type": "string" },
+                "details": {}
+              },
+              "additionalProperties": false
+            }
+          ]
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}
