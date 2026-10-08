@@ -6,26 +6,25 @@ import '../config/app_config.dart';
 
 /// Gerencia autenticação do Gestor.
 ///
-/// Suporta dois modos:
-/// 1. **PocketBase Auth**: Usa conta de usuário criada no PocketBase admin.
-///    Requer: criar usuário em ${AppConfig.pbUrl}/_/ → Collections → users
+/// Autenticação exclusiva via **PocketBase Auth** (collection `users`), conforme
+/// modelo de provisionamento aprovado na Issue #13
+/// (docs/security/ACCESS_MATRIX.md §5):
 ///
-/// 2. **PIN Local** (fallback): Usa PIN armazenado em FlutterSecureStorage.
-///    PIN padrão configurável via --dart-define=GESTOR_PIN=suasenha
-///    Alterável via app (fica gravado em secure storage no dispositivo).
+/// - Contas pessoais individuais no backend — sem conta compartilhada e sem
+///   credencial válida embarcada no cliente.
+/// - Configuração ausente ou servidor inacessível falha de forma explícita:
+///   **nenhum privilégio local é concedido**.
+/// - Transição/rotação do modelo anterior (PIN local): ver
+///   `docs/security/CREDENTIAL_TRANSITION.md`.
 class AuthService extends ChangeNotifier {
   static const _tokenKey = 'gestor_auth_token';
   static const _nameKey = 'gestor_auth_name';
-  static const _pinKey = 'gestor_pin';
 
-  // PIN padrão de primeiro uso — alterável via build-time ou pelo app.
-  // Configure via: flutter run --dart-define=GESTOR_PIN=suasenha
-  static const _defaultPin = String.fromEnvironment(
-    'GESTOR_PIN',
-    defaultValue: 'trocar-na-primeira-vez',
-  );
+  /// Chave legada do PIN local (modelo removido na #24) — mantida apenas para
+  /// purgar o valor de instalações antigas no init.
+  static const _legacyPinKey = 'gestor_pin';
 
-  final PocketBase pb = PocketBase(AppConfig.pbUrl);
+  final PocketBase pb;
   final Box _configBox;
 
   final _ss = const FlutterSecureStorage(
@@ -34,26 +33,23 @@ class AuthService extends ChangeNotifier {
 
   bool _isLoggedIn = false;
   String? _gestorName;
-  bool _usesPinAuth = false;
-  String _cachedPin = _defaultPin; // atualizado no _initAsync
 
-  AuthService(this._configBox) {
+  AuthService(this._configBox, {PocketBase? client})
+    : pb = client ?? PocketBase(AppConfig.pbUrl) {
     _initAsync();
   }
 
   bool get isLoggedIn => _isLoggedIn;
   String? get gestorName => _gestorName;
-  bool get usesPinAuth => _usesPinAuth;
-
-  /// PIN atual em memória (carregado do secure storage ao inicializar)
-  String get gestorPin => _cachedPin;
 
   Future<void> _initAsync() async {
-    _cachedPin = await _ss.read(key: _pinKey) ?? _defaultPin;
+    // Purga o PIN local de instalações anteriores (fallback removido na #24).
+    await _ss.delete(key: _legacyPinKey);
     await _restoreSession();
   }
 
-  /// Tenta restaurar sessão PocketBase salva no secure storage
+  /// Tenta restaurar sessão PocketBase salva no secure storage.
+  /// O token é emitido pelo servidor e revogável — não é credencial embutida.
   Future<void> _restoreSession() async {
     final token = await _ss.read(key: _tokenKey);
     if (token != null && token.isNotEmpty) {
@@ -61,47 +57,38 @@ class AuthService extends ChangeNotifier {
       if (pb.authStore.isValid) {
         _isLoggedIn = true;
         _gestorName = _configBox.get(_nameKey) as String?;
-        _usesPinAuth = false;
         notifyListeners();
       }
     }
   }
 
-  /// Login do gestor.
-  /// Tenta PIN primeiro; se não for PIN, tenta PocketBase.
+  /// Login do gestor via conta PocketBase.
+  ///
+  /// Não existe credencial local de fallback: credencial inválida ou servidor
+  /// indisponível retornam erro e **não** concedem acesso.
   ///
   /// Retorna `null` em sucesso ou mensagem de erro.
-  Future<String?> login(String emailOrPin, String password) async {
-    // ── Modo PIN local ──────────────────────────────────
-    if (emailOrPin == _cachedPin || password == _cachedPin) {
-      _isLoggedIn = true;
-      _gestorName = 'Gestor (PIN)';
-      _usesPinAuth = true;
-      notifyListeners();
-      return null;
-    }
-
-    // ── Modo PocketBase Auth ────────────────────────────
+  Future<String?> login(String email, String password) async {
     try {
-      await pb.collection('users').authWithPassword(emailOrPin, password);
+      await pb.collection('users').authWithPassword(email, password);
       await _ss.write(key: _tokenKey, value: pb.authStore.token);
-      await _configBox.put(_nameKey, emailOrPin); // nome não é sensível
+      await _configBox.put(_nameKey, email); // nome não é sensível
       _isLoggedIn = true;
-      _gestorName = emailOrPin;
-      _usesPinAuth = false;
+      _gestorName = email;
       notifyListeners();
       return null;
     } on ClientException catch (e) {
       debugPrint('[AuthService] PB Login error: ${e.statusCode}');
       if (e.statusCode == 400) {
         return 'Credenciais inválidas.\n'
-            'Use o PIN do gestor ou crie um usuário em:\n'
-            '${AppConfig.pbUrl}/_/';
+            'Peça a conta ao coordenador responsável.';
       }
-      return 'Servidor indisponível. Use o PIN local.';
+      return 'Servidor indisponível.\n'
+          'O painel do gestor exige conexão com o servidor.';
     } catch (e) {
       debugPrint('[AuthService] Login error: $e');
-      return 'Erro de conexão. Tente o PIN local.';
+      return 'Servidor indisponível.\n'
+          'O painel do gestor exige conexão com o servidor.';
     }
   }
 
@@ -112,30 +99,31 @@ class AuthService extends ChangeNotifier {
     await _configBox.delete(_nameKey);
     _isLoggedIn = false;
     _gestorName = null;
-    _usesPinAuth = false;
     notifyListeners();
   }
 
-  /// Salva novo PIN do gestor no secure storage
-  Future<void> setPin(String newPin) async {
-    await _ss.write(key: _pinKey, value: newPin);
-    _cachedPin = newPin;
-  }
-
   /// Aprova um place no PocketBase.
-  /// Retorna [true] se enviado ao servidor, [false] se somente local (PIN mode).
+  /// Retorna [true] somente se confirmado pelo servidor — sem login válido,
+  /// nenhuma aprovação é concedida.
   Future<bool> approvePlace(String placeId) async {
     if (!_isLoggedIn) return false;
     try {
-      await pb.collection('places').update(placeId, body: {
-        'status': 'active',
-        'approved_at': DateTime.now().toIso8601String(),
-      });
+      await pb
+          .collection('places')
+          .update(
+            placeId,
+            body: {
+              'status': 'active',
+              'approved_at': DateTime.now().toIso8601String(),
+            },
+          );
       return true;
     } on ClientException catch (e) {
       if (e.statusCode == 401 || e.statusCode == 403 || e.statusCode == 404) {
-        debugPrint('[AuthService] Approve requires PocketBase auth. '
-            'Configure usuário gestor em ${AppConfig.pbUrl}/_/');
+        debugPrint(
+          '[AuthService] Approve requires PocketBase auth. '
+          'Configure usuário gestor em ${AppConfig.pbUrl}/_/',
+        );
         return false;
       }
       debugPrint('[AuthService] Approve error: ${e.statusCode}');
@@ -150,9 +138,9 @@ class AuthService extends ChangeNotifier {
   Future<bool> rejectPlace(String placeId) async {
     if (!_isLoggedIn) return false;
     try {
-      await pb.collection('places').update(placeId, body: {
-        'status': 'rejected',
-      });
+      await pb
+          .collection('places')
+          .update(placeId, body: {'status': 'rejected'});
       return true;
     } on ClientException catch (e) {
       if (e.statusCode == 401 || e.statusCode == 403 || e.statusCode == 404) {
@@ -170,10 +158,9 @@ class AuthService extends ChangeNotifier {
   Future<List<Map<String, dynamic>>> fetchPendingPlaces() async {
     if (!_isLoggedIn) return [];
     try {
-      final records = await pb.collection('places').getFullList(
-        filter: 'status = "pending"',
-        sort: '-created',
-      );
+      final records = await pb
+          .collection('places')
+          .getFullList(filter: 'status = "pending"', sort: '-created');
       return records
           .map((r) => <String, dynamic>{'id': r.id, ...r.data})
           .toList();
@@ -186,10 +173,9 @@ class AuthService extends ChangeNotifier {
   /// Busca places ativos do PocketBase (para sync-down em operadores)
   Future<List<Map<String, dynamic>>> fetchActivePlaces() async {
     try {
-      final records = await pb.collection('places').getFullList(
-        filter: 'status = "active"',
-        sort: 'name',
-      );
+      final records = await pb
+          .collection('places')
+          .getFullList(filter: 'status = "active"', sort: 'name');
       return records
           .map((r) => <String, dynamic>{'id': r.id, ...r.data})
           .toList();

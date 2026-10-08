@@ -35,8 +35,8 @@ function Snap($folder, $name) {
     adb -s $dev pull /sdcard/sc.png "$folder/$file"
 }
 
-# PocketBase URL via Tailscale
-$PB_URL = if ($args[0]) { $args[0] } else { "http://92.112.179.111:8090" }
+# PocketBase URL: argumento posicional ou env PB_URL (nunca literal no repo)
+$PB_URL = if ($args[0]) { $args[0] } elseif ($env:PB_URL) { $env:PB_URL } else { "http://localhost:8090" }
 Write-Host "PocketBase URL: $PB_URL" -ForegroundColor DarkCyan
 
 foreach ($t in $tests) {
@@ -47,7 +47,15 @@ foreach ($t in $tests) {
     Write-Host "`n=== Executando Teste: $testId ===" -ForegroundColor Yellow
     Write-Host "Arquivo: $testFile" -ForegroundColor Gray
 
-    cmd /c "flutter test $testFile -d $dev --dart-define=PB_URL=$PB_URL --dart-define=GESTOR_PIN=jalapao2026 2>&1" | ForEach-Object {
+    # Conta SINTETICA de teste do gestor via env (Issue #24 — sem credencial
+    # embutida; o PIN local de fallback foi removido)
+    $testDefines = "--dart-define=PB_URL=$PB_URL"
+    if ($env:TEST_GESTOR_EMAIL -and $env:TEST_GESTOR_PASSWORD) {
+        $testDefines += " --dart-define=TEST_GESTOR_EMAIL=$env:TEST_GESTOR_EMAIL"
+        $testDefines += " --dart-define=TEST_GESTOR_PASSWORD=$env:TEST_GESTOR_PASSWORD"
+    }
+
+    cmd /c "flutter test $testFile -d $dev $testDefines 2>&1" | ForEach-Object {
         Write-Host $_
         if ($_ -match '\[SCREEN_CAPTURE\]:\s*(.+)') {
             $n = $Matches[1].Trim()
@@ -61,9 +69,9 @@ Write-Host "`nFinalizado ciclo de testes. Screenshots em: $baseFolder" -Foregrou
 # ── 2.5: Verificacao E2E no PocketBase (User Auth) ──────────────────────────
 Write-Host "`n=== Verificando sync no PocketBase (E2E) ===" -ForegroundColor Yellow
 
-# Credenciais de Gestor (conforme .env: USER_GESTOR / PASS_GESTOR)
-$PB_GESTOR_USER = "gestor@jalapao.br"
-$PB_GESTOR_PASS = "jalapao2026"
+# Credenciais de Gestor — lidas do ambiente (Issue #24 — sem literal no repo)
+$PB_GESTOR_USER = $env:PB_GESTOR_USER
+$PB_GESTOR_PASS = $env:PB_GESTOR_PASS
 
 # Step 1: Autenticar para obter token
 $authUrl  = "$PB_URL/api/collections/users/auth-with-password"

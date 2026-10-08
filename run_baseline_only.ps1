@@ -23,10 +23,20 @@ function Snap($folder, $name) {
     adb -s $dev pull /sdcard/sc.png "$folder/$file"
 }
 
-$PB_URL = "http://92.112.179.111:8090"
+$PB_URL = if ($env:PB_URL) { $env:PB_URL } else { "http://localhost:8090" }
+Write-Host "PocketBase URL: $PB_URL" -ForegroundColor DarkCyan
 Write-Host "Executando Teste: $testId" -ForegroundColor Yellow
 
-cmd /c "flutter test $testFile -d $dev --dart-define=PB_URL=$PB_URL --dart-define=GESTOR_PIN=jalapao2026 2>&1" | ForEach-Object {
+# Secao do gestor usa conta SINTETICA de teste via env (Issue #24 — sem
+# credencial embutida; o PIN local de fallback foi removido):
+#   $env:TEST_GESTOR_EMAIL / $env:TEST_GESTOR_PASSWORD
+$testDefines = "--dart-define=PB_URL=$PB_URL"
+if ($env:TEST_GESTOR_EMAIL -and $env:TEST_GESTOR_PASSWORD) {
+    $testDefines += " --dart-define=TEST_GESTOR_EMAIL=$env:TEST_GESTOR_EMAIL"
+    $testDefines += " --dart-define=TEST_GESTOR_PASSWORD=$env:TEST_GESTOR_PASSWORD"
+}
+
+cmd /c "flutter test $testFile -d $dev $testDefines 2>&1" | ForEach-Object {
     Write-Host $_
     if ($_ -match '\[SCREEN_CAPTURE\]:\s*(.+)') {
         $n = $Matches[1].Trim()

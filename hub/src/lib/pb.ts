@@ -1,7 +1,9 @@
 import PocketBase from 'pocketbase';
 
-// URL do PocketBase — configure via variável de ambiente em produção
-const PB_URL = process.env.NEXT_PUBLIC_PB_URL ?? 'http://92.112.179.111:8090';
+// URL do PocketBase — configure via NEXT_PUBLIC_PB_URL (ver .env.example).
+// Sem fallback para endereço de produção: ausente aponta para localhost
+// (valor de desenvolvimento não sensível, mesma convenção do app Flutter).
+const PB_URL = process.env.NEXT_PUBLIC_PB_URL ?? 'http://localhost:8090';
 
 const pb = new PocketBase(PB_URL);
 

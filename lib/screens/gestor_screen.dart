@@ -61,27 +61,14 @@ class _GestorScreenState extends State<GestorScreen>
       () => _remotePendingPlaces.removeWhere((p) => p['id'] == placeId),
     );
 
-    // Se modo PIN, o PocketBase pode não ter sido atualizado
-    if (authService.usesPinAuth) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            '✅ "${placeData['name']}" aprovado localmente.\n'
-            'Para sincronizar com outros tablets, crie um usuário gestor\n'
-            'em: http://92.112.179.111:8090/_/',
-          ),
-          backgroundColor: Colors.orange[700],
-          duration: const Duration(seconds: 5),
-        ),
-      );
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('✅ "${placeData['name']}" aprovado com sucesso!'),
-          backgroundColor: Colors.green,
-        ),
-      );
-    }
+    // Autenticação é exclusivamente PocketBase (Issue #24): se a aprovação
+    // não chegou ao servidor, approvePlace retorna false e nada foi aplicado.
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('✅ "${placeData['name']}" aprovado com sucesso!'),
+        backgroundColor: Colors.green,
+      ),
+    );
   }
 
   Future<void> _rejectPlace(Map<String, dynamic> placeData) async {

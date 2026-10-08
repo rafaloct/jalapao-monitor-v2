@@ -105,9 +105,9 @@ Proposta para substituir o modelo atual — nada embarcado no APK concede privil
 
 | # | Risco observado em `a6d9bfe` | Evidência |
 |---|---|---|
-| R1 | Fallback de PIN local com valor padrão literal não vazio; login local ocorre antes da auth PocketBase e concede fluxo de gestor sem servidor | `lib/services/auth_service.dart` |
+| R1 | ~~Fallback de PIN local com valor padrão literal não vazio; login local ocorre antes da auth PocketBase e concede fluxo de gestor sem servidor~~ **Resolvido na #24**: autenticação exclusiva por conta PocketBase; ver `docs/security/CREDENTIAL_TRANSITION.md` | `lib/services/auth_service.dart` |
 | R2 | Regras de collection **abertas** (`""`) documentadas — qualquer cliente escreve/lê sem autenticação; `SyncService` envia sem token | `docs/POCKETBASE_SCHEMA.md`, `lib/services/sync_service.dart` |
-| R3 | Aprovação de `places` em modo PIN retorna sucesso silencioso apenas local (falso positivo operacional) | `auth_service.approvePlace` |
+| R3 | ~~Aprovação de `places` em modo PIN retorna sucesso silencioso apenas local (falso positivo operacional)~~ **Resolvido na #24**: aprovação exige resposta do servidor | `auth_service.approvePlace` |
 | R4 | Transporte HTTP cleartext configurável (`PB_URL` http; exceção cleartext no `network_security_config.xml`) | `lib/config/app_config.dart`, `android/` |
 | R5 | Hub protegido por senha única compartilhada (`NEXT_PUBLIC_HUB_PASSWORD`), sem papel nem auditoria | `hub/README.md`, middleware |
 | R6 | Duplicata multi-tablet na janela de sync de 30s — mitigável por dedup server-side (#18), continua limitação | `docs/ARCHITECTURE.md` |
