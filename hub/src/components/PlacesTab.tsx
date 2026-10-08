@@ -619,8 +619,8 @@ export function PlacesTab() {
             <XAxis dataKey="hour" tick={{ fill: '#5D4037', fontSize: 11 }} />
             <YAxis tick={{ fill: '#5D4037', fontSize: 11 }} />
             <Tooltip
-              formatter={(value: number | undefined, name: string | undefined) => [
-                value ?? 0,
+              formatter={(value, name) => [
+                typeof value === 'number' ? value : 0,
                 name === 'pax' ? 'Visitantes' : 'Visitas',
               ]}
               contentStyle={{
@@ -732,7 +732,7 @@ export function PlacesTab() {
                 tick={{ fill: '#5D4037', fontSize: 11 }}
               />
               <Tooltip
-                formatter={(value: number | undefined) => [value ?? 0, 'Visitantes']}
+                formatter={(value) => [typeof value === 'number' ? value : 0, 'Visitantes']}
                 contentStyle={{ background: '#FBE9E7', border: '1px solid #D7CCC8', borderRadius: '0.5rem' }}
               />
               <Bar dataKey="pax" name="pax" fill="#00ACC1" radius={[0, 4, 4, 0]} />
