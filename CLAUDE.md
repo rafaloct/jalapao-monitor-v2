@@ -1,7 +1,10 @@
 # CLAUDE.md — Contexto completo para agentes AI
 
-Este arquivo é o ponto de entrada para qualquer agente AI que for continuar o desenvolvimento
-do Jalapão Monitor. Leia inteiramente antes de propor qualquer mudança.
+O ponto de entrada é [AGENTS.md](AGENTS.md), comum a Devin, Cursor e outros agentes.
+Este documento preserva o contexto técnico do legado. Leia também a issue, o
+[protocolo de coordenação](docs/operations/AGENT_COORDINATION.md) e o
+[baseline observado](docs/operations/REPOSITORY_BASELINE.md).
+As decisões vNext ficam nas issues #1/#2 e em ADRs aprovadas; este histórico não autoriza migração, merge ou deploy.
 
 ## O que é este projeto
 
@@ -38,7 +41,7 @@ Tablet (Flutter + Hive) → sync 30s → PocketBase :8090 → Hub Next.js :3000
 | `screens/counter_screen.dart` | Cachoeira/atrativos: contador entrada/saída |
 | `screens/place_reservation_screen.dart` | Pousada/restaurante: reservas |
 | `screens/session_selector_screen.dart` | Seleção de local de trabalho |
-| `screens/gestor_screen.dart` | Gestão (PIN: ver memory do projeto) |
+| `screens/gestor_screen.dart` | Gestão; política de acesso em #13 |
 | `services/sync_service.dart` | Upload/download PocketBase a cada 30s |
 | `providers/place_provider.dart` | Estado + timer de sync |
 
@@ -151,16 +154,21 @@ pousada                 → PlaceReservationScreen
 
 ## Fluxo de desenvolvimento recomendado
 
-1. **Leia este arquivo e `docs/ARCHITECTURE.md`** antes de qualquer mudança
-2. **Verifique `docs/BACKLOG.md`** para o contexto da melhoria solicitada
+1. **Leia `AGENTS.md`, a issue e este arquivo** antes de qualquer mudança
+2. **Verifique a fila de Issues, dependências e PRs**; `docs/BACKLOG.md` guarda observações históricas
 3. **Para mudanças em datas/horas:** leia `docs/TIMEZONE_POLICY.md` primeiro
 4. **Para mudanças no schema:** atualize `docs/POCKETBASE_SCHEMA.md`
-5. **Após implementar:** rode os testes de integração com tablet físico
-6. **Registre observações** de campo em `docs/BACKLOG.md`
+5. **Após implementar:** execute os testes contratados na issue em ambiente isolado; hardware físico exige escopo e autorização próprios
+6. **Entregue um draft PR e handoff na issue**, sem merge, deploy ou assumir outra tarefa
 
 ---
 
-## Testes
+## Testes históricos
+
+O comando abaixo é referência histórica, **não um passo automático de onboarding**.
+Os cenários atuais não demonstram isolamento de Hive/rede e precisam de backend
+sintético antes de execução. A #17 começa somente pelos testes unitários de modelos.
+Capturas esperadas e duração descrita abaixo não comprovam execução no SHA atual.
 
 ```bash
 # Testes de integração (tablet físico necessário)
