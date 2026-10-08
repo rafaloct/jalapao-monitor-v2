@@ -1,50 +1,26 @@
-# Jalapão Monitor — Hub Next.js
+# Jalapão Monitor: Hub
 
-Painel web de monitoramento em tempo real de todos os atrativos do Jalapão.
+Painel de visualização do monitoramento turístico. O checkout auditado contém fontes Next.js/TypeScript em `src/`, com consultas PocketBase e exibição em BRT.
 
-## Stack
+## Estado do setup
 
-- Next.js 14 (App Router)
-- PocketBase JS SDK
-- Tailwind CSS
-- Recharts (gráficos)
-- Lucide React (ícones)
+Faltam `package.json`, lockfile, `tsconfig.json`, layout e configuração suficiente para instalação/build reproduzíveis. A [Issue #22](https://github.com/rafaloct/jalapao-monitor-v2/issues/22) delimita sua recuperação. Não inferir que comandos npm funcionam neste checkout.
 
-## Estrutura relevante
+Versões mencionadas no histórico não são um ambiente validado. Recuperar scaffold com proveniência e lock, então registrar os comandos reais. Não colocar senha ou credencial em variável `NEXT_PUBLIC_*`.
 
-```
-src/
-  app/
-    page.tsx          # Dashboard principal + modal de backup CSV
-    docs/page.tsx     # Documentação inline
-  components/
-    PlacesTab.tsx     # Aba principal: cards, heatmap, fluxo horário, fervedouros
-  lib/
-    pb.ts             # Cliente PocketBase singleton
-    tz.ts             # Utilitários de timezone BRT (LEIA ANTES DE ALTERAR DATAS)
-    types.ts          # Tipos TypeScript de todas as collections
-    places-service.ts # Queries ao PocketBase + funções de agregação
-```
+## Fontes presentes
 
-## Setup local
+| Path | Função |
+| --- | --- |
+| `src/app/page.tsx` | Dashboard e exportação |
+| `src/components/PlacesTab.tsx` | Visões por local |
+| `src/lib/pb.ts` | Cliente PocketBase |
+| `src/lib/tz.ts` | Datas e horários em America/Sao_Paulo |
+| `src/lib/types.ts` | Tipos das collections |
+| `src/lib/places-service.ts` | Consultas e agregações |
 
-```bash
-npm install
-# Crie .env.local com:
-# NEXT_PUBLIC_PB_URL=http://SEU_POCKETBASE:8090
-# NEXT_PUBLIC_HUB_PASSWORD=sua_senha
-npm run dev
-```
+Preservar `pb.autoCancellation(false)`, os helpers de timezone e a compatibilidade dos dados do legado. A referência histórica a `src/app/docs/page.tsx` não corresponde a arquivo no baseline.
 
-## Deploy (VPS)
+## Para continuar
 
-```bash
-npm run build
-pm2 restart hub
-```
-
-## Timezone
-
-**Nunca** use `new Date().getHours()`, `toLocaleDateString()` sem `timeZone`, ou
-`toISOString().split('T')[0]` para obter "hoje". Use sempre os helpers em `src/lib/tz.ts`.
-Ver `docs/TIMEZONE_POLICY.md` para a política completa.
+Ler [AGENTS.md](../AGENTS.md), a issue, o [baseline](../docs/operations/REPOSITORY_BASELINE.md) e o [guia de desenvolvimento](../docs/DEVELOPMENT.md). Um agente trabalha em uma tarefa por draft PR; não altera VPS ou faz deploy a partir deste README.

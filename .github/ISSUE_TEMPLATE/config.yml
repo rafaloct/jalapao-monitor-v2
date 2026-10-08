@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Roadmap e sequência de desenvolvimento
+    url: https://github.com/rafaloct/jalapao-monitor-v2/issues/1
+    about: Consulte epics, marcos e dependências antes de criar uma nova frente.

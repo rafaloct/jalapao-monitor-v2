@@ -1,140 +1,83 @@
-# Guia de Desenvolvimento — Jalapão Monitor
+# Desenvolvimento do Jalapão Monitor
 
-## Pré-requisitos
+## Começar pelo estado real
 
-- Flutter SDK ≥ 3.19 (canal stable)
-- Dart SDK ≥ 3.3
-- Android SDK (API 26+)
-- Node.js ≥ 18 (para o Hub)
-- ADB (para deploy no tablet)
+Leia [AGENTS.md](../AGENTS.md), a issue escolhida e o [baseline do checkout](operations/REPOSITORY_BASELINE.md).
+A preparação #16 altera documentação e governança. A reprodução do ambiente é a [#17](https://github.com/rafaloct/jalapao-monitor-v2/issues/17); a arquitetura futura é proposta na #18 e aprovada na #2.
 
-## App Flutter
+Não usar exemplos históricos de VPS, scripts de captura ou credenciais de campo para preparar um agente.
 
-### Rodar em modo debug
+## Ferramentas
 
-```bash
-# Conectar tablet via USB, habilitar depuração USB
-adb devices
+| Componente | Requisito observado | Estado |
+| --- | --- | --- |
+| Dart | `>=3.7.0 <4.0.0` em pubspec/lock | Mínimo declarado; versão exata a comprovar |
+| Flutter | `>=3.29.0` em pubspec.lock | Mínimo declarado; versão exata a comprovar |
+| Java | 17 no build Android | Ambiente a reproduzir |
+| Android | SDKs derivados do Flutter; NDK 27.0.12077973 | Bootstrap a validar; não fixar API por suposição |
+| Gradle | 8.14 no wrapper properties | Scripts/JAR não versionados no baseline |
+| Hub | Fontes Next.js/TypeScript | Manifest, lock e scaffold ausentes; #22 |
 
-# Passar a URL do PocketBase via dart-define
-flutter run --dart-define=PB_URL=http://92.112.179.111:8090
-```
+Os mínimos acima não são uma combinação já testada. Não atualizar dependências para a versão mais recente sem escopo próprio.
 
-### Build APK para instalação
+## Baseline inicial sem backend
 
-```bash
-flutter build apk --release \
-  --dart-define=PB_URL=http://92.112.179.111:8090
-
-# Instalar no tablet conectado
-adb install build/app/outputs/flutter-apk/app-release.apk
-```
-
-### Testes de integração (38 screenshots)
+Em checkout/worktree isolado, registrar o SHA e as versões das ferramentas. Para a #17:
 
 ```bash
-# Requer tablet físico conectado via ADB
-flutter test integration_test/baseline_operational_walkthrough.dart \
-  -d <device-id> \
-  --dart-define=PB_URL=http://92.112.179.111:8090
+flutter --version
+dart --version
+flutter pub get
+flutter analyze
+flutter test test/models
 ```
 
-> **Atenção:** O teste usa `pump(500ms × 4)` em vez de `pumpAndSettle` para evitar
-> loop infinito causado pelo timer de sync de 30s do PlaceProvider.
+Existem 35 declarações de teste de modelos. Registrar a quantidade realmente executada, comandos, exit codes e falhas. A execução ainda não está comprovada por este guia.
+A #17 só pode escrever `docs/evidence/BASELINE_EXECUTION.md`; não alterar código ou manifests para esconder falhas.
 
-### Estrutura de diretórios Flutter
+## Configuração e integração
 
-```
-lib/
-  main.dart                     # HomeRouter — roteamento por tipo de local
-  models/
-    place.dart                  # Place, PlaceVisit (Hive)
-    visit_record.dart           # VisitRecord legado (fervedouro)
-    reservation.dart            # Reservation
-  providers/
-    place_provider.dart         # Estado dos locais + sync timer 30s
-  screens/
-    onboarding_screen.dart      # Configuração inicial do tablet
-    session_selector_screen.dart # Seleção de local de monitoramento
-    dashboard_screen.dart       # Fervedouro: fila/água/concluído
-    counter_screen.dart         # Cachoeira/atrativo: contador entrada/saída
-    place_reservation_screen.dart # Pousada/restaurante: reservas
-    gestor_screen.dart          # Gestão de locais (PIN protegido)
-    place_form_screen.dart      # Formulário de cadastro de novo local
-  services/
-    sync_service.dart           # Upload/download PocketBase a cada 30s
-  theme/
-    jalapao_theme.dart          # Cores e estilos do sistema
-  widgets/                      # Componentes reutilizáveis
-```
+A URL do PocketBase é definida por `PB_URL` em `lib/config/app_config.dart`. O default de código no baseline é loopback HTTP, e regras de rede Android/documentação histórica divergem. Usar uma URL explícita de ambiente sintético e preparar o encaminhamento de rede apropriado antes de executar app ou integração.
 
-### Variáveis de configuração
+Os cenários em `integration_test/` abrem o app/Hive e podem iniciar sincronização. Eles não são o comando padrão de setup: primeiro é necessário isolar armazenamento, backend, dados e assertions em tarefa autorizada. Os scripts `run_baseline_only.ps1` e `capture_screens.ps1` também contêm configuração específica de máquina e não são bootstrap portátil.
 
-| Variável dart-define | Padrão | Descrição |
-|---|---|---|
-| `PB_URL` | `http://92.112.179.111:8090` | URL do PocketBase |
+`pumpAndSettle` pode conflitar com timers de sync. Novos cenários devem esperar condições observáveis e usar limites de tempo; ausência de exceção ou screenshot não substitui assertion funcional.
 
-Credenciais (PIN do gestor, token PocketBase) são armazenadas em `flutter_secure_storage`, nunca em código.
+## Build Android
 
----
+Os arquivos Gradle e o manifest principal estão presentes, mas os scripts/JAR do wrapper não estão versionados. A #17 deve verificar como o ambiente Flutter prepara esse bootstrap; não declarar o build aprovado sem executá-lo.
 
-## Hub Next.js
+O bloco release atual usa configuração de assinatura debug. Um APK técnico gerado assim não é uma release de distribuição. Configurar assinatura, instalar em tablet de campo e publicar exigem tarefa e autorização específicas.
 
-### Setup local
+## Hub
 
-```bash
-cd hub
-npm install
+O diretório `hub/src/` contém fontes, mas faltam `package.json`, lockfile, configuração TypeScript e partes do scaffold. `npm install` e `npm run dev` ainda não são reproduzíveis apenas com este checkout.
 
-# Criar arquivo de configuração local
-cat > .env.local << 'EOF'
-NEXT_PUBLIC_PB_URL=http://92.112.179.111:8090
-NEXT_PUBLIC_HUB_PASSWORD=sua_senha_aqui
-EOF
+A [#22](https://github.com/rafaloct/jalapao-monitor-v2/issues/22) recupera esses arquivos da origem legítima ou propõe reconstrução delimitada. Só depois registrar o gerenciador, versões e scripts reais.
 
-npm run dev
-# Acesse http://localhost:3000
-```
+No futuro setup, separar variáveis públicas de credenciais. Nunca usar uma variável `NEXT_PUBLIC_*` para senha ou token secreto, pois ela pertence à configuração entregue ao cliente.
 
-### Deploy no VPS
+## Backend
 
-```bash
-# No VPS via SSH
-cd /root/jalapao-hub   # ou caminho configurado
-git pull
-npm install --production
-npm run build
-pm2 restart hub
-```
+O schema está descrito em [POCKETBASE_SCHEMA.md](POCKETBASE_SCHEMA.md), mas o checkout não contém provisionamento/migrations suficientes para reproduzir ou atestar o serviço existente.
 
-### Variáveis de ambiente do Hub
+Nenhum guia local autoriza alterar regras de collection, usar superuser em cliente, consultar dados de campo ou fazer deploy. A matriz da #19 deve ser aprovada na #13 antes de implementação das APIs.
 
-| Variável | Descrição |
-|---|---|
-| `NEXT_PUBLIC_PB_URL` | URL do PocketBase |
-| `NEXT_PUBLIC_HUB_PASSWORD` | Senha de acesso ao Hub |
+O baseline contém fallback literal de PIN em `lib/services/auth_service.dart`; a correção planejada está na #24. Não copiar seu valor nem assumir que o mecanismo atual atende aos requisitos futuros.
 
----
+## Paths técnicos reais
 
-## PocketBase
+| Área | Caminhos |
+| --- | --- |
+| Entrada do app | `lib/main.dart` |
+| Modelos | `lib/models/place.dart`, `place_visit.dart`, `reservation.dart`, `visit.dart` |
+| Estado e sync | `lib/providers/`, `lib/services/sync_service.dart` |
+| Autenticação | `lib/services/auth_service.dart`, `lib/screens/gestor_login_screen.dart` |
+| Hub | `hub/src/app/page.tsx`, `hub/src/components/PlacesTab.tsx`, `hub/src/lib/` |
 
-### Acesso admin
+Para datas, leia [TIMEZONE_POLICY.md](TIMEZONE_POLICY.md) e use `hub/src/lib/tz.ts`. Preserve UTC no armazenamento, exibição em `America/Sao_Paulo`, `pb.autoCancellation(false)` e compatibilidade entre `visits`, `place_visits` e `reservations`.
 
-```
-URL: http://<VPS_IP>:8090/_/
-Usuário: configurado no primeiro setup
-```
+## Entrega
 
-### Backup manual de dados
-
-Via Hub: botão "Backup CSV" na página principal.
-Via PocketBase admin: Settings → Backups.
-
----
-
-## Regras gerais de código
-
-1. **Timezone:** nunca use `getHours()`, `toLocaleDateString()` sem `timeZone`, ou `split('T')[0]` para datas. Use sempre `src/lib/tz.ts` no Hub e `DateTime.now()` com offset no Flutter.
-2. **Queries paralelas ao PocketBase:** `pb.autoCancellation(false)` está setado — não remova.
-3. **IDs de PlaceVisit no fervedouro:** derivados do `groupId` local — idempotentes para partial moves.
-4. **Sync timer:** o `PlaceProvider` tem um timer de 30s. Em testes de integração, use `pump()` em vez de `pumpAndSettle()`.
+Seguir o [protocolo de coordenação](operations/AGENT_COORDINATION.md) e o [plano de CI](operations/CI_PLAN.md).
+A issue é a especificação da tarefa, o PR é a entrega revisável e as evidências demonstram o resultado. Merge e produção não são autorizados pelo comando de build nem pelo label ready.

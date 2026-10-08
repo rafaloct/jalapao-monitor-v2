@@ -1,3 +1,5 @@
+> Esta página descreve a arquitetura do legado. O alvo sem banco local da [#2](https://github.com/rafaloct/jalapao-monitor-v2/issues/2) depende de ADR aprovada. O [baseline](operations/REPOSITORY_BASELINE.md) registra as lacunas do checkout; descrições de serviço abaixo não comprovam seu estado live.
+
 # Arquitetura do Sistema — Jalapão Monitor
 
 ## Visão geral
