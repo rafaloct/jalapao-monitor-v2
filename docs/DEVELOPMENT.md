@@ -16,7 +16,7 @@ Não usar exemplos históricos de VPS, scripts de captura ou credenciais de camp
 | Java | 17 no build Android | Ambiente a reproduzir |
 | Android | SDKs derivados do Flutter; NDK 27.0.12077973 | Bootstrap a validar; não fixar API por suposição |
 | Gradle | 8.14 no wrapper properties | Scripts/JAR não versionados no baseline |
-| Hub | Fontes Next.js/TypeScript | Manifest, lock e scaffold ausentes; #22 |
+| Hub | Next.js 14.2.3 / React 18 / TS5 | Scaffold recuperado (#22); `npm ci` reproduzível |
 
 Os mínimos acima não são uma combinação já testada. Não atualizar dependências para a versão mais recente sem escopo próprio.
 
@@ -39,6 +39,8 @@ A #17 só pode escrever `docs/evidence/BASELINE_EXECUTION.md`; não alterar cód
 
 A URL do PocketBase é definida por `PB_URL` em `lib/config/app_config.dart`. O default de código no baseline é loopback HTTP, e regras de rede Android/documentação histórica divergem. Usar uma URL explícita de ambiente sintético e preparar o encaminhamento de rede apropriado antes de executar app ou integração.
 
+Para builds por ambiente (staging/produção), use `--dart-define-from-file` com `env/<ambiente>.local.json` — ver [operations/ENVIRONMENTS.md](operations/ENVIRONMENTS.md). Nenhuma credencial entra no build (modelo da #24).
+
 Os cenários em `integration_test/` abrem o app/Hive e podem iniciar sincronização. Eles não são o comando padrão de setup: primeiro é necessário isolar armazenamento, backend, dados e assertions em tarefa autorizada. Os scripts `run_baseline_only.ps1` e `capture_screens.ps1` também contêm configuração específica de máquina e não são bootstrap portátil.
 
 `pumpAndSettle` pode conflitar com timers de sync. Novos cenários devem esperar condições observáveis e usar limites de tempo; ausência de exceção ou screenshot não substitui assertion funcional.
@@ -51,19 +53,21 @@ O bloco release atual usa configuração de assinatura debug. Um APK técnico ge
 
 ## Hub
 
-O diretório `hub/src/` contém fontes, mas faltam `package.json`, lockfile, configuração TypeScript e partes do scaffold. `npm install` e `npm run dev` ainda não são reproduzíveis apenas com este checkout.
+O scaffold foi recuperado na [#22](https://github.com/rafaloct/jalapao-monitor-v2/issues/22) — `npm ci`, `npm run lint` e `npm run build` são reproduzíveis (proveniência em `docs/evidence/HUB_SCAFFOLD_PROVENANCE.md`):
 
-A [#22](https://github.com/rafaloct/jalapao-monitor-v2/issues/22) recupera esses arquivos da origem legítima ou propõe reconstrução delimitada. Só depois registrar o gerenciador, versões e scripts reais.
+```bash
+cd hub && cp .env.example .env.local && npm ci && npm run dev
+```
 
-No futuro setup, separar variáveis públicas de credenciais. Nunca usar uma variável `NEXT_PUBLIC_*` para senha ou token secreto, pois ela pertence à configuração entregue ao cliente.
+Separar variáveis públicas de credenciais. Nunca usar uma variável `NEXT_PUBLIC_*` para senha ou token secreto, pois ela pertence à configuração entregue ao cliente. `NEXT_PUBLIC_PB_URL` carrega somente a URL pública do backend.
 
 ## Backend
 
 O schema está descrito em [POCKETBASE_SCHEMA.md](POCKETBASE_SCHEMA.md), mas o checkout não contém provisionamento/migrations suficientes para reproduzir ou atestar o serviço existente.
 
-Nenhum guia local autoriza alterar regras de collection, usar superuser em cliente, consultar dados de campo ou fazer deploy. A matriz da #19 deve ser aprovada na #13 antes de implementação das APIs.
+Nenhum guia local autoriza alterar regras de collection, usar superuser em cliente, consultar dados de campo ou fazer deploy. A matriz da #19 está aprovada (ata na #13, 2026-10-06) — implementações de API devem segui-la.
 
-O baseline contém fallback literal de PIN em `lib/services/auth_service.dart`; a correção planejada está na #24. Não copiar seu valor nem assumir que o mecanismo atual atende aos requisitos futuros.
+O fallback literal de PIN de `lib/services/auth_service.dart` foi removido na [#24](https://github.com/rafaloct/jalapao-monitor-v2/issues/24) (PR #38) — autenticação exclusiva por conta PocketBase, com transição/rotação documentada em `docs/security/CREDENTIAL_TRANSITION.md`.
 
 ## Paths técnicos reais
 

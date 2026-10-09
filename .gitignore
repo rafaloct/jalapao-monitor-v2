@@ -74,6 +74,10 @@ hub/out/
 screenshots/
 screenshots_claudia/
 
+# Configuração de ambiente por build (dart-define-from-file) — os arquivos
+# *.local.json contêm os hostnames reais e nunca são versionados
+env/*.local.json
+
 # Artefatos locais de desenvolvimento
 images_teste/
 *.zip
