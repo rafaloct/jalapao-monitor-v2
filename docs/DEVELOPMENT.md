@@ -80,9 +80,14 @@ Para smoke exploratório (agente Gemini navega o APK sozinho em device de nuvem)
 
 1. Build do APK de staging apontando para o PB de staging:
    `flutter build apk --flavor staging --dart-define=PB_URL=https://pb-staging.neruds.org`
-2. Upload: `firebase appdistribution:distribute <apk> --app <staging-app-id> --groups testers`
-3. Test cases do agente: `ops/firebase/app_test_cases.yaml` (sintético — nunca
-   apontar o agente ou APK de teste para produção).
+2. Upload + execução dos test cases de `ops/firebase/` num device de nuvem:
+   `firebase apptesting:execute build/app/outputs/flutter-apk/app-staging-debug.apk --app <staging-app-id> --test-dir ops/firebase --test-devices "model=MediumPhone.arm,version=36,locale=pt_BR,orientation=portrait" --test-non-blocking`
+   (o comando sobe o APK e invoca os testes do agente; `--app` é o app id
+   **staging** do Firebase, `locale` usa underscore — `pt_BR`, não `pt-BR`)
+3. Resultados: console Firebase → App Distribution → release → aba de testes.
+   `appdistribution:distribute` sozinho só distribui para testers humanos e
+   **não** executa os casos de `ops/firebase/app_test_cases.yaml` — sintéticos,
+   nunca apontar o agente ou APK de teste para produção.
 
 ## Build Android
 
