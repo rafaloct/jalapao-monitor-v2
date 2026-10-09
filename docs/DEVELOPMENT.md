@@ -63,7 +63,7 @@ PB_BIN=/tmp/pb-bin/pocketbase ./ops/pocketbase/seed_ci.sh
 adb -s emulator-5554 uninstall br.gov.to.jalapao.jalapao_monitor.staging
 
 # 4) rodar a walkthrough num emulador/AVD local
-flutter test integration_test/baseline_operational_walkthrough.dart \
+flutter test integration_test/baseline_operational_walkthrough_test.dart \
   -d emulator-5554 --flavor staging \
   --dart-define=PB_URL=http://10.0.2.2:8090 \
   --dart-define=TEST_GESTOR_EMAIL=gestor-e2e@example.invalid \
