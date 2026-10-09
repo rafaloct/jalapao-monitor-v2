@@ -47,11 +47,11 @@ void _mockSecureStorage() {
 
 /// JWT sintético estruturalmente válido com expiração futura, para testar
 /// restauração de sessão sem emitir credencial real.
-String _fakeJwt() {
+String _fakeJwt({String id = 'u1'}) {
   String b64(Map<String, dynamic> m) =>
       base64Url.encode(utf8.encode(jsonEncode(m))).replaceAll('=', '');
   return '${b64({'alg': 'HS256', 'typ': 'JWT'})}.'
-      '${b64({'id': 'test', 'type': 'auth', 'exp': 9999999999})}.assinatura';
+      '${b64({'id': id, 'type': 'auth', 'exp': 9999999999})}.assinatura';
 }
 
 /// Servidor PocketBase falso: responde ao endpoint de auth com sucesso ou 400
@@ -66,7 +66,28 @@ class FakePocketBaseServer {
   Future<void> start() async {
     _server = await HttpServer.bind(InternetAddress.loopbackIPv4, 0);
     _server!.listen((req) async {
-      if (req.method == 'POST' &&
+      if (req.uri.path == '/api/collections/users/auth-refresh') {
+        // Revalida o token recebido (SDK envia com ou sem prefixo Bearer):
+        // só o token do usuário sintético 'u1' continua válido — qualquer
+        // outro simula token revogado/rotacionado.
+        final authz = req.headers.value('authorization') ?? '';
+        final presented =
+            authz.startsWith('Bearer ') ? authz.substring(7) : authz;
+        if (presented == _fakeJwt(id: 'u1')) {
+          req.response
+            ..statusCode = 200
+            ..headers.contentType = ContentType.json
+            ..write(jsonEncode({
+              'token': _fakeJwt(),
+              'record': {'id': 'u1', 'email': okEmail},
+            }));
+        } else {
+          req.response
+            ..statusCode = 401
+            ..headers.contentType = ContentType.json
+            ..write(jsonEncode({'message': 'Invalid auth token.'}));
+        }
+      } else if (req.method == 'POST' &&
           req.uri.path == '/api/collections/users/auth-with-password') {
         final body =
             jsonDecode(await utf8.decoder.bind(req).join())
@@ -204,16 +225,38 @@ void main() {
   });
 
   group('restauração de sessão', () {
-    test('token válido persistido restaura sessão sem novo login', () async {
+    test('token válido persistido restaura sessão após revalidar no servidor',
+        () async {
       _fakeSecureStorage['gestor_auth_token'] = _fakeJwt();
       final auth = buildService('http://127.0.0.1:${fakePb.port}');
       await Future<void>.delayed(const Duration(milliseconds: 50));
       expect(auth.isLoggedIn, isTrue);
     });
 
+    test('token revogado pelo servidor é descartado — sem grant local',
+        () async {
+      // Token de outro "usuário": o servidor falso rejeita no auth-refresh.
+      _fakeSecureStorage['gestor_auth_token'] = _fakeJwt(id: 'u-revogado');
+      final auth = buildService('http://127.0.0.1:${fakePb.port}');
+      await Future<void>.delayed(const Duration(milliseconds: 50));
+      expect(auth.isLoggedIn, isFalse);
+      expect(_fakeSecureStorage.containsKey('gestor_auth_token'), isFalse);
+    });
+
     test('token inválido persistido não restaura sessão', () async {
       _fakeSecureStorage['gestor_auth_token'] = 'lixo-nao-jwt';
       final auth = buildService('http://127.0.0.1:${fakePb.port}');
+      await Future<void>.delayed(const Duration(milliseconds: 50));
+      expect(auth.isLoggedIn, isFalse);
+    });
+
+    test('servidor indisponível na restauração não concede acesso', () async {
+      final probe = await HttpServer.bind(InternetAddress.loopbackIPv4, 0);
+      final deadPort = probe.port;
+      await probe.close();
+
+      _fakeSecureStorage['gestor_auth_token'] = _fakeJwt();
+      final auth = buildService('http://127.0.0.1:$deadPort');
       await Future<void>.delayed(const Duration(milliseconds: 50));
       expect(auth.isLoggedIn, isFalse);
     });

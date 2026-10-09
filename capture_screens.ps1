@@ -69,9 +69,15 @@ Write-Host "`nFinalizado ciclo de testes. Screenshots em: $baseFolder" -Foregrou
 # ── 2.5: Verificacao E2E no PocketBase (User Auth) ──────────────────────────
 Write-Host "`n=== Verificando sync no PocketBase (E2E) ===" -ForegroundColor Yellow
 
-# Credenciais de Gestor — lidas do ambiente (Issue #24 — sem literal no repo)
+# Credenciais de Gestor — lidas do ambiente (Issue #24 — sem literal no repo).
+# Sem elas a verificação E2E cairia em acesso anônimo e reportaria verde falso:
+# falha explícita antes de emitir qualquer query.
 $PB_GESTOR_USER = $env:PB_GESTOR_USER
 $PB_GESTOR_PASS = $env:PB_GESTOR_PASS
+if (-not $PB_GESTOR_USER -or -not $PB_GESTOR_PASS) {
+    Write-Error "Defina PB_GESTOR_USER e PB_GESTOR_PASS no ambiente para a verificacao E2E autenticada."
+    exit 1
+}
 
 # Step 1: Autenticar para obter token
 $authUrl  = "$PB_URL/api/collections/users/auth-with-password"

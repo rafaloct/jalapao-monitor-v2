@@ -211,10 +211,11 @@ class PlaceProvider extends ChangeNotifier {
         (place).copyWith(status: 'active', isSynced: true),
       );
     }
-    return true; // local approval always succeeds
+    return syncedRemote; // #24: sucesso somente com confirmação do servidor
   }
 
   /// Rejeita um place localmente E tenta sincronizar com PocketBase.
+  /// Retorna o resultado remoto — rejeição não confirmada não é sucesso.
   Future<bool> rejectPlace(String placeId, AuthService authService) async {
     final place = _placesBox.get(placeId);
     if (place != null) {
@@ -224,8 +225,7 @@ class PlaceProvider extends ChangeNotifier {
       );
       notifyListeners();
     }
-    await authService.rejectPlace(placeId);
-    return true;
+    return authService.rejectPlace(placeId);
   }
 
   /// Aprova um place pendente do PocketBase (não existe localmente ainda).
@@ -250,7 +250,7 @@ class PlaceProvider extends ChangeNotifier {
     if (syncedRemote) {
       await _placesBox.put(placeId, place.copyWith(isSynced: true));
     }
-    return true;
+    return syncedRemote; // #24: sucesso somente com confirmação do servidor
   }
 
   /// Rejeita um place remoto (não existe no Hive local)
@@ -265,8 +265,7 @@ class PlaceProvider extends ChangeNotifier {
     );
     await _placesBox.put(placeId, place);
     notifyListeners();
-    await authService.rejectPlace(placeId);
-    return true;
+    return authService.rejectPlace(placeId);
   }
 
   // ── PlaceVisit Management ──────────────────────────────

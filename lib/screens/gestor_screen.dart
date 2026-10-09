@@ -50,23 +50,28 @@ class _GestorScreenState extends State<GestorScreen>
     final localPlace =
         placeProvider.allPlaces.where((p) => p.id == placeId).firstOrNull;
 
-    if (localPlace != null) {
-      await placeProvider.approvePlace(placeId, authService);
-    } else {
-      await placeProvider.approvePlaceRemote(placeData, authService);
-    }
+    // #24: sucesso somente com confirmação do servidor — aprovação não
+    // confirmada não é exibida como aplicada.
+    final success = localPlace != null
+        ? await placeProvider.approvePlace(placeId, authService)
+        : await placeProvider.approvePlaceRemote(placeData, authService);
 
     if (!mounted) return;
-    setState(
-      () => _remotePendingPlaces.removeWhere((p) => p['id'] == placeId),
-    );
-
-    // Autenticação é exclusivamente PocketBase (Issue #24): se a aprovação
-    // não chegou ao servidor, approvePlace retorna false e nada foi aplicado.
+    if (success) {
+      setState(
+        () => _remotePendingPlaces.removeWhere((p) => p['id'] == placeId),
+      );
+    }
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('✅ "${placeData['name']}" aprovado com sucesso!'),
-        backgroundColor: Colors.green,
+        content: Text(
+          success
+              ? '✅ "${placeData['name']}" aprovado com sucesso!'
+              : '⚠️ "${placeData['name']}" não foi aprovado no servidor.\n'
+                  'Verifique a conexão e a sessão do gestor.',
+        ),
+        backgroundColor: success ? Colors.green : Colors.orange[700],
+        duration: Duration(seconds: success ? 3 : 5),
       ),
     );
   }

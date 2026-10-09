@@ -467,10 +467,13 @@ void main() {
           await tester.pumpAndSettle();
         }
       } else {
-        debugPrint('[SKIP] Seção do gestor: defina --dart-define=TEST_GESTOR_EMAIL '
-            'e TEST_GESTOR_PASSWORD com conta sintética do PocketBase de teste.');
-        await tester.pageBack();
-        await tester.pump(const Duration(seconds: 1));
+        // #24: sem credencial sintética o walkthrough NÃO pode fingir cobertura
+        // do fluxo de autenticação — falha explicitamente em vez de reportar verde.
+        fail(
+          'Seção do gestor sem credencial de teste: defina '
+          '--dart-define=TEST_GESTOR_EMAIL e --dart-define=TEST_GESTOR_PASSWORD '
+          'apontando para conta sintética do PocketBase de teste.',
+        );
       }
     }
 

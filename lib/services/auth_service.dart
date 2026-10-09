@@ -50,15 +50,30 @@ class AuthService extends ChangeNotifier {
 
   /// Tenta restaurar sessão PocketBase salva no secure storage.
   /// O token é emitido pelo servidor e revogável — não é credencial embutida.
+  /// A validade local (exp do JWT) não basta: o token é revalidado no servidor
+  /// via auth-refresh antes de conceder acesso.
   Future<void> _restoreSession() async {
     final token = await _ss.read(key: _tokenKey);
-    if (token != null && token.isNotEmpty) {
-      pb.authStore.save(token, null);
-      if (pb.authStore.isValid) {
-        _isLoggedIn = true;
-        _gestorName = _configBox.get(_nameKey) as String?;
-        notifyListeners();
-      }
+    if (token == null || token.isEmpty) return;
+
+    pb.authStore.save(token, null);
+    if (!pb.authStore.isValid) return;
+
+    try {
+      // Revalida server-side: token revogado ou conta rotacionada falha aqui.
+      await pb.collection('users').authRefresh();
+      await _ss.write(key: _tokenKey, value: pb.authStore.token);
+      _isLoggedIn = true;
+      _gestorName = _configBox.get(_nameKey) as String?;
+      notifyListeners();
+    } on ClientException {
+      // Rejeição explícita do servidor (401/403): token revogado — descarta.
+      pb.authStore.clear();
+      await _ss.delete(key: _tokenKey);
+    } catch (_) {
+      // Falha de transporte: não concede acesso, mas mantém o token
+      // para nova tentativa no próximo init.
+      pb.authStore.clear();
     }
   }
 
