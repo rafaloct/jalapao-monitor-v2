@@ -14,6 +14,16 @@ const _testGestorPassword = String.fromEnvironment('TEST_GESTOR_PASSWORD');
 /// NUNCA usar pumpAndSettle() sem timeout — o timer SyncDown do PlaceProvider
 /// (30s) impede que retorne. Usar pumps finitos em todo lugar.
 Future<void> _voltarAoSelector(WidgetTester tester) async {
+  // Fecha qualquer Dialog residual antes de tentar swap_horiz
+  final dialogAberto = find.byType(Dialog);
+  if (dialogAberto.evaluate().isNotEmpty) {
+    debugPrint('[NAV] Dialog residual antes de swap_horiz — fechando');
+    await tester.tapAt(const Offset(10, 10));
+    for (int i = 0; i < 4; i++) {
+      await tester.pump(const Duration(milliseconds: 500));
+    }
+  }
+
   final swapBtn = find.byIcon(Icons.swap_horiz);
   debugPrint('[NAV] swap_horiz=${swapBtn.evaluate().length}');
   if (swapBtn.evaluate().isNotEmpty) {
@@ -394,7 +404,8 @@ void main() {
     // F. GESTOR SCREEN — login, 3 abas, PlaceFormScreen, logout
     // ══════════════════════════════════════════════════════════════════════════
     // F0: fechar diálogos residuais antes de navegar
-    final dialogAberto = find.byType(AlertDialog);
+    // Usa Dialog (superclasse) — cobre AlertDialog e Dialog genérico
+    final dialogAberto = find.byType(Dialog);
     if (dialogAberto.evaluate().isNotEmpty) {
       debugPrint('[NAV] diálogo residual encontrado — fechando');
       await tester.tapAt(const Offset(10, 10)); // toca fora p/ dispensar
