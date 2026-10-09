@@ -388,6 +388,11 @@ Decisões transversais em outras issues: matriz de acesso (#19→#13), provision
   fase 2 passa a incluir `places`, deduplicação `visits`↔`place_visits` e
   reconciliação de contagens; §6/§8 definem projeção pública sanitizada com
   snapshot inicial e exportação de pesquisa de-identificada.
+- Reconciliação 2026-10-09 (Issue #35, relay Codex→repo): os SHAs de nuvem
+  `9e8edf5` e `7ad2343` não estavam disponíveis no `origin`; comparação com a
+  `main` pós-PRs #28/#33 confirmou este arquivo já alinhado aos pontos
+  relatados (`fundamentação delimitada`, correções de extrapolação e
+  recomendações concretas). Sem divergência documental adicional nesta ADR.
 - Revisão 2026-10-06 (2ª rodada): recuperação pós-restart corrigida para chave
   natural por tipo de operação (§4.3) — a idempotency_key se perde com a memória;
   rollback do piloto condicionado a reconciliação testada (§7); decisões
