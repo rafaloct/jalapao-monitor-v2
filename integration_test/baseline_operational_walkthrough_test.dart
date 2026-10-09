@@ -15,6 +15,7 @@ const _testGestorPassword = String.fromEnvironment('TEST_GESTOR_PASSWORD');
 /// (30s) impede que retorne. Usar pumps finitos em todo lugar.
 Future<void> _voltarAoSelector(WidgetTester tester) async {
   final swapBtn = find.byIcon(Icons.swap_horiz);
+  debugPrint('[NAV] swap_horiz=${swapBtn.evaluate().length}');
   if (swapBtn.evaluate().isNotEmpty) {
     await tester.tap(swapBtn.first, warnIfMissed: false);
     // pumpAndSettle trava com o timer SyncDown — pump finito
@@ -22,6 +23,7 @@ Future<void> _voltarAoSelector(WidgetTester tester) async {
       await tester.pump(const Duration(milliseconds: 500));
     }
     final trocarBtn = find.text('Trocar');
+    debugPrint('[NAV] trocar=${trocarBtn.evaluate().length}');
     if (trocarBtn.evaluate().isNotEmpty) {
       await tester.tap(trocarBtn.first, warnIfMissed: false);
       for (int i = 0; i < 4; i++) {
@@ -401,22 +403,24 @@ void main() {
       'TextFormField=${find.byType(TextFormField).evaluate().length}',
     );
 
-    final adminIcon = find.byIcon(Icons.admin_panel_settings);
-    if (adminIcon.evaluate().isNotEmpty) {
-      await tester.ensureVisible(adminIcon.first);
+    // byTooltip('Gestor') é mais específico que byIcon — o Icon standalone
+    // dentro do GestorLoginScreen também usa admin_panel_settings (não clicável)
+    final gestorTooltip = find.byTooltip('Gestor');
+    if (gestorTooltip.evaluate().isNotEmpty) {
+      await tester.ensureVisible(gestorTooltip.first);
       await tester.pump(const Duration(milliseconds: 300));
-      await tester.tap(adminIcon.first, warnIfMissed: false);
-      // Poll até TextFormField aparecer — Navigator.push pode demorar em CI
-      var loginFields = find.byType(TextFormField);
-      for (int i = 0; i < 10 && loginFields.evaluate().isEmpty; i++) {
+      await tester.tap(gestorTooltip.first, warnIfMissed: false);
+      // Poll até 'Painel do Gestor' aparecer — confirma que a tela abriu
+      var painel = find.text('Painel do Gestor');
+      for (int i = 0; i < 10 && painel.evaluate().isEmpty; i++) {
         await tester.pump(const Duration(milliseconds: 500));
-        loginFields = find.byType(TextFormField);
+        painel = find.text('Painel do Gestor');
       }
-      // Diagnóstico: distingue credencial vazia de campo de login ausente
+      final loginFields = find.byType(TextFormField);
       debugPrint(
         '[GESTOR] loginFields=${loginFields.evaluate().length} '
-        'email=${_testGestorEmail.isEmpty ? "<vazio>" : "ok"} '
-        'password=${_testGestorPassword.isEmpty ? "<vazio>" : "ok"}',
+        'painel=${find.text("Painel do Gestor").evaluate().length} '
+        'email=${_testGestorEmail.isEmpty ? "<vazio>" : "ok"}',
       );
       if (loginFields.evaluate().isNotEmpty &&
           _testGestorEmail.isNotEmpty &&
