@@ -1,0 +1,29 @@
+# Test cases para o Firebase App Testing agent — app STAGING.
+# Backend: https://pb-staging.neruds.org (PocketBase sintético, VPS :8092).
+# NUNCA apontar o agente para produção.
+tests:
+  - displayName: "Onboarding e sessão de trabalho"
+    id: onboarding-session
+    steps:
+      - goal: "Digite 'FB-AGENT-01' no campo ID do tablet e toque em SALVAR E INICIAR"
+        hint: "O campo fica na tela de Configuração do Tablet"
+        finalScreenAssertion: "A tela de seleção de local aparece listando locais"
+      - goal: "Selecione o local 'Cachoeira da Formiga'"
+        finalScreenAssertion: "A tela de contador de fluxo abre"
+  - displayName: "Contador de fluxo (cachoeira)"
+    id: counter-flow
+    prerequisiteTestCaseId: onboarding-session
+    steps:
+      - goal: "Toque 3 vezes no botão de entrada de turistas"
+        finalScreenAssertion: "O contador de entradas mostra 3"
+      - goal: "Toque 1 vez no botão de saída"
+        finalScreenAssertion: "O contador de saídas mostra 1"
+  - displayName: "Login do gestor"
+    id: gestor-login
+    prerequisiteTestCaseId: onboarding-session
+    steps:
+      - goal: "Volte para a seleção de local e abra a área do gestor"
+        hint: "O acesso ao gestor fica na tela de seleção de locais"
+        finalScreenAssertion: "Uma tela de login do gestor aparece"
+      - goal: "Faça login com o email gestor-e2e@example.invalid e a senha e2e-gestor-sintetico"
+        finalScreenAssertion: "O painel do gestor abre mostrando locais"

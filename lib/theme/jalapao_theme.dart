@@ -45,12 +45,22 @@ class JalapaoTheme {
           fontWeight: FontWeight.bold,
           fontSize: 24,
         ),
+        displaySmall: GoogleFonts.outfit(color: textSync),
+        headlineLarge: GoogleFonts.outfit(color: textSync),
+        headlineMedium: GoogleFonts.outfit(color: textSync),
+        headlineSmall: GoogleFonts.outfit(color: textSync),
+        titleLarge: GoogleFonts.outfit(color: textSync),
+        titleMedium: GoogleFonts.outfit(color: textSync),
+        titleSmall: GoogleFonts.outfit(color: textSync),
         bodyLarge: GoogleFonts.outfit(color: textSync, fontSize: 18),
         bodyMedium: GoogleFonts.outfit(color: textSync, fontSize: 16),
+        bodySmall: GoogleFonts.outfit(color: textSync),
         labelLarge: GoogleFonts.outfit(
           color: textSync,
           fontWeight: FontWeight.w600,
         ),
+        labelMedium: GoogleFonts.outfit(color: textSync),
+        labelSmall: GoogleFonts.outfit(color: textSync),
       ),
 
       // Card Theme
