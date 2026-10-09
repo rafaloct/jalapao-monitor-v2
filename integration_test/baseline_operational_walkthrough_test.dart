@@ -11,15 +11,22 @@ const _testGestorEmail = String.fromEnvironment('TEST_GESTOR_EMAIL');
 const _testGestorPassword = String.fromEnvironment('TEST_GESTOR_PASSWORD');
 
 /// Helpers de navegação
+/// NUNCA usar pumpAndSettle() sem timeout — o timer SyncDown do PlaceProvider
+/// (30s) impede que retorne. Usar pumps finitos em todo lugar.
 Future<void> _voltarAoSelector(WidgetTester tester) async {
   final swapBtn = find.byIcon(Icons.swap_horiz);
   if (swapBtn.evaluate().isNotEmpty) {
     await tester.tap(swapBtn.first, warnIfMissed: false);
-    await tester.pumpAndSettle();
+    // pumpAndSettle trava com o timer SyncDown — pump finito
+    for (int i = 0; i < 4; i++) {
+      await tester.pump(const Duration(milliseconds: 500));
+    }
     final trocarBtn = find.text('Trocar');
     if (trocarBtn.evaluate().isNotEmpty) {
-      await tester.tap(trocarBtn.first);
-      await tester.pumpAndSettle(const Duration(seconds: 2));
+      await tester.tap(trocarBtn.first, warnIfMissed: false);
+      for (int i = 0; i < 4; i++) {
+        await tester.pump(const Duration(milliseconds: 500));
+      }
     }
   }
 }
