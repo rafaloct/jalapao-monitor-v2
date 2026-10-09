@@ -1,0 +1,42 @@
+# Exemplo de configuração cloudflared (Cloudflare Tunnel) para o VPS do
+# Jalapão Monitor. Copie para config.yml no VPS e ajuste — nunca comite o
+# arquivo real (ele referencia o tunnel-id e pode residir junto ao
+# credentials-file, que é segredo operacional).
+#
+# Uso documentado em docs/operations/CLOUDFLARE_BACKEND.md.
+#
+#   tunnel: <TUNNEL-UUID>          — saída de `cloudflared tunnel create`
+#   credentials-file: /etc/cloudflared/<TUNNEL-UUID>.json
+
+tunnel: TUNNEL-UUID-AQUI
+credentials-file: /etc/cloudflared/TUNNEL-UUID-AQUI.json
+
+# Todo o tráfego chega via HTTPS terminado na borda do Cloudflare.
+# O PocketBase e o Hub continuam escutando somente em localhost.
+ingress:
+  # PocketBase — API REST + realtime (SSE/WebSocket são suportados pelo tunnel)
+  # Usar 127.0.0.1 literal (não "localhost"): em VPS dual-stack, localhost pode
+  # resolver para ::1 primeiro e o bind do PB é IPv4-only (ver runbook §4).
+  - hostname: pb.SEU-DOMINIO.example
+    service: http://127.0.0.1:8090
+    originRequest:
+      httpHostHeader: localhost
+
+  # Hub Next.js — dashboard de coordenação
+  # ATENÇÃO: `next start` escuta em 0.0.0.0 por padrão — para o Hub ficar
+  # restrito à loopback (sem bypassar o tunnel), inicie com
+  # `next start -H 127.0.0.1` ou aplique firewall local na porta 3000.
+  - hostname: hub.SEU-DOMINIO.example
+    service: http://127.0.0.1:3000
+    originRequest:
+      httpHostHeader: localhost
+
+  # Staging — só crie a rota DNS se esta entrada de ingress existir;
+  # hostname sem ingress casaria na regra final e responderia 404.
+  - hostname: pb-staging.SEU-DOMINIO.example
+    service: http://127.0.0.1:8091   # PocketBase de staging em porta própria
+    originRequest:
+      httpHostHeader: localhost
+
+  # Regra obrigatória de encerramento — tudo que não casar retorna 404
+  - service: http_status:404
