@@ -394,8 +394,17 @@ void main() {
     // F0: resetar para o SessionSelector antes de buscar ícone admin
     await _voltarAoSelector(tester);
 
+    // Diagnóstico: qual tela está ativa antes do tap
+    debugPrint(
+      '[GESTOR] swap_horiz=${find.byIcon(Icons.swap_horiz).evaluate().length} '
+      'admin=${find.byIcon(Icons.admin_panel_settings).evaluate().length} '
+      'TextFormField=${find.byType(TextFormField).evaluate().length}',
+    );
+
     final adminIcon = find.byIcon(Icons.admin_panel_settings);
     if (adminIcon.evaluate().isNotEmpty) {
+      await tester.ensureVisible(adminIcon.first);
+      await tester.pump(const Duration(milliseconds: 300));
       await tester.tap(adminIcon.first, warnIfMissed: false);
       // Poll até TextFormField aparecer — Navigator.push pode demorar em CI
       var loginFields = find.byType(TextFormField);
