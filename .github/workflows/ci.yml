@@ -1,5 +1,5 @@
 # CI minimo — issue #21, conforme plano aprovado (CI_PLAN §4, issue #3).
-# Flutter 3.29.3 pinado: unica combinacao SDK/lock comprovada (Via A):
+# Flutter 3.47.7 pinado: versão estável alvo (issue #52 — upgrade de 3.29.3):
 # `flutter pub get` deixa pubspec.lock imutavel e 35/35 testes passam.
 # Ratchets de analyze/format sao limiares explicitos versionados, nao
 # continue-on-error. Nenhum check se autodeclara obrigatorio: nomes/origem
@@ -28,7 +28,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.29.3'
+          flutter-version: '3.47.7'
           channel: stable
           cache: true
       - name: deps reproduziveis — lock imutavel (Via A)
@@ -44,7 +44,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.29.3'
+          flutter-version: '3.47.7'
           channel: stable
           cache: true
       - run: flutter pub get
@@ -59,7 +59,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.29.3'
+          flutter-version: '3.47.7'
           channel: stable
           cache: true
       - run: flutter pub get

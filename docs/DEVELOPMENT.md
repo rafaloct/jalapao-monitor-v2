@@ -12,7 +12,7 @@ Não usar exemplos históricos de VPS, scripts de captura ou credenciais de camp
 | Componente | Requisito observado | Estado |
 | --- | --- | --- |
 | Dart | `>=3.7.0 <4.0.0` em pubspec/lock | Mínimo declarado; versão exata a comprovar |
-| Flutter | `>=3.29.0` em pubspec.lock | Mínimo declarado; versão exata a comprovar |
+| Flutter | `3.47.7` | Pinada no CI e validada localmente (#52) |
 | Java | 17 no build Android | Ambiente a reproduzir |
 | Android | SDKs derivados do Flutter; NDK 27.0.12077973 | Bootstrap a validar; não fixar API por suposição |
 | Gradle | 8.14 no wrapper properties | Scripts/JAR não versionados no baseline |

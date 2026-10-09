@@ -78,20 +78,20 @@ class Reservation extends HiveObject {
   }
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'place_id': placeId,
-        'pax_qty': paxQty,
-        'guest_name': guestName,
-        'contact_phone': contactPhone,
-        'scheduled_time': scheduledTime.toIso8601String(),
-        'arrival_time': arrivalTime?.toIso8601String(),
-        'exit_time': exitTime?.toIso8601String(),
-        'status': status,
-        'notes': notes,
-        'tablet_id': tabletId,
-        'is_estimated': isEstimated,
-        'origin_city': originCity,
-      };
+    'id': id,
+    'place_id': placeId,
+    'pax_qty': paxQty,
+    'guest_name': guestName,
+    'contact_phone': contactPhone,
+    'scheduled_time': scheduledTime.toIso8601String(),
+    'arrival_time': arrivalTime?.toIso8601String(),
+    'exit_time': exitTime?.toIso8601String(),
+    'status': status,
+    'notes': notes,
+    'tablet_id': tabletId,
+    'is_estimated': isEstimated,
+    'origin_city': originCity,
+  };
 
   Reservation copyWith({
     String? id,

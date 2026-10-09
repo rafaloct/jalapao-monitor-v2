@@ -57,7 +57,7 @@ O checkout auditado contém Flutter/Hive, clientes PocketBase e parte do Hub Nex
 
 ## Setup e validação
 
-Os mínimos do lock são Dart 3.7 e Flutter 3.29. A versão exata funcional será comprovada na #17. O Hub ainda precisa de scaffold na #22. Veja [plano de CI](docs/operations/CI_PLAN.md).
+Toolchain: Flutter 3.47.7 e Dart 3.13.5 (issue #52 — mínimos antigos Dart 3.7/Flutter 3.29 substituídos). O Hub ainda precisa de scaffold na #22. Veja [plano de CI](docs/operations/CI_PLAN.md).
 
 Para a tarefa #17, em checkout e ambiente de desenvolvimento isolados:
 

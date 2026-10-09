@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:provider/provider.dart';
 import '../services/auth_service.dart';
 import '../theme/jalapao_theme.dart';
@@ -19,7 +19,8 @@ class _GestorLoginScreenState extends State<GestorLoginScreen> {
   final _passwordTEC = TextEditingController();
   bool _loading = false;
   bool _obscurePassword = true;
-  bool _showTechHint = false; // colapsado por padrão — revealing only on long press
+  bool _showTechHint =
+      false; // colapsado por padrão — revealing only on long press
 
   Future<void> _login() async {
     if (!_formKey.currentState!.validate()) return;
@@ -36,10 +37,7 @@ class _GestorLoginScreenState extends State<GestorLoginScreen> {
 
     if (error != null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(error),
-          backgroundColor: Colors.red,
-        ),
+        SnackBar(content: Text(error), backgroundColor: Colors.red),
       );
     } else {
       // Login com sucesso → ir para painel do gestor
@@ -154,16 +152,18 @@ class _GestorLoginScreenState extends State<GestorLoginScreen> {
                               ? Icons.visibility_off
                               : Icons.visibility,
                         ),
-                        onPressed: () => setState(
-                          () => _obscurePassword = !_obscurePassword,
-                        ),
+                        onPressed:
+                            () => setState(
+                              () => _obscurePassword = !_obscurePassword,
+                            ),
                       ),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
                     ),
-                    validator: (v) =>
-                        v == null || v.isEmpty ? 'Campo obrigatório' : null,
+                    validator:
+                        (v) =>
+                            v == null || v.isEmpty ? 'Campo obrigatório' : null,
                   ),
                   const SizedBox(height: 24),
 
@@ -178,23 +178,24 @@ class _GestorLoginScreenState extends State<GestorLoginScreen> {
                         borderRadius: BorderRadius.circular(12),
                       ),
                     ),
-                    child: _loading
-                        ? const SizedBox(
-                            height: 20,
-                            width: 20,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              color: Colors.white,
+                    child:
+                        _loading
+                            ? const SizedBox(
+                              height: 20,
+                              width: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: Colors.white,
+                              ),
+                            )
+                            : const Text(
+                              'ENTRAR',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                letterSpacing: 1,
+                              ),
                             ),
-                          )
-                        : const Text(
-                            'ENTRAR',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              letterSpacing: 1,
-                            ),
-                          ),
                   ),
                   const SizedBox(height: 16),
 

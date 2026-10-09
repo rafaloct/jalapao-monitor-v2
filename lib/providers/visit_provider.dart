@@ -40,15 +40,18 @@ class VisitProvider extends ChangeNotifier {
   String _generateId() {
     const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
     final rand = Random();
-    return List.generate(15, (index) => chars[rand.nextInt(chars.length)])
-        .join();
+    return List.generate(
+      15,
+      (index) => chars[rand.nextInt(chars.length)],
+    ).join();
   }
 
   // ── Config Getters ───────────────────────────────────
   String get atrativo => _configBox.get('atrativo', defaultValue: '');
   String get tabletId => _configBox.get('tabletId', defaultValue: '');
   int get poolCapacity => _configBox.get('poolCapacity', defaultValue: 6);
-  int get bathTimeMinutes => _configBox.get('bathTimeMinutes', defaultValue: 20);
+  int get bathTimeMinutes =>
+      _configBox.get('bathTimeMinutes', defaultValue: 20);
   bool get isConfigured => _configBox.get('isConfigured', defaultValue: false);
 
   // ── Config Setters ───────────────────────────────────
@@ -68,25 +71,23 @@ class VisitProvider extends ChangeNotifier {
 
   // ── Visit Lists ──────────────────────────────────────
   List<Visit> get queueVisits {
-    return _visitsBox.values
-        .where((v) => v.status == 'fila')
-        .toList()
+    return _visitsBox.values.where((v) => v.status == 'fila').toList()
       ..sort((a, b) => a.arrivalTime.compareTo(b.arrivalTime));
   }
 
   List<Visit> get waterVisits {
-    return _visitsBox.values
-        .where((v) => v.status == 'agua')
-        .toList()
-      ..sort((a, b) => (a.entryTime ?? a.arrivalTime)
-          .compareTo(b.entryTime ?? b.arrivalTime));
+    return _visitsBox.values.where((v) => v.status == 'agua').toList()..sort(
+      (a, b) => (a.entryTime ?? a.arrivalTime).compareTo(
+        b.entryTime ?? b.arrivalTime,
+      ),
+    );
   }
 
   /// Returns visits created today (local time), sorted by arrival time (descending)
   List<Visit> get historyVisits {
     final now = DateTime.now();
     final todayStart = DateTime(now.year, now.month, now.day);
-    
+
     return _visitsBox.values
         .where((v) => v.arrivalTime.isAfter(todayStart))
         .toList()
@@ -98,13 +99,20 @@ class VisitProvider extends ChangeNotifier {
   }
 
   /// Registros locais ainda não enviados ao PocketBase
-  int get unsyncedCount =>
-      _visitsBox.values.where((v) => !v.isSynced).length;
+  int get unsyncedCount => _visitsBox.values.where((v) => !v.isSynced).length;
 
   // ── Actions ──────────────────────────────────────────
   static const _jalapaoNames = [
-    'Ipê', 'Buriti', 'Capim-dourado', 'Cerrado', 'Veredas',
-    'Sertão', 'Candeia', 'Pequi', 'Aroeira', 'Mangaba',
+    'Ipê',
+    'Buriti',
+    'Capim-dourado',
+    'Cerrado',
+    'Veredas',
+    'Sertão',
+    'Candeia',
+    'Pequi',
+    'Aroeira',
+    'Mangaba',
   ];
 
   String _randomGroupName() {
@@ -112,7 +120,11 @@ class VisitProvider extends ChangeNotifier {
     return 'Grupo ${_jalapaoNames[rand.nextInt(_jalapaoNames.length)]}';
   }
 
-  Future<void> addToQueue(int paxQty, {String? groupName, String? originCity}) async {
+  Future<void> addToQueue(
+    int paxQty, {
+    String? groupName,
+    String? originCity,
+  }) async {
     final String uid = _generateId();
     final visit = Visit(
       id: uid,
@@ -123,8 +135,12 @@ class VisitProvider extends ChangeNotifier {
       tabletId: tabletId,
       groupId: uid,
       capacityLimit: poolCapacity,
-      groupName: groupName?.trim().isEmpty ?? true ? _randomGroupName() : groupName!.trim(),
-      originCity: originCity?.trim().isEmpty ?? true ? null : originCity!.trim(),
+      groupName:
+          groupName?.trim().isEmpty ?? true
+              ? _randomGroupName()
+              : groupName!.trim(),
+      originCity:
+          originCity?.trim().isEmpty ?? true ? null : originCity!.trim(),
     );
     await _visitsBox.put(visit.id, visit);
     notifyListeners();
@@ -159,7 +175,8 @@ class VisitProvider extends ChangeNotifier {
       visit.status = 'agua';
       visit.entryTime = now;
       visit.isSynced = false;
-      if (visit.groupId.isEmpty) visit.groupId = visit.id; // Ensure legacy data has groupId
+      if (visit.groupId.isEmpty)
+        visit.groupId = visit.id; // Ensure legacy data has groupId
       await visit.save();
     }
 
@@ -221,21 +238,21 @@ class VisitProvider extends ChangeNotifier {
   // ── Export CSV ───────────────────────────────────────
   Future<void> exportCsv() async {
     final List<List<dynamic>> rows = [];
-    
+
     // Header (BigQuery Compatible)
     rows.add([
-      'id', 
+      'id',
       'group_id',
-      'arrival_date', 
-      'atrativo', 
-      'tablet_id', 
-      'pax_qty', 
-      'arrival_time', 
-      'entry_time', 
-      'exit_time', 
-      'stay_duration_min', 
+      'arrival_date',
+      'atrativo',
+      'tablet_id',
+      'pax_qty',
+      'arrival_time',
+      'entry_time',
+      'exit_time',
+      'stay_duration_min',
       'status',
-      'capacity_limit'
+      'capacity_limit',
     ]);
 
     final dateFormat = DateFormat('yyyy-MM-dd');
@@ -273,7 +290,9 @@ class VisitProvider extends ChangeNotifier {
     final file = File(path);
     await file.writeAsString(csvData);
 
-    await Share.shareXFiles([XFile(path)], text: 'Relatório Jalapão Monitor ($dateStr)');
+    await Share.shareXFiles([
+      XFile(path),
+    ], text: 'Relatório Jalapão Monitor ($dateStr)');
   }
 
   @override

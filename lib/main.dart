@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter/services.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:provider/provider.dart';
@@ -45,11 +45,15 @@ void main() async {
           create: (_) => VisitProvider(visitsBox, configBox),
         ),
         ChangeNotifierProvider(
-          create: (_) => PlaceProvider(placesBox, placeVisitsBox, reservationsBox, configBox),
+          create:
+              (_) => PlaceProvider(
+                placesBox,
+                placeVisitsBox,
+                reservationsBox,
+                configBox,
+              ),
         ),
-        ChangeNotifierProvider(
-          create: (_) => AuthService(configBox),
-        ),
+        ChangeNotifierProvider(create: (_) => AuthService(configBox)),
       ],
       child: const JalapaoApp(),
     ),
@@ -76,7 +80,10 @@ class HomeRouter extends StatelessWidget {
   const HomeRouter({super.key});
 
   static const _reservationTypes = {
-    'restaurante', 'pousada', 'fazenda', 'chacaras',
+    'restaurante',
+    'pousada',
+    'fazenda',
+    'chacaras',
   };
 
   @override

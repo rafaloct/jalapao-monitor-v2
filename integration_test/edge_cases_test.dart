@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:jalapao_monitor/main.dart' as app;
@@ -28,17 +28,17 @@ void main() {
     if (novoGrupoBtn.evaluate().isNotEmpty) {
       await tester.tap(novoGrupoBtn);
       await tester.pumpAndSettle();
-      
+
       // O valor inicial é 1. Vamos tentar baixar para 0.
       final removeIcon = find.byIcon(Icons.remove);
       if (removeIcon.evaluate().isNotEmpty) {
         await tester.tap(removeIcon);
         await tester.pump();
       }
-      
+
       await snap(tester, '01_pax_zero_attempt');
-      
-      // Tentar confirmar (deve falhar ou o botão deve estar desabilitado se implementado, 
+
+      // Tentar confirmar (deve falhar ou o botão deve estar desabilitado se implementado,
       // ou simplesmente ignoramos e cancelamos para o teste prosseguir)
       final cancelarBtn = find.text('CANCELAR');
       await tester.tap(cancelarBtn);
@@ -46,7 +46,7 @@ void main() {
     }
 
     // --- EDGE CASE 2: Alerta de Tempo Excedido ---
-    // (Este teste é difícil de automatizar sem "viajar no tempo", 
+    // (Este teste é difícil de automatizar sem "viajar no tempo",
     // mas capturamos o estado do Dashboard com grupos ativos).
     await snap(tester, '02_dashboard_overdue_check');
 

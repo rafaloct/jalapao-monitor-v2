@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import '../theme/jalapao_theme.dart';
 
 class PaxSelector extends StatefulWidget {
@@ -50,16 +50,17 @@ class _PaxSelectorState extends State<PaxSelector> {
       children: [
         AnimatedSwitcher(
           duration: const Duration(milliseconds: 200),
-          transitionBuilder: (child, anim) =>
-              ScaleTransition(scale: anim, child: child),
+          transitionBuilder:
+              (child, anim) => ScaleTransition(scale: anim, child: child),
           child: Text(
             '${widget.selectedCount}',
             key: ValueKey(widget.selectedCount),
             style: Theme.of(context).textTheme.displayLarge?.copyWith(
               fontSize: 48,
-              color: widget.selectedCount > 0
-                  ? widget.activeColor
-                  : JalapaoTheme.textSync.withOpacity(0.5),
+              color:
+                  widget.selectedCount > 0
+                      ? widget.activeColor
+                      : JalapaoTheme.textSync.withOpacity(0.5),
             ),
           ),
         ),
@@ -80,9 +81,10 @@ class _PaxSelectorState extends State<PaxSelector> {
             _HoldButton(
               icon: Icons.remove,
               color: widget.activeColor,
-              onTap: () => widget.onChanged(
-                (widget.selectedCount - 1).clamp(0, widget.maxPax),
-              ),
+              onTap:
+                  () => widget.onChanged(
+                    (widget.selectedCount - 1).clamp(0, widget.maxPax),
+                  ),
               onHoldStart: () => _startHold(-1),
               onHoldEnd: _stopHold,
             ),
@@ -100,9 +102,10 @@ class _PaxSelectorState extends State<PaxSelector> {
             _HoldButton(
               icon: Icons.add,
               color: widget.activeColor,
-              onTap: () => widget.onChanged(
-                (widget.selectedCount + 1).clamp(0, widget.maxPax),
-              ),
+              onTap:
+                  () => widget.onChanged(
+                    (widget.selectedCount + 1).clamp(0, widget.maxPax),
+                  ),
               onHoldStart: () => _startHold(1),
               onHoldEnd: _stopHold,
             ),
@@ -119,8 +122,8 @@ class _PaxSelectorState extends State<PaxSelector> {
     return LayoutBuilder(
       builder: (context, constraints) {
         // cada item tem margin: horizontal(4) = 8px total por item
-        final double itemSize =
-            ((constraints.maxWidth - cols * 8) / cols).clamp(28.0, 44.0);
+        final double itemSize = ((constraints.maxWidth - cols * 8) / cols)
+            .clamp(28.0, 44.0);
 
         return Column(
           children: List.generate(rows, (row) {
@@ -142,14 +145,16 @@ class _PaxSelectorState extends State<PaxSelector> {
                       height: itemSize,
                       margin: const EdgeInsets.symmetric(horizontal: 4),
                       decoration: BoxDecoration(
-                        color: isSelected
-                            ? widget.activeColor.withOpacity(0.2)
-                            : Colors.white.withOpacity(0.5),
+                        color:
+                            isSelected
+                                ? widget.activeColor.withOpacity(0.2)
+                                : Colors.white.withOpacity(0.5),
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
-                          color: isSelected
-                              ? widget.activeColor
-                              : JalapaoTheme.textSync.withOpacity(0.2),
+                          color:
+                              isSelected
+                                  ? widget.activeColor
+                                  : JalapaoTheme.textSync.withOpacity(0.2),
                           width: isSelected ? 3.0 : 1.5,
                         ),
                       ),

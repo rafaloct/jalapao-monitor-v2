@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:provider/provider.dart';
 import '../models/place.dart';
 import '../providers/place_provider.dart';
@@ -74,13 +74,14 @@ class _SessionSelectorScreenState extends State<SessionSelectorScreen> {
           children: [
             _buildHeader(visitProvider.tabletId),
             Expanded(
-              child: _loading
-                  ? const Center(
-                      child: CircularProgressIndicator(
-                        color: Color(0xFF58A6FF),
-                      ),
-                    )
-                  : activePlaces.isEmpty
+              child:
+                  _loading
+                      ? const Center(
+                        child: CircularProgressIndicator(
+                          color: Color(0xFF58A6FF),
+                        ),
+                      )
+                      : activePlaces.isEmpty
                       ? _buildEmptyState(placeProvider)
                       : _buildPlaceGrid(context, activePlaces, placeProvider),
             ),
@@ -97,7 +98,9 @@ class _SessionSelectorScreenState extends State<SessionSelectorScreen> {
       decoration: BoxDecoration(
         color: JalapaoTheme.background,
         border: Border(
-          bottom: BorderSide(color: JalapaoTheme.textSync.withValues(alpha: 0.1)),
+          bottom: BorderSide(
+            color: JalapaoTheme.textSync.withValues(alpha: 0.1),
+          ),
         ),
       ),
       child: Row(
@@ -127,16 +130,23 @@ class _SessionSelectorScreenState extends State<SessionSelectorScreen> {
           ),
           const Spacer(),
           Consumer<AuthService>(
-            builder: (context, authService, _) => IconButton(
-              onPressed: () => Navigator.of(context).push(
-                MaterialPageRoute(builder: (_) => const GestorLoginScreen()),
-              ),
-              icon: Icon(
-                Icons.admin_panel_settings,
-                color: authService.isLoggedIn ? Colors.green : Colors.grey[500],
-              ),
-              tooltip: 'Gestor',
-            ),
+            builder:
+                (context, authService, _) => IconButton(
+                  onPressed:
+                      () => Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => const GestorLoginScreen(),
+                        ),
+                      ),
+                  icon: Icon(
+                    Icons.admin_panel_settings,
+                    color:
+                        authService.isLoggedIn
+                            ? Colors.green
+                            : Colors.grey[500],
+                  ),
+                  tooltip: 'Gestor',
+                ),
           ),
         ],
       ),
@@ -178,7 +188,11 @@ class _SessionSelectorScreenState extends State<SessionSelectorScreen> {
     );
   }
 
-  Widget _buildPlaceGrid(BuildContext context, List<Place> places, PlaceProvider placeProvider) {
+  Widget _buildPlaceGrid(
+    BuildContext context,
+    List<Place> places,
+    PlaceProvider placeProvider,
+  ) {
     return Padding(
       padding: const EdgeInsets.all(24),
       child: Column(
@@ -203,7 +217,9 @@ class _SessionSelectorScreenState extends State<SessionSelectorScreen> {
               itemCount: places.length,
               itemBuilder: (context, index) {
                 final place = places[index];
-                final int occupancy = placeProvider.getCurrentOccupancy(place.id);
+                final int occupancy = placeProvider.getCurrentOccupancy(
+                  place.id,
+                );
                 return _PlaceCard(
                   place: place,
                   typeLabel: _typeLabels[place.type] ?? place.type,
@@ -286,8 +302,10 @@ class _PlaceCard extends StatelessWidget {
                 ),
                 const Spacer(),
                 Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 3,
+                  ),
                   decoration: BoxDecoration(
                     color: color.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(20),
@@ -326,18 +344,12 @@ class _PlaceCard extends StatelessWidget {
                 else if (currentOccupancy > 0)
                   Text(
                     '$currentOccupancy agora',
-                    style: TextStyle(
-                      color: Colors.grey.shade400,
-                      fontSize: 12,
-                    ),
+                    style: TextStyle(color: Colors.grey.shade400, fontSize: 12),
                   )
                 else
                   Text(
                     'Sem limite de cap.',
-                    style: TextStyle(
-                      color: Colors.grey.shade600,
-                      fontSize: 12,
-                    ),
+                    style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
                   ),
               ],
             ),
