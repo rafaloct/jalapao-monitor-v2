@@ -390,12 +390,12 @@ void main() {
     final adminIcon = find.byIcon(Icons.admin_panel_settings);
     if (adminIcon.evaluate().isNotEmpty) {
       await tester.tap(adminIcon.first, warnIfMissed: false);
-      // Navigator.push precisa de frames para completar — pump extra
-      for (int i = 0; i < 6; i++) {
+      // Poll até TextFormField aparecer — Navigator.push pode demorar em CI
+      var loginFields = find.byType(TextFormField);
+      for (int i = 0; i < 10 && loginFields.evaluate().isEmpty; i++) {
         await tester.pump(const Duration(milliseconds: 500));
+        loginFields = find.byType(TextFormField);
       }
-
-      final loginFields = find.byType(TextFormField);
       // Diagnóstico: distingue credencial vazia de campo de login ausente
       debugPrint(
         '[GESTOR] loginFields=${loginFields.evaluate().length} '
