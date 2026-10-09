@@ -4,8 +4,12 @@
 - **Objetivo:** servir PocketBase e Hub via Cloudflare Tunnel com TLS na borda,
   sem expor IP/porta do VPS e sem cleartext HTTP (mitiga o risco R4 da
   [matriz de acesso](../security/ACCESS_MATRIX.md)).
-- **Escopo deste documento:** procedimento operacional. **Nenhuma etapa foi
-  executada** — o acesso ao VPS e à conta Cloudflare é operação humana.
+- **Status:** **implantado em 2026-10-09** no VPS `srv1011336` — tunnel
+  `jalapao` ativo servindo `pb.neruds.org` e `hub.neruds.org` com origens em
+  loopback. Pendências de hardening/rate-limit e cleartext Android rastreadas
+  na [Issue #46](https://github.com/rafaloct/jalapao-monitor-v2/issues/46).
+- **Escopo deste documento:** procedimento operacional, mantido como
+  referência para staging e re-provisionamento.
 
 ## 1. Arquitetura alvo
 
@@ -18,8 +22,9 @@ Tablet Flutter ──HTTPS──▶ Cloudflare Edge ──tunnel──▶ cloudf
 - O VPS não precisa de porta pública aberta — o tunnel é saída (outbound only).
 - TLS é terminado na borda do Cloudflare; o tráfego tunnel↔origem fica na
   loopback do VPS.
-- SSE/realtime do PocketBase funciona sobre o tunnel (HTTP/1.1 com
-  `noHappyEyeballs`).
+- SSE/realtime do PocketBase funciona sobre o tunnel (verificado com
+  `event:PB_CONNECT` em produção). Origens em `127.0.0.1` literal — não usar
+  `localhost` (dual-stack resolve para `::1` e o bind é IPv4-only).
 
 ## 2. Pré-requisitos
 
