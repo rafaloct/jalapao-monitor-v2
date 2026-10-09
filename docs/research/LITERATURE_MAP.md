@@ -105,3 +105,14 @@
 3. Putjorn 2025 (capacidade dinâmica áreas naturais) → #4/#9
 4. MONTUR 2025 (dataset + arquitetura de sensoriamento) → #11/#12
 5. TOURETHOS 2024 (big data em tempo real de destino) → #2/Hub
+
+## 5. Reconciliação de relay (Issue #35)
+
+- Os commits de nuvem citados no protocolo A2A (`9e8edf5`, `7ad2343`) não
+  estavam acessíveis no `origin` no momento do relay.
+- A reconciliação contra a `main` pós-PRs #28/#33 indica que este mapa já
+  incorpora os pontos reportados nesses resumos: delimitação da fundamentação,
+  correção de extrapolações e recomendações objetivas por epic.
+- Pendência residual explícita: leituras completas dos PDFs e eventual ajuste de
+  priorização permanecem dependentes da abertura das tarefas executáveis de cada
+  epic, sem mudança funcional nesta entrega documental.
