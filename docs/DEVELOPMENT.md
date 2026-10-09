@@ -69,7 +69,7 @@ O schema está descrito em [POCKETBASE_SCHEMA.md](POCKETBASE_SCHEMA.md), mas o c
 
 Nenhum guia local autoriza alterar regras de collection, usar superuser em cliente, consultar dados de campo ou fazer deploy. A matriz da #19 está aprovada (ata na #13, 2026-10-06) — implementações de API devem segui-la.
 
-O fallback literal de PIN de `lib/services/auth_service.dart` foi removido na [#24](https://github.com/rafaloct/jalapao-monitor-v2/issues/24) (PR #38) — autenticação exclusiva por conta PocketBase, com transição/rotação documentada em `docs/security/CREDENTIAL_TRANSITION.md`.
+O fallback literal de PIN de `lib/services/auth_service.dart` está em remoção na [#24](https://github.com/rafaloct/jalapao-monitor-v2/issues/24) (PR #38 — **pendente de merge**; a transição/rotação está documentada em `docs/security/CREDENTIAL_TRANSITION.md` naquela branch). Enquanto o PR #38 não integra, builds a partir da main ainda contêm o fallback de PIN — não tratar o modelo credential-free como vigente antes disso.
 
 ## Paths técnicos reais
 
