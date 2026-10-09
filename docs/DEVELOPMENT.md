@@ -82,12 +82,14 @@ Para smoke exploratório (agente Gemini navega o APK sozinho em device de nuvem)
    Se a instância não estiver provisionada, os testes falham sem locais — a rota
    é criada conforme `docs/operations/ENVIRONMENTS.md` (PocketBase :8092 no VPS +
    ingress no tunnel).
-1. Build do APK de staging apontando para o PB de staging:
-   `flutter build apk --flavor staging --dart-define=PB_URL=https://pb-staging.neruds.org`
+1. Build do APK de staging pelo arquivo de ambiente — contrato da
+   `docs/operations/ENVIRONMENTS.md` (o example já aponta `pb-staging.neruds.org`):
+   `cp env/staging.example.json env/staging.local.json`
+   `flutter build apk --flavor staging --dart-define-from-file=env/staging.local.json`
    → artefato: `build/app/outputs/flutter-apk/app-staging-release.apk`
 2. Upload + execução dos test cases de `ops/firebase/` num **tablet** de nuvem
-   (o app é desenhado para tablet e força landscape):
-   `firebase apptesting:execute build/app/outputs/flutter-apk/app-staging-release.apk --app <staging-app-id> --test-dir ops/firebase --test-devices "model=MediumTablet.arm,version=36,locale=pt_BR,orientation=landscape" --test-non-blocking`
+   (o app é desenhado para tablet e força landscape; MediumTablet cobre API 26–35):
+   `firebase apptesting:execute build/app/outputs/flutter-apk/app-staging-release.apk --app <staging-app-id> --test-dir ops/firebase --test-devices "model=MediumTablet.arm,version=35,locale=pt_BR,orientation=landscape" --test-non-blocking`
    (`--app` é o app id **staging** do Firebase; `locale` usa underscore —
    `pt_BR`, não `pt-BR`. Sem `<apk>` o comando reusa o último release do
    App Distribution.)
