@@ -187,38 +187,60 @@ class PlaceProvider extends ChangeNotifier {
   /// Aprova um place: confirma no PocketBase **antes** de mutar o estado local.
   /// Aprovação não confirmada não altera o Hive e não é sucesso (#24 — elimina
   /// o falso positivo R3 de ponta a ponta).
+  /// Registro criado localmente e ainda não sincronizado (isSynced=false) não
+  /// existe no servidor — um update remoto retornaria 404; nesse caso faz
+  /// upsert do registro completo já com o status final.
   Future<bool> approvePlace(String placeId, AuthService authService) async {
-    final syncedRemote = await authService.approvePlace(placeId);
-    if (syncedRemote) {
-      final place = _placesBox.get(placeId);
-      if (place != null) {
-        await _placesBox.put(
-          placeId,
-          place.copyWith(
-            status: 'active',
-            approvedAt: DateTime.now(),
-            isSynced: true,
-          ),
-        );
+    final place = _placesBox.get(placeId);
+    if (place != null && !place.isSynced) {
+      final updated = place.copyWith(
+        status: 'active',
+        approvedAt: DateTime.now(),
+        isSynced: true,
+      );
+      final confirmed = await authService.upsertPlace(updated.toJson());
+      if (confirmed) {
+        await _placesBox.put(placeId, updated);
         notifyListeners();
       }
+      return confirmed;
+    }
+    final syncedRemote = await authService.approvePlace(placeId);
+    if (syncedRemote && place != null) {
+      await _placesBox.put(
+        placeId,
+        place.copyWith(
+          status: 'active',
+          approvedAt: DateTime.now(),
+          isSynced: true,
+        ),
+      );
+      notifyListeners();
     }
     return syncedRemote;
   }
 
   /// Rejeita um place: confirma no PocketBase **antes** de mutar o estado local.
+  /// Mesmo caso do registro ainda não sincronizado (upsert primeiro).
   /// Retorna o resultado remoto — rejeição não confirmada não é sucesso.
   Future<bool> rejectPlace(String placeId, AuthService authService) async {
-    final syncedRemote = await authService.rejectPlace(placeId);
-    if (syncedRemote) {
-      final place = _placesBox.get(placeId);
-      if (place != null) {
-        await _placesBox.put(
-          placeId,
-          place.copyWith(status: 'rejected', isSynced: true),
-        );
+    final place = _placesBox.get(placeId);
+    if (place != null && !place.isSynced) {
+      final updated = place.copyWith(status: 'rejected', isSynced: true);
+      final confirmed = await authService.upsertPlace(updated.toJson());
+      if (confirmed) {
+        await _placesBox.put(placeId, updated);
         notifyListeners();
       }
+      return confirmed;
+    }
+    final syncedRemote = await authService.rejectPlace(placeId);
+    if (syncedRemote && place != null) {
+      await _placesBox.put(
+        placeId,
+        place.copyWith(status: 'rejected', isSynced: true),
+      );
+      notifyListeners();
     }
     return syncedRemote;
   }

@@ -269,6 +269,27 @@ void main() {
     });
 
     test(
+      'token malformado de 3 segmentos não trava o init nem bloqueia login',
+      () async {
+        // JWT estruturalmente "válido" (3 segmentos) mas payload não-decodificável:
+        // isValid do AuthStore pode LANÇAR em vez de retornar false — sem guarda,
+        // ready falharia e todo login() travaria no `await ready`.
+        _fakeSecureStorage['gestor_auth_token'] = 'abc.@@@.def';
+        final auth = buildService('http://127.0.0.1:${fakePb.port}');
+        await auth.ready; // não pode lançar
+        expect(auth.isLoggedIn, isFalse);
+        expect(_fakeSecureStorage.containsKey('gestor_auth_token'), isFalse);
+        // Login interativo segue funcionando após o init.
+        final error = await auth.login(
+          FakePocketBaseServer.okEmail,
+          FakePocketBaseServer.okPassword,
+        );
+        expect(error, isNull);
+        expect(auth.isLoggedIn, isTrue);
+      },
+    );
+
+    test(
       'erro transitório (429) na revalidação preserva o token persistido',
       () async {
         fakePb.refreshErrorStatus = 429;

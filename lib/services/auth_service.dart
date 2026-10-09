@@ -62,7 +62,21 @@ class AuthService extends ChangeNotifier {
     if (token == null || token.isEmpty) return;
 
     pb.authStore.save(token, null);
-    if (!pb.authStore.isValid) return;
+    // isValid decodifica o payload do JWT e pode lançar (não apenas
+    // retornar false) em token malformado — isso fora do try travaria
+    // o init e bloquearia até o login interativo. Valor corrompido é
+    // descartado e a inicialização segue sem sessão.
+    bool tokenOk;
+    try {
+      tokenOk = pb.authStore.isValid;
+    } catch (_) {
+      tokenOk = false;
+    }
+    if (!tokenOk) {
+      pb.authStore.clear();
+      await _ss.delete(key: _tokenKey);
+      return;
+    }
 
     try {
       // Revalida server-side: token revogado ou conta rotacionada falha aqui.
@@ -179,6 +193,27 @@ class AuthService extends ChangeNotifier {
       return false;
     } catch (e) {
       debugPrint('[AuthService] Reject place error: $e');
+      return false;
+    }
+  }
+
+  /// Cria ou atualiza um place completo no PocketBase (upsert por id —
+  /// mesmo padrão do SyncService). Necessário quando o registro ainda só
+  /// existe no Hive (`isSynced: false`): um update de status retornaria 404.
+  /// Requer gestor autenticado — retorna false sem grant local.
+  Future<bool> upsertPlace(Map<String, dynamic> placeJson) async {
+    if (!_isLoggedIn) return false;
+    final placeId = placeJson['id'] as String;
+    try {
+      try {
+        await pb.collection('places').update(placeId, body: placeJson);
+      } on ClientException catch (e) {
+        if (e.statusCode != 404) rethrow;
+        await pb.collection('places').create(body: placeJson);
+      }
+      return true;
+    } catch (e) {
+      debugPrint('[AuthService] Upsert place error: $e');
       return false;
     }
   }

@@ -52,9 +52,10 @@ class _GestorScreenState extends State<GestorScreen>
 
     // #24: sucesso somente com confirmação do servidor — aprovação não
     // confirmada não é exibida como aplicada.
-    final success = localPlace != null
-        ? await placeProvider.approvePlace(placeId, authService)
-        : await placeProvider.approvePlaceRemote(placeData, authService);
+    final success =
+        localPlace != null
+            ? await placeProvider.approvePlace(placeId, authService)
+            : await placeProvider.approvePlaceRemote(placeData, authService);
 
     if (!mounted) return;
     if (success) {
@@ -79,23 +80,27 @@ class _GestorScreenState extends State<GestorScreen>
   Future<void> _rejectPlace(Map<String, dynamic> placeData) async {
     final confirmed = await showDialog<bool>(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Rejeitar local?'),
-        content: Text(
-          'Deseja rejeitar "${placeData['name']}"?\nO local não ficará disponível para operadores.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('Cancelar'),
+      builder:
+          (ctx) => AlertDialog(
+            title: const Text('Rejeitar local?'),
+            content: Text(
+              'Deseja rejeitar "${placeData['name']}"?\nO local não ficará disponível para operadores.',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(ctx, false),
+                child: const Text('Cancelar'),
+              ),
+              ElevatedButton(
+                onPressed: () => Navigator.pop(ctx, true),
+                style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                child: const Text(
+                  'Rejeitar',
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
+            ],
           ),
-          ElevatedButton(
-            onPressed: () => Navigator.pop(ctx, true),
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            child: const Text('Rejeitar', style: TextStyle(color: Colors.white)),
-          ),
-        ],
-      ),
     );
 
     if (confirmed != true || !mounted) return;
@@ -104,9 +109,8 @@ class _GestorScreenState extends State<GestorScreen>
     final authService = context.read<AuthService>();
     final placeId = placeData['id'] as String;
 
-    final localPlace = placeProvider.allPlaces
-        .where((p) => p.id == placeId)
-        .firstOrNull;
+    final localPlace =
+        placeProvider.allPlaces.where((p) => p.id == placeId).firstOrNull;
 
     bool success;
     if (localPlace != null) {
@@ -117,32 +121,42 @@ class _GestorScreenState extends State<GestorScreen>
 
     if (!mounted) return;
     if (success) {
-      setState(() => _remotePendingPlaces.removeWhere((p) => p['id'] == placeId));
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('❌ "${placeData['name']}" rejeitado.'),
-        ),
+      setState(
+        () => _remotePendingPlaces.removeWhere((p) => p['id'] == placeId),
       );
     }
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          success
+              ? '❌ "${placeData['name']}" rejeitado.'
+              : '⚠️ "${placeData['name']}" não foi rejeitado no servidor.\n'
+                  'Verifique a conexão e a sessão do gestor.',
+        ),
+        backgroundColor: success ? null : Colors.orange[700],
+        duration: Duration(seconds: success ? 3 : 5),
+      ),
+    );
   }
 
   void _logout() async {
     final confirmed = await showDialog<bool>(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Sair do painel?'),
-        content: const Text('Deseja encerrar a sessão do gestor?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('Cancelar'),
+      builder:
+          (ctx) => AlertDialog(
+            title: const Text('Sair do painel?'),
+            content: const Text('Deseja encerrar a sessão do gestor?'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(ctx, false),
+                child: const Text('Cancelar'),
+              ),
+              ElevatedButton(
+                onPressed: () => Navigator.pop(ctx, true),
+                child: const Text('Sair'),
+              ),
+            ],
           ),
-          ElevatedButton(
-            onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('Sair'),
-          ),
-        ],
-      ),
     );
 
     if (confirmed != true || !mounted) return;
@@ -213,9 +227,10 @@ class _GestorScreenState extends State<GestorScreen>
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => Navigator.of(context).push(
-          MaterialPageRoute(builder: (_) => const PlaceFormScreen()),
-        ),
+        onPressed:
+            () => Navigator.of(
+              context,
+            ).push(MaterialPageRoute(builder: (_) => const PlaceFormScreen())),
         backgroundColor: JalapaoTheme.primaryColor,
         icon: const Icon(Icons.add_location_alt, color: Colors.white),
         label: const Text(
@@ -236,10 +251,13 @@ class _GestorScreenState extends State<GestorScreen>
             _remotePendingPlaces.map((p) => p['id'] as String).toSet();
 
         // Places locais pendentes ainda não enviados ao PocketBase
-        final localOnlyPending = placeProvider.pendingPlaces
-            .where((p) => !remoteIds.contains(p.id))
-            .map((p) => <String, dynamic>{...p.toJson(), '_localOnly': true})
-            .toList();
+        final localOnlyPending =
+            placeProvider.pendingPlaces
+                .where((p) => !remoteIds.contains(p.id))
+                .map(
+                  (p) => <String, dynamic>{...p.toJson(), '_localOnly': true},
+                )
+                .toList();
 
         // Mescla: locais não sincronizados aparecem primeiro
         final allPending = [...localOnlyPending, ..._remotePendingPlaces];
@@ -253,8 +271,11 @@ class _GestorScreenState extends State<GestorScreen>
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.check_circle_outline,
-                    size: 64, color: Colors.green[300]),
+                Icon(
+                  Icons.check_circle_outline,
+                  size: 64,
+                  color: Colors.green[300],
+                ),
                 const SizedBox(height: 16),
                 const Text(
                   'Nenhum local pendente de aprovação.',
@@ -327,15 +348,13 @@ class _GestorScreenState extends State<GestorScreen>
             final place = active[index];
             final occupancy = placeProvider.getCurrentOccupancy(place.id);
             final avgStay = placeProvider.getAverageStay(place.id);
-            final todayVisits = placeProvider
-                .visitsByPlace(place.id)
-                .where((v) {
+            final todayVisits =
+                placeProvider.visitsByPlace(place.id).where((v) {
                   final today = DateTime.now();
                   return v.arrivalTime.year == today.year &&
                       v.arrivalTime.month == today.month &&
                       v.arrivalTime.day == today.day;
-                })
-                .length;
+                }).length;
 
             return _ActivePlaceCard(
               place: place,
@@ -474,9 +493,10 @@ class _PendingPlaceCard extends StatelessWidget {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
         side: BorderSide(
-          color: isLocalOnly
-              ? Colors.blue.withOpacity(0.4)
-              : Colors.orange.withOpacity(0.3),
+          color:
+              isLocalOnly
+                  ? Colors.blue.withOpacity(0.4)
+                  : Colors.orange.withOpacity(0.3),
         ),
       ),
       child: Padding(
@@ -492,9 +512,10 @@ class _PendingPlaceCard extends StatelessWidget {
                     vertical: 4,
                   ),
                   decoration: BoxDecoration(
-                    color: isLocalOnly
-                        ? Colors.blue.withOpacity(0.12)
-                        : Colors.orange.withOpacity(0.15),
+                    color:
+                        isLocalOnly
+                            ? Colors.blue.withOpacity(0.12)
+                            : Colors.orange.withOpacity(0.15),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
@@ -502,24 +523,19 @@ class _PendingPlaceCard extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.bold,
-                      color: isLocalOnly ? Colors.blue[700] : Colors.orange[700],
+                      color:
+                          isLocalOnly ? Colors.blue[700] : Colors.orange[700],
                     ),
                   ),
                 ),
                 const Spacer(),
-                Text(
-                  _typeLabel(type),
-                  style: const TextStyle(fontSize: 13),
-                ),
+                Text(_typeLabel(type), style: const TextStyle(fontSize: 13)),
               ],
             ),
             const SizedBox(height: 10),
             Text(
               name,
-              style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 6),
             Row(
@@ -614,9 +630,8 @@ class _ActivePlaceCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ratio = place.capacityTotal > 0
-        ? occupancy / place.capacityTotal
-        : 0.0;
+    final ratio =
+        place.capacityTotal > 0 ? occupancy / place.capacityTotal : 0.0;
     final color = _occupancyColor(occupancy, place.capacityTotal);
 
     return Card(
@@ -713,10 +728,7 @@ class _StatChip extends StatelessWidget {
         children: [
           Icon(icon, size: 12, color: Colors.grey[600]),
           const SizedBox(width: 4),
-          Text(
-            label,
-            style: TextStyle(fontSize: 12, color: Colors.grey[700]),
-          ),
+          Text(label, style: TextStyle(fontSize: 12, color: Colors.grey[700])),
         ],
       ),
     );
@@ -826,7 +838,9 @@ class _PlaceTypeSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final info = _typeInfo[type] ?? {'label': type, 'unit': 'pessoas', 'metric': 'Ocupação'};
+    final info =
+        _typeInfo[type] ??
+        {'label': type, 'unit': 'pessoas', 'metric': 'Ocupação'};
 
     // Métricas do tipo
     final totalCapacity = places.fold<int>(
@@ -889,10 +903,7 @@ class _PlaceTypeSection extends StatelessWidget {
                 icon: Icons.equalizer,
                 label: '${info['metric']}: $totalOccupancy / $totalCapacity',
               ),
-              _StatChip(
-                icon: Icons.today,
-                label: 'Hoje: $todayVisits visitas',
-              ),
+              _StatChip(icon: Icons.today, label: 'Hoje: $todayVisits visitas'),
             ],
           ),
         ),
@@ -901,14 +912,14 @@ class _PlaceTypeSection extends StatelessWidget {
         // Cada place do tipo
         ...places.map((place) {
           final occ = placeProvider.getCurrentOccupancy(place.id);
-          final ratio = place.capacityTotal > 0
-              ? occ / place.capacityTotal
-              : 0.0;
-          final color = ratio >= 1.0
-              ? Colors.red
-              : ratio >= 0.7
-              ? Colors.orange
-              : Colors.green;
+          final ratio =
+              place.capacityTotal > 0 ? occ / place.capacityTotal : 0.0;
+          final color =
+              ratio >= 1.0
+                  ? Colors.red
+                  : ratio >= 0.7
+                  ? Colors.orange
+                  : Colors.green;
 
           return Padding(
             padding: const EdgeInsets.only(left: 8, bottom: 6),
@@ -924,10 +935,7 @@ class _PlaceTypeSection extends StatelessWidget {
                 ),
                 const SizedBox(width: 8),
                 Expanded(
-                  child: Text(
-                    place.name,
-                    style: const TextStyle(fontSize: 13),
-                  ),
+                  child: Text(place.name, style: const TextStyle(fontSize: 13)),
                 ),
                 Text(
                   '$occ/${place.capacityTotal}',
