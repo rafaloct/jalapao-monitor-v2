@@ -78,75 +78,58 @@ class _DashboardScreenState extends State<DashboardScreen> {
             builder:
                 (ctx, setDialogState) => Dialog(
                   backgroundColor: JalapaoTheme.background,
+                  // Sobe o diálogo quando o teclado aparece
+                  insetPadding: EdgeInsets.fromLTRB(
+                    40,
+                    24,
+                    40,
+                    MediaQuery.of(ctx).viewInsets.bottom + 24,
+                  ),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(24),
                   ),
-                  child: ConstrainedBox(
-                    constraints: BoxConstraints(
-                      maxHeight: MediaQuery.of(ctx).size.height * 0.85,
-                    ),
-                    child: SingleChildScrollView(
-                      padding: const EdgeInsets.all(32),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            'CHEGADA DE GRUPO',
-                            textAlign: TextAlign.center,
-                            style: Theme.of(context).textTheme.displayMedium
-                                ?.copyWith(color: JalapaoTheme.primary),
-                          ),
-                          const SizedBox(height: 24),
-                          PaxSelector(
-                            maxPax: maxPax,
-                            selectedCount: selected,
-                            activeColor: JalapaoTheme.primary,
-                            label: 'Quantas Pessoas?',
-                            onChanged:
-                                (v) => setDialogState(() => selected = v),
-                          ),
-                          const SizedBox(height: 20),
-                          TextField(
-                            controller: groupNameCtrl,
-                            style: const TextStyle(color: Colors.white),
-                            decoration: InputDecoration(
-                              labelText: 'Nome do grupo (opcional)',
-                              labelStyle: TextStyle(
-                                color: JalapaoTheme.textSync.withOpacity(0.6),
-                              ),
-                              hintText: 'Ex: Grupo Ipê',
-                              hintStyle: TextStyle(
-                                color: JalapaoTheme.textSync.withOpacity(0.3),
-                              ),
-                              filled: true,
-                              fillColor: Colors.white.withOpacity(0.05),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                                borderSide: BorderSide.none,
-                              ),
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.all(32),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          'CHEGADA DE GRUPO',
+                          textAlign: TextAlign.center,
+                          style: Theme.of(context).textTheme.displayMedium
+                              ?.copyWith(color: JalapaoTheme.primary),
+                        ),
+                        const SizedBox(height: 24),
+                        PaxSelector(
+                          maxPax: maxPax,
+                          selectedCount: selected,
+                          activeColor: JalapaoTheme.primary,
+                          label: 'Quantas Pessoas?',
+                          onChanged:
+                              (v) => setDialogState(() => selected = v),
+                        ),
+                        const SizedBox(height: 20),
+                        TextField(
+                          controller: groupNameCtrl,
+                          decoration: InputDecoration(
+                            labelText: 'Nome do grupo (opcional)',
+                            hintText: 'Ex: Grupo Ipê',
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
                             ),
                           ),
-                          const SizedBox(height: 12),
-                          TextField(
-                            controller: originCityCtrl,
-                            style: const TextStyle(color: Colors.white),
-                            decoration: InputDecoration(
-                              labelText: 'Cidade de origem (opcional)',
-                              labelStyle: TextStyle(
-                                color: JalapaoTheme.textSync.withOpacity(0.6),
-                              ),
-                              hintText: 'Ex: Palmas, Brasília...',
-                              hintStyle: TextStyle(
-                                color: JalapaoTheme.textSync.withOpacity(0.3),
-                              ),
-                              filled: true,
-                              fillColor: Colors.white.withOpacity(0.05),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                                borderSide: BorderSide.none,
-                              ),
+                        ),
+                        const SizedBox(height: 12),
+                        TextField(
+                          controller: originCityCtrl,
+                          decoration: InputDecoration(
+                            labelText: 'Cidade de origem (opcional)',
+                            hintText: 'Ex: Palmas, Brasília...',
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
                             ),
                           ),
+                        ),
                           const SizedBox(height: 24),
                           Row(
                             children: [
@@ -192,7 +175,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         ],
                       ),
                     ),
-                  ),
                 ),
           ),
     );

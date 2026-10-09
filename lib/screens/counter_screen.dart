@@ -71,42 +71,22 @@ class _CounterScreenState extends State<CounterScreen> {
                   TextField(
                     controller: groupNameCtrl,
                     autofocus: false,
-                    style: const TextStyle(color: Colors.white),
                     decoration: InputDecoration(
                       labelText: 'Nome do grupo (opcional)',
-                      labelStyle: TextStyle(
-                        color: JalapaoTheme.textSync.withOpacity(0.6),
-                      ),
                       hintText: 'Ex: Grupo Ipê',
-                      hintStyle: TextStyle(
-                        color: JalapaoTheme.textSync.withOpacity(0.3),
-                      ),
-                      filled: true,
-                      fillColor: Colors.white.withOpacity(0.05),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide.none,
                       ),
                     ),
                   ),
                   const SizedBox(height: 12),
                   TextField(
                     controller: originCityCtrl,
-                    style: const TextStyle(color: Colors.white),
                     decoration: InputDecoration(
                       labelText: 'Cidade de origem (opcional)',
-                      labelStyle: TextStyle(
-                        color: JalapaoTheme.textSync.withOpacity(0.6),
-                      ),
                       hintText: 'Ex: Palmas, Brasília...',
-                      hintStyle: TextStyle(
-                        color: JalapaoTheme.textSync.withOpacity(0.3),
-                      ),
-                      filled: true,
-                      fillColor: Colors.white.withOpacity(0.05),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide.none,
                       ),
                     ),
                   ),
@@ -328,79 +308,86 @@ class _CounterScreenState extends State<CounterScreen> {
     int todayTotal,
     Place place,
   ) {
-    return Padding(
-      padding: const EdgeInsets.all(20),
-      child: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'REGISTRAR CHEGADA',
-              style: TextStyle(
-                color: JalapaoTheme.textSync.withValues(alpha: 0.5),
-                fontSize: 11,
-                fontWeight: FontWeight.w700,
-                letterSpacing: 1.5,
-              ),
-            ),
-            const SizedBox(height: 16),
-            PaxSelector(
-              // 1.2: maxPax dinâmico baseado na capacidade do lugar; fallback 30
-              maxPax: place.capacityTotal > 0 ? place.capacityTotal : 30,
-              selectedCount: _pendingPax,
-              activeColor: const Color(0xFF3FB950),
-              label: 'Pessoas no grupo',
-              onChanged: (v) => setState(() => _pendingPax = v),
-            ),
-            const SizedBox(height: 20),
-            SizedBox(
-              width: double.infinity,
-              height: 52,
-              child: ElevatedButton.icon(
-                onPressed:
-                    _registering
-                        ? null
-                        : () => _showRegisterDialog(pp, placeId),
-                icon: const Icon(Icons.add_circle_outline, size: 22),
-                label: Text(
-                  'CHEGOU — $_pendingPax pessoa${_pendingPax > 1 ? "s" : ""}',
+    // CTA fixo no rodapé — fora do scroll para nunca sair da dobra
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'REGISTRAR CHEGADA',
+                  style: TextStyle(
+                    color: JalapaoTheme.textSync.withValues(alpha: 0.5),
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 1.5,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                PaxSelector(
+                  // 1.2: maxPax dinâmico baseado na capacidade do lugar; fallback 30
+                  maxPax: place.capacityTotal > 0 ? place.capacityTotal : 30,
+                  selectedCount: _pendingPax,
+                  activeColor: const Color(0xFF3FB950),
+                  label: 'Pessoas no grupo',
+                  onChanged: (v) => setState(() => _pendingPax = v),
+                ),
+                const SizedBox(height: 24),
+                Divider(color: JalapaoTheme.textSync.withValues(alpha: 0.1)),
+                const SizedBox(height: 12),
+                Text(
+                  'HOJE',
+                  style: TextStyle(
+                    color: JalapaoTheme.textSync.withValues(alpha: 0.5),
+                    fontSize: 11,
+                    letterSpacing: 1.5,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  '$todayTotal visitantes',
                   style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w800,
+                    color: JalapaoTheme.textSync,
+                    fontSize: 28,
+                    fontWeight: FontWeight.w900,
                   ),
                 ),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: JalapaoTheme.primary,
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-              ),
+              ],
             ),
-            const SizedBox(height: 32),
-            Divider(color: JalapaoTheme.textSync.withValues(alpha: 0.1)),
-            const SizedBox(height: 16),
-            Text(
-              'HOJE',
-              style: TextStyle(
-                color: JalapaoTheme.textSync.withValues(alpha: 0.5),
-                fontSize: 11,
-                letterSpacing: 1.5,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              '$todayTotal visitantes',
-              style: const TextStyle(
-                color: JalapaoTheme.textSync,
-                fontSize: 28,
-                fontWeight: FontWeight.w900,
-              ),
-            ),
-          ],
+          ),
         ),
-      ),
+        // CTA sempre visível — fixo no rodapé do painel
+        Padding(
+          padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
+          child: SizedBox(
+            width: double.infinity,
+            height: 56,
+            child: ElevatedButton.icon(
+              onPressed:
+                  _registering ? null : () => _showRegisterDialog(pp, placeId),
+              icon: const Icon(Icons.add_circle_outline, size: 22),
+              label: Text(
+                'CHEGOU — $_pendingPax pessoa${_pendingPax > 1 ? "s" : ""}',
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: JalapaoTheme.primary,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 

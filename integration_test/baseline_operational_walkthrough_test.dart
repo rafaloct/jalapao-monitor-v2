@@ -11,15 +11,34 @@ const _testGestorEmail = String.fromEnvironment('TEST_GESTOR_EMAIL');
 const _testGestorPassword = String.fromEnvironment('TEST_GESTOR_PASSWORD');
 
 /// Helpers de navegação
+/// NUNCA usar pumpAndSettle() sem timeout — o timer SyncDown do PlaceProvider
+/// (30s) impede que retorne. Usar pumps finitos em todo lugar.
 Future<void> _voltarAoSelector(WidgetTester tester) async {
+  // Fecha qualquer Dialog residual antes de tentar swap_horiz
+  final dialogAberto = find.byType(Dialog);
+  if (dialogAberto.evaluate().isNotEmpty) {
+    debugPrint('[NAV] Dialog residual antes de swap_horiz — fechando');
+    await tester.tapAt(const Offset(10, 10));
+    for (int i = 0; i < 4; i++) {
+      await tester.pump(const Duration(milliseconds: 500));
+    }
+  }
+
   final swapBtn = find.byIcon(Icons.swap_horiz);
+  debugPrint('[NAV] swap_horiz=${swapBtn.evaluate().length}');
   if (swapBtn.evaluate().isNotEmpty) {
     await tester.tap(swapBtn.first, warnIfMissed: false);
-    await tester.pumpAndSettle();
+    // pumpAndSettle trava com o timer SyncDown — pump finito
+    for (int i = 0; i < 4; i++) {
+      await tester.pump(const Duration(milliseconds: 500));
+    }
     final trocarBtn = find.text('Trocar');
+    debugPrint('[NAV] trocar=${trocarBtn.evaluate().length}');
     if (trocarBtn.evaluate().isNotEmpty) {
-      await tester.tap(trocarBtn.first);
-      await tester.pumpAndSettle(const Duration(seconds: 2));
+      await tester.tap(trocarBtn.first, warnIfMissed: false);
+      for (int i = 0; i < 4; i++) {
+        await tester.pump(const Duration(milliseconds: 500));
+      }
     }
   }
 }
@@ -384,15 +403,46 @@ void main() {
     // ══════════════════════════════════════════════════════════════════════════
     // F. GESTOR SCREEN — login, 3 abas, PlaceFormScreen, logout
     // ══════════════════════════════════════════════════════════════════════════
+    // F0: fechar diálogos residuais antes de navegar
+    // Usa Dialog (superclasse) — cobre AlertDialog e Dialog genérico
+    final dialogAberto = find.byType(Dialog);
+    if (dialogAberto.evaluate().isNotEmpty) {
+      debugPrint('[NAV] diálogo residual encontrado — fechando');
+      await tester.tapAt(const Offset(10, 10)); // toca fora p/ dispensar
+      for (int i = 0; i < 4; i++) {
+        await tester.pump(const Duration(milliseconds: 500));
+      }
+    }
+
     // F0: resetar para o SessionSelector antes de buscar ícone admin
     await _voltarAoSelector(tester);
 
-    final adminIcon = find.byIcon(Icons.admin_panel_settings);
-    if (adminIcon.evaluate().isNotEmpty) {
-      await tester.tap(adminIcon.first);
-      await tester.pumpAndSettle(const Duration(seconds: 2));
+    // Diagnóstico: qual tela está ativa antes do tap
+    debugPrint(
+      '[GESTOR] swap_horiz=${find.byIcon(Icons.swap_horiz).evaluate().length} '
+      'admin=${find.byIcon(Icons.admin_panel_settings).evaluate().length} '
+      'TextFormField=${find.byType(TextFormField).evaluate().length}',
+    );
 
+    // byTooltip('Gestor') é mais específico que byIcon — o Icon standalone
+    // dentro do GestorLoginScreen também usa admin_panel_settings (não clicável)
+    final gestorTooltip = find.byTooltip('Gestor');
+    if (gestorTooltip.evaluate().isNotEmpty) {
+      await tester.ensureVisible(gestorTooltip.first);
+      await tester.pump(const Duration(milliseconds: 300));
+      await tester.tap(gestorTooltip.first, warnIfMissed: false);
+      // Poll até 'Painel do Gestor' aparecer — confirma que a tela abriu
+      var painel = find.text('Painel do Gestor');
+      for (int i = 0; i < 10 && painel.evaluate().isEmpty; i++) {
+        await tester.pump(const Duration(milliseconds: 500));
+        painel = find.text('Painel do Gestor');
+      }
       final loginFields = find.byType(TextFormField);
+      debugPrint(
+        '[GESTOR] loginFields=${loginFields.evaluate().length} '
+        'painel=${find.text("Painel do Gestor").evaluate().length} '
+        'email=${_testGestorEmail.isEmpty ? "<vazio>" : "ok"}',
+      );
       if (loginFields.evaluate().isNotEmpty &&
           _testGestorEmail.isNotEmpty &&
           _testGestorPassword.isNotEmpty) {

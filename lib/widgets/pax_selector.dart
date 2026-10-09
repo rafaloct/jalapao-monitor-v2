@@ -48,6 +48,7 @@ class _PaxSelectorState extends State<PaxSelector> {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
+        // Contador grande animado
         AnimatedSwitcher(
           duration: const Duration(milliseconds: 200),
           transitionBuilder:
@@ -56,7 +57,7 @@ class _PaxSelectorState extends State<PaxSelector> {
             '${widget.selectedCount}',
             key: ValueKey(widget.selectedCount),
             style: Theme.of(context).textTheme.displayLarge?.copyWith(
-              fontSize: 48,
+              fontSize: 56,
               color:
                   widget.selectedCount > 0
                       ? widget.activeColor
@@ -72,9 +73,10 @@ class _PaxSelectorState extends State<PaxSelector> {
           ),
         ),
         const SizedBox(height: 16),
-        _buildPersonGrid(),
+        // Chips de atalho para valores comuns (1/2/4/10)
+        _buildQuickChips(),
         const SizedBox(height: 16),
-        // +/- com long-press para incremento rápido (grupos grandes)
+        // Botões −/+ com long-press para incremento rápido
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -115,67 +117,56 @@ class _PaxSelectorState extends State<PaxSelector> {
     );
   }
 
-  Widget _buildPersonGrid() {
-    const int cols = 5;
-    final int rows = (widget.maxPax / cols).ceil();
+  /// Chips de atalho para seleção rápida: 1, 2, 4, 10.
+  /// Substitui a grade de N ícones que bloqueava o CTA em locais com alta capacidade.
+  Widget _buildQuickChips() {
+    final chips = [1, 2, 4, 10].where((v) => v <= widget.maxPax).toList();
+    if (chips.isEmpty) return const SizedBox.shrink();
 
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        // cada item tem margin: horizontal(4) = 8px total por item
-        final double itemSize = ((constraints.maxWidth - cols * 8) / cols)
-            .clamp(28.0, 44.0);
-
-        return Column(
-          children: List.generate(rows, (row) {
-            return Padding(
-              padding: const EdgeInsets.only(bottom: 4.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: List.generate(cols, (col) {
-                  final int index = row * cols + col + 1;
-                  if (index > widget.maxPax) return SizedBox(width: itemSize);
-
-                  final bool isSelected = index <= widget.selectedCount;
-
-                  return GestureDetector(
-                    onTap: () => widget.onChanged(index),
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 150),
-                      width: itemSize,
-                      height: itemSize,
-                      margin: const EdgeInsets.symmetric(horizontal: 4),
-                      decoration: BoxDecoration(
-                        color:
-                            isSelected
-                                ? widget.activeColor.withOpacity(0.2)
-                                : Colors.white.withOpacity(0.5),
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color:
-                              isSelected
-                                  ? widget.activeColor
-                                  : JalapaoTheme.textSync.withOpacity(0.2),
-                          width: isSelected ? 3.0 : 1.5,
-                        ),
-                      ),
-                      padding: const EdgeInsets.all(6),
-                      child: Center(
-                        child: Text(
-                          '👤',
-                          style: TextStyle(fontSize: itemSize * 0.55),
-                        ),
-                      ),
-                    ),
-                  );
-                }),
+    return Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      alignment: WrapAlignment.center,
+      children: chips.map((v) {
+        final bool selected = widget.selectedCount == v;
+        return InkWell(
+          onTap: () => widget.onChanged(v),
+          borderRadius: BorderRadius.circular(20),
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 150),
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            decoration: BoxDecoration(
+              color:
+                  selected
+                      ? widget.activeColor.withOpacity(0.15)
+                      : JalapaoTheme.textSync.withOpacity(0.06),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(
+                color:
+                    selected
+                        ? widget.activeColor
+                        : JalapaoTheme.textSync.withOpacity(0.2),
+                width: selected ? 2.0 : 1.0,
               ),
-            );
-          }),
+            ),
+            child: Text(
+              '$v',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w700,
+                color:
+                    selected
+                        ? widget.activeColor
+                        : JalapaoTheme.textSync.withOpacity(0.7),
+              ),
+            ),
+          ),
         );
-      },
+      }).toList(),
     );
   }
 }
+
 
 class _HoldButton extends StatelessWidget {
   final IconData icon;
@@ -200,14 +191,14 @@ class _HoldButton extends StatelessWidget {
       onLongPressEnd: (_) => onHoldEnd(),
       onLongPressCancel: onHoldEnd,
       child: Container(
-        width: 52,
-        height: 52,
+        width: 64,
+        height: 64,
         decoration: BoxDecoration(
           color: color.withOpacity(0.12),
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(16),
           border: Border.all(color: color.withOpacity(0.35), width: 2),
         ),
-        child: Icon(icon, color: color, size: 26),
+        child: Icon(icon, color: color, size: 30),
       ),
     );
   }
