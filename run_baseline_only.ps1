@@ -30,16 +30,24 @@ Write-Host "Executando Teste: $testId" -ForegroundColor Yellow
 # Secao do gestor usa conta SINTETICA de teste via env (Issue #24 — sem
 # credencial embutida; o PIN local de fallback foi removido):
 #   $env:TEST_GESTOR_EMAIL / $env:TEST_GESTOR_PASSWORD
-$testDefines = "--dart-define=PB_URL=$PB_URL"
+# Invocação direta com array de argumentos: sem `cmd /c` para não reparsear
+# credenciais com &, |, ^, aspas ou espaços.
+$flutterArgs = @('test', $testFile, '-d', $dev, "--dart-define=PB_URL=$PB_URL")
 if ($env:TEST_GESTOR_EMAIL -and $env:TEST_GESTOR_PASSWORD) {
-    $testDefines += " --dart-define=TEST_GESTOR_EMAIL=$env:TEST_GESTOR_EMAIL"
-    $testDefines += " --dart-define=TEST_GESTOR_PASSWORD=$env:TEST_GESTOR_PASSWORD"
+    $flutterArgs += "--dart-define=TEST_GESTOR_EMAIL=$env:TEST_GESTOR_EMAIL"
+    $flutterArgs += "--dart-define=TEST_GESTOR_PASSWORD=$env:TEST_GESTOR_PASSWORD"
 }
 
-cmd /c "flutter test $testFile -d $dev $testDefines 2>&1" | ForEach-Object {
+& flutter @flutterArgs 2>&1 | ForEach-Object {
     Write-Host $_
     if ($_ -match '\[SCREEN_CAPTURE\]:\s*(.+)') {
         $n = $Matches[1].Trim()
         if ($n -notmatch '99_fim') { Snap $currentFolder $n }
     }
+}
+# O pipeline não propaga o exit code do processo filho — propagar explicitamente
+# para não reportar verde com o walkthrough falho.
+if ($LASTEXITCODE -ne 0) {
+    Write-Host "FALHA: walkthrough encerrou com codigo $LASTEXITCODE" -ForegroundColor Red
+    exit $LASTEXITCODE
 }

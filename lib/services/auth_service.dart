@@ -34,9 +34,14 @@ class AuthService extends ChangeNotifier {
   bool _isLoggedIn = false;
   String? _gestorName;
 
+  /// Futuro da inicialização (purge de PIN legado + restauração de sessão).
+  /// `login()` aguarda isso — evita race entre um login interativo e um
+  /// auth-refresh de token antigo operando sobre o mesmo authStore.
+  late final Future<void> ready;
+
   AuthService(this._configBox, {PocketBase? client})
     : pb = client ?? PocketBase(AppConfig.pbUrl) {
-    _initAsync();
+    ready = _initAsync();
   }
 
   bool get isLoggedIn => _isLoggedIn;
@@ -66,10 +71,16 @@ class AuthService extends ChangeNotifier {
       _isLoggedIn = true;
       _gestorName = _configBox.get(_nameKey) as String?;
       notifyListeners();
-    } on ClientException {
-      // Rejeição explícita do servidor (401/403): token revogado — descarta.
+    } on ClientException catch (e) {
+      // Somente 401/403 estabelece revogação — aí o token é descartado.
+      if (e.statusCode == 401 || e.statusCode == 403) {
+        pb.authStore.clear();
+        await _ss.delete(key: _tokenKey);
+        return;
+      }
+      // Erro transitório (429/5xx/4xx genérico): não concede acesso, mas
+      // preserva o token persistido para nova tentativa no próximo init.
       pb.authStore.clear();
-      await _ss.delete(key: _tokenKey);
     } catch (_) {
       // Falha de transporte: não concede acesso, mas mantém o token
       // para nova tentativa no próximo init.
@@ -84,6 +95,9 @@ class AuthService extends ChangeNotifier {
   ///
   /// Retorna `null` em sucesso ou mensagem de erro.
   Future<String?> login(String email, String password) async {
+    // Serializa com a restauração de sessão em voo — um refresh de token
+    // antigo não pode sobrescrever nem apagar o resultado deste login.
+    await ready;
     try {
       await pb.collection('users').authWithPassword(email, password);
       await _ss.write(key: _tokenKey, value: pb.authStore.token);

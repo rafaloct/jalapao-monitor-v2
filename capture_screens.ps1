@@ -48,19 +48,27 @@ foreach ($t in $tests) {
     Write-Host "Arquivo: $testFile" -ForegroundColor Gray
 
     # Conta SINTETICA de teste do gestor via env (Issue #24 — sem credencial
-    # embutida; o PIN local de fallback foi removido)
-    $testDefines = "--dart-define=PB_URL=$PB_URL"
+    # embutida; o PIN local de fallback foi removido). Invocação direta com
+    # array de argumentos: sem `cmd /c` para não reparsear valores com
+    # &, |, ^, aspas ou espaços.
+    $flutterArgs = @('test', $testFile, '-d', $dev, "--dart-define=PB_URL=$PB_URL")
     if ($env:TEST_GESTOR_EMAIL -and $env:TEST_GESTOR_PASSWORD) {
-        $testDefines += " --dart-define=TEST_GESTOR_EMAIL=$env:TEST_GESTOR_EMAIL"
-        $testDefines += " --dart-define=TEST_GESTOR_PASSWORD=$env:TEST_GESTOR_PASSWORD"
+        $flutterArgs += "--dart-define=TEST_GESTOR_EMAIL=$env:TEST_GESTOR_EMAIL"
+        $flutterArgs += "--dart-define=TEST_GESTOR_PASSWORD=$env:TEST_GESTOR_PASSWORD"
     }
 
-    cmd /c "flutter test $testFile -d $dev $testDefines 2>&1" | ForEach-Object {
+    & flutter @flutterArgs 2>&1 | ForEach-Object {
         Write-Host $_
         if ($_ -match '\[SCREEN_CAPTURE\]:\s*(.+)') {
             $n = $Matches[1].Trim()
             if ($n -notmatch '99_fim') { Snap $currentFolder $n }
         }
+    }
+    # O pipeline não propaga o exit code do processo filho — verificar
+    # explicitamente para não reportar verde com teste falho.
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host "FALHA: teste $testId encerrou com codigo $LASTEXITCODE" -ForegroundColor Red
+        exit $LASTEXITCODE
     }
 }
 
@@ -89,8 +97,12 @@ try {
     $token = $authResp.token
     Write-Host "Gestor Auth OK. Token obtido." -ForegroundColor DarkGreen
 } catch {
-    Write-Host "AVISO: Falha na autenticacao do Gestor: $_" -ForegroundColor DarkYellow
-    Write-Host "       Tentando acesso anonimo..." -ForegroundColor DarkGray
+    Write-Error "Falha na autenticacao do Gestor: $_. E2E abortado — sem credencial valida nao ha verificacao autenticada (acesso anonimo reportaria verde falso)."
+    exit 1
+}
+if (-not $token) {
+    Write-Error "Autenticacao retornou sem token. E2E abortado."
+    exit 1
 }
 
 # Step 2: Consultar place_visits com token

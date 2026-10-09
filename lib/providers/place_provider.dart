@@ -22,7 +22,12 @@ class PlaceProvider extends ChangeNotifier {
   String? _lastSyncError;
   String? get lastSyncError => _lastSyncError;
 
-  PlaceProvider(this._placesBox, this._placeVisitsBox, this._reservationsBox, this._configBox) {
+  PlaceProvider(
+    this._placesBox,
+    this._placeVisitsBox,
+    this._reservationsBox,
+    this._configBox,
+  ) {
     _syncService = SyncService(
       placesBox: _placesBox,
       placeVisitsBox: _placeVisitsBox,
@@ -43,7 +48,8 @@ class PlaceProvider extends ChangeNotifier {
     if (sessionDateStr == null) return;
     final sessionDate = DateTime.parse(sessionDateStr);
     final today = DateTime.now();
-    final isToday = sessionDate.year == today.year &&
+    final isToday =
+        sessionDate.year == today.year &&
         sessionDate.month == today.month &&
         sessionDate.day == today.day;
     if (!isToday) {
@@ -93,8 +99,10 @@ class PlaceProvider extends ChangeNotifier {
   String _generateId() {
     const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
     final rand = Random();
-    return List.generate(15, (index) => chars[rand.nextInt(chars.length)])
-        .join();
+    return List.generate(
+      15,
+      (index) => chars[rand.nextInt(chars.length)],
+    ).join();
   }
 
   // ── Sync-Down: Baixa places ativos do PocketBase ──────
@@ -103,10 +111,9 @@ class PlaceProvider extends ChangeNotifier {
   /// Permite que tablets de operadores vejam places aprovados pelo gestor.
   Future<void> syncDownActivePlaces() async {
     try {
-      final records = await _pb.collection('places').getFullList(
-        filter: 'status = "active"',
-        sort: 'name',
-      );
+      final records = await _pb
+          .collection('places')
+          .getFullList(filter: 'status = "active"', sort: 'name');
 
       bool changed = false;
       for (final record in records) {
@@ -136,10 +143,7 @@ class PlaceProvider extends ChangeNotifier {
   // ── Place Management ──────────────────────────────────
 
   Future<void> addPlace(Place place) async {
-    final placeWithId = place.copyWith(
-      id: _generateId(),
-      isSynced: false,
-    );
+    final placeWithId = place.copyWith(id: _generateId(), isSynced: false);
     await _placesBox.put(placeWithId.id, placeWithId);
     notifyListeners();
   }
@@ -154,16 +158,12 @@ class PlaceProvider extends ChangeNotifier {
   }
 
   List<Place> get pendingPlaces {
-    return _placesBox.values
-        .where((p) => p.status == 'pending')
-        .toList()
+    return _placesBox.values.where((p) => p.status == 'pending').toList()
       ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
   }
 
   List<Place> get approvedPlaces {
-    return _placesBox.values
-        .where((p) => p.status == 'active')
-        .toList()
+    return _placesBox.values.where((p) => p.status == 'active').toList()
       ..sort((a, b) => a.name.compareTo(b.name));
   }
 
@@ -184,95 +184,94 @@ class PlaceProvider extends ChangeNotifier {
 
   // ── Gestão de Aprovação (Gestor only) ─────────────────
 
-  /// Aprova um place localmente E tenta sincronizar com PocketBase.
-  /// Retorna true se aprovado localmente (sempre).
-  /// A sincronização com PocketBase pode falhar se a regra de update exigir auth
-  /// de usuário — nesse caso, aprovar localmente funciona mas outros tablets
-  /// não verão o place como ativo até que o admin aprove no PocketBase.
+  /// Aprova um place: confirma no PocketBase **antes** de mutar o estado local.
+  /// Aprovação não confirmada não altera o Hive e não é sucesso (#24 — elimina
+  /// o falso positivo R3 de ponta a ponta).
   Future<bool> approvePlace(String placeId, AuthService authService) async {
-    // Sempre aprova localmente primeiro
-    final place = _placesBox.get(placeId);
-    if (place != null) {
-      await _placesBox.put(
-        placeId,
-        place.copyWith(
-          status: 'active',
-          approvedAt: DateTime.now(),
-          isSynced: false, // marca para tentar sync depois
-        ),
-      );
-      notifyListeners();
-    }
-    // Tenta sincronizar com PocketBase
     final syncedRemote = await authService.approvePlace(placeId);
-    if (syncedRemote && place != null) {
-      await _placesBox.put(
-        placeId,
-        (place).copyWith(status: 'active', isSynced: true),
-      );
+    if (syncedRemote) {
+      final place = _placesBox.get(placeId);
+      if (place != null) {
+        await _placesBox.put(
+          placeId,
+          place.copyWith(
+            status: 'active',
+            approvedAt: DateTime.now(),
+            isSynced: true,
+          ),
+        );
+        notifyListeners();
+      }
     }
-    return syncedRemote; // #24: sucesso somente com confirmação do servidor
+    return syncedRemote;
   }
 
-  /// Rejeita um place localmente E tenta sincronizar com PocketBase.
+  /// Rejeita um place: confirma no PocketBase **antes** de mutar o estado local.
   /// Retorna o resultado remoto — rejeição não confirmada não é sucesso.
   Future<bool> rejectPlace(String placeId, AuthService authService) async {
-    final place = _placesBox.get(placeId);
-    if (place != null) {
-      await _placesBox.put(
-        placeId,
-        place.copyWith(status: 'rejected', isSynced: false),
-      );
-      notifyListeners();
+    final syncedRemote = await authService.rejectPlace(placeId);
+    if (syncedRemote) {
+      final place = _placesBox.get(placeId);
+      if (place != null) {
+        await _placesBox.put(
+          placeId,
+          place.copyWith(status: 'rejected', isSynced: true),
+        );
+        notifyListeners();
+      }
     }
-    return authService.rejectPlace(placeId);
+    return syncedRemote;
   }
 
   /// Aprova um place pendente do PocketBase (não existe localmente ainda).
-  /// Salva localmente como active e tenta aprovar no PocketBase.
+  /// Só salva localmente como active **depois** da confirmação do servidor.
   Future<bool> approvePlaceRemote(
     Map<String, dynamic> placeData,
     AuthService authService,
   ) async {
     final placeId = placeData['id'] as String;
-
-    // Salvar localmente como active
-    final place = Place.fromJson(placeData).copyWith(
-      status: 'active',
-      approvedAt: DateTime.now(),
-      isSynced: false,
-    );
-    await _placesBox.put(placeId, place);
-    notifyListeners();
-
-    // Tentar sincronizar com PocketBase
     final syncedRemote = await authService.approvePlace(placeId);
     if (syncedRemote) {
-      await _placesBox.put(placeId, place.copyWith(isSynced: true));
+      final place = Place.fromJson(
+        placeData,
+      ).copyWith(status: 'active', approvedAt: DateTime.now(), isSynced: true);
+      await _placesBox.put(placeId, place);
+      notifyListeners();
     }
-    return syncedRemote; // #24: sucesso somente com confirmação do servidor
+    return syncedRemote;
   }
 
-  /// Rejeita um place remoto (não existe no Hive local)
+  /// Rejeita um place remoto (não existe no Hive local).
+  /// Só salva localmente como rejected **depois** da confirmação do servidor.
   Future<bool> rejectPlaceRemote(
     Map<String, dynamic> placeData,
     AuthService authService,
   ) async {
     final placeId = placeData['id'] as String;
-    final place = Place.fromJson(placeData).copyWith(
-      status: 'rejected',
-      isSynced: false,
-    );
-    await _placesBox.put(placeId, place);
-    notifyListeners();
-    return authService.rejectPlace(placeId);
+    final syncedRemote = await authService.rejectPlace(placeId);
+    if (syncedRemote) {
+      final place = Place.fromJson(
+        placeData,
+      ).copyWith(status: 'rejected', isSynced: true);
+      await _placesBox.put(placeId, place);
+      notifyListeners();
+    }
+    return syncedRemote;
   }
 
   // ── PlaceVisit Management ──────────────────────────────
 
   static const _jalapaoNames = [
-    'Ipê', 'Buriti', 'Capim-dourado', 'Cerrado', 'Veredas',
-    'Sertão', 'Candeia', 'Pequi', 'Aroeira', 'Mangaba',
+    'Ipê',
+    'Buriti',
+    'Capim-dourado',
+    'Cerrado',
+    'Veredas',
+    'Sertão',
+    'Candeia',
+    'Pequi',
+    'Aroeira',
+    'Mangaba',
   ];
 
   String _randomGroupName() {
@@ -300,8 +299,12 @@ class PlaceProvider extends ChangeNotifier {
       entryTime: entryTime,
       status: 'visiting',
       tabletId: _configBox.get('tabletId') as String? ?? 'tablet-sem-id',
-      groupName: groupName?.trim().isEmpty ?? true ? _randomGroupName() : groupName!.trim(),
-      originCity: originCity?.trim().isEmpty ?? true ? null : originCity!.trim(),
+      groupName:
+          groupName?.trim().isEmpty ?? true
+              ? _randomGroupName()
+              : groupName!.trim(),
+      originCity:
+          originCity?.trim().isEmpty ?? true ? null : originCity!.trim(),
     );
     await _placeVisitsBox.put(visitId, visit);
     notifyListeners();
@@ -332,16 +335,12 @@ class PlaceProvider extends ChangeNotifier {
   }
 
   List<PlaceVisit> visitsByPlace(String placeId) {
-    return _placeVisitsBox.values
-        .where((v) => v.placeId == placeId)
-        .toList()
+    return _placeVisitsBox.values.where((v) => v.placeId == placeId).toList()
       ..sort((a, b) => b.arrivalTime.compareTo(a.arrivalTime));
   }
 
   List<PlaceVisit> get activeVisits {
-    return _placeVisitsBox.values
-        .where((v) => v.status == 'visiting')
-        .toList()
+    return _placeVisitsBox.values.where((v) => v.status == 'visiting').toList()
       ..sort((a, b) => a.arrivalTime.compareTo(b.arrivalTime));
   }
 
@@ -361,9 +360,10 @@ class PlaceProvider extends ChangeNotifier {
   }
 
   double? getAverageStay(String placeId) {
-    final visits = _placeVisitsBox.values
-        .where((v) => v.placeId == placeId && v.status == 'exited')
-        .toList();
+    final visits =
+        _placeVisitsBox.values
+            .where((v) => v.placeId == placeId && v.status == 'exited')
+            .toList();
     if (visits.isEmpty) return null;
     final totalMinutes = visits.fold<int>(
       0,
@@ -413,7 +413,8 @@ class PlaceProvider extends ChangeNotifier {
       status: 'reserva',
       notes: notes,
       tabletId: tabletId,
-      originCity: originCity?.trim().isEmpty ?? true ? null : originCity!.trim(),
+      originCity:
+          originCity?.trim().isEmpty ?? true ? null : originCity!.trim(),
     );
     await _reservationsBox.put(id, reservation);
     notifyListeners();
@@ -425,14 +426,21 @@ class PlaceProvider extends ChangeNotifier {
     if (r == null) return;
     await _reservationsBox.put(
       reservationId,
-      r.copyWith(status: 'no_local', arrivalTime: DateTime.now(), isSynced: false),
+      r.copyWith(
+        status: 'no_local',
+        arrivalTime: DateTime.now(),
+        isSynced: false,
+      ),
     );
     notifyListeners();
   }
 
   /// Faz check-out: no_local → concluida
   /// [isEstimated] = true quando gerado automaticamente (sem ação do fiscal)
-  Future<void> checkOut(String reservationId, {bool isEstimated = false}) async {
+  Future<void> checkOut(
+    String reservationId, {
+    bool isEstimated = false,
+  }) async {
     final r = _reservationsBox.get(reservationId);
     if (r == null || r.status != 'no_local') return;
     await _reservationsBox.put(
@@ -462,14 +470,16 @@ class PlaceProvider extends ChangeNotifier {
       id: id,
       placeId: placeId,
       paxQty: paxQty,
-      guestName: groupName?.trim().isEmpty ?? true
-          ? _randomGroupName()
-          : groupName!.trim(),
+      guestName:
+          groupName?.trim().isEmpty ?? true
+              ? _randomGroupName()
+              : groupName!.trim(),
       scheduledTime: now,
       arrivalTime: now,
       status: 'no_local',
       tabletId: tabletId,
-      originCity: originCity?.trim().isEmpty ?? true ? null : originCity!.trim(),
+      originCity:
+          originCity?.trim().isEmpty ?? true ? null : originCity!.trim(),
     );
     await _reservationsBox.put(id, reservation);
     notifyListeners();
@@ -480,10 +490,12 @@ class PlaceProvider extends ChangeNotifier {
   List<Reservation> staleCheckIns(String placeId, {int maxHours = 4}) {
     final cutoff = DateTime.now().subtract(Duration(hours: maxHours));
     return _reservationsBox.values
-        .where((r) =>
-            r.placeId == placeId &&
-            r.status == 'no_local' &&
-            (r.arrivalTime ?? r.scheduledTime).isBefore(cutoff))
+        .where(
+          (r) =>
+              r.placeId == placeId &&
+              r.status == 'no_local' &&
+              (r.arrivalTime ?? r.scheduledTime).isBefore(cutoff),
+        )
         .toList();
   }
 
@@ -526,11 +538,15 @@ class PlaceProvider extends ChangeNotifier {
     final dayStart = DateTime(date.year, date.month, date.day);
     final dayEnd = dayStart.add(const Duration(days: 1));
     return _reservationsBox.values
-        .where((r) =>
-            r.placeId == placeId &&
-            r.status == 'reserva' &&
-            r.scheduledTime.isAfter(dayStart.subtract(const Duration(seconds: 1))) &&
-            r.scheduledTime.isBefore(dayEnd))
+        .where(
+          (r) =>
+              r.placeId == placeId &&
+              r.status == 'reserva' &&
+              r.scheduledTime.isAfter(
+                dayStart.subtract(const Duration(seconds: 1)),
+              ) &&
+              r.scheduledTime.isBefore(dayEnd),
+        )
         .toList()
       ..sort((a, b) => a.scheduledTime.compareTo(b.scheduledTime));
   }
@@ -540,14 +556,16 @@ class PlaceProvider extends ChangeNotifier {
     return _reservationsBox.values
         .where((r) => r.placeId == placeId && r.status == 'no_local')
         .toList()
-      ..sort((a, b) => (a.arrivalTime ?? a.scheduledTime)
-          .compareTo(b.arrivalTime ?? b.scheduledTime));
+      ..sort(
+        (a, b) => (a.arrivalTime ?? a.scheduledTime).compareTo(
+          b.arrivalTime ?? b.scheduledTime,
+        ),
+      );
   }
 
   /// Ocupação atual de um place via reservas (soma de paxQty no_local)
   int getReservationOccupancy(String placeId) {
-    return onSiteByPlace(placeId)
-        .fold<int>(0, (sum, r) => sum + r.paxQty);
+    return onSiteByPlace(placeId).fold<int>(0, (sum, r) => sum + r.paxQty);
   }
 
   /// Histórico de reservas concluídas de um place em uma data
@@ -555,11 +573,15 @@ class PlaceProvider extends ChangeNotifier {
     final dayStart = DateTime(date.year, date.month, date.day);
     final dayEnd = dayStart.add(const Duration(days: 1));
     return _reservationsBox.values
-        .where((r) =>
-            r.placeId == placeId &&
-            r.status == 'concluida' &&
-            r.scheduledTime.isAfter(dayStart.subtract(const Duration(seconds: 1))) &&
-            r.scheduledTime.isBefore(dayEnd))
+        .where(
+          (r) =>
+              r.placeId == placeId &&
+              r.status == 'concluida' &&
+              r.scheduledTime.isAfter(
+                dayStart.subtract(const Duration(seconds: 1)),
+              ) &&
+              r.scheduledTime.isBefore(dayEnd),
+        )
         .toList()
       ..sort((a, b) => b.scheduledTime.compareTo(a.scheduledTime));
   }

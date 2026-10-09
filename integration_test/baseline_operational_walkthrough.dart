@@ -457,14 +457,17 @@ void main() {
           }
           await snap(tester, '38_pos_logout_session_selector');
         } else {
-          debugPrint('[WARN] Login do gestor falhou — credencial ou rede');
+          // Credencial sintética FOI fornecida — rejeição ou indisponibilidade
+          // não é skip, é falha (#24: seção do gestor nunca confirma em verde).
           final backBtn = find.byType(BackButton);
           if (backBtn.evaluate().isNotEmpty) {
             await tester.tap(backBtn.first);
-          } else {
-            await tester.pageBack();
           }
-          await tester.pumpAndSettle();
+          await tester.pump(const Duration(seconds: 1));
+          fail(
+            'Login do gestor falhou com credencial sintética fornecida — '
+            'backend offline ou credencial recusada.',
+          );
         }
       } else {
         // #24: sem credencial sintética o walkthrough NÃO pode fingir cobertura

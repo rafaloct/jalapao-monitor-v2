@@ -60,6 +60,10 @@ class FakePocketBaseServer {
   HttpServer? _server;
   int get port => _server!.port;
 
+  /// Quando definido, o auth-refresh responde com este status (ex.: 429/503)
+  /// para simular erro transitório no lugar de validar o token.
+  int? refreshErrorStatus;
+
   static const okEmail = 'gestor.teste@example.invalid';
   static const okPassword = 'senha-sintetica-de-teste';
 
@@ -67,6 +71,14 @@ class FakePocketBaseServer {
     _server = await HttpServer.bind(InternetAddress.loopbackIPv4, 0);
     _server!.listen((req) async {
       if (req.uri.path == '/api/collections/users/auth-refresh') {
+        if (refreshErrorStatus != null) {
+          req.response
+            ..statusCode = refreshErrorStatus!
+            ..headers.contentType = ContentType.json
+            ..write(jsonEncode({'message': 'transient error'}));
+          await req.response.close();
+          return;
+        }
         // Revalida o token recebido (SDK envia com ou sem prefixo Bearer):
         // só o token do usuário sintético 'u1' continua válido — qualquer
         // outro simula token revogado/rotacionado.
@@ -232,7 +244,7 @@ void main() {
       () async {
         _fakeSecureStorage['gestor_auth_token'] = _fakeJwt();
         final auth = buildService('http://127.0.0.1:${fakePb.port}');
-        await Future<void>.delayed(const Duration(milliseconds: 50));
+        await auth.ready;
         expect(auth.isLoggedIn, isTrue);
       },
     );
@@ -243,7 +255,7 @@ void main() {
         // Token de outro "usuário": o servidor falso rejeita no auth-refresh.
         _fakeSecureStorage['gestor_auth_token'] = _fakeJwt(id: 'u-revogado');
         final auth = buildService('http://127.0.0.1:${fakePb.port}');
-        await Future<void>.delayed(const Duration(milliseconds: 50));
+        await auth.ready;
         expect(auth.isLoggedIn, isFalse);
         expect(_fakeSecureStorage.containsKey('gestor_auth_token'), isFalse);
       },
@@ -252,9 +264,23 @@ void main() {
     test('token inválido persistido não restaura sessão', () async {
       _fakeSecureStorage['gestor_auth_token'] = 'lixo-nao-jwt';
       final auth = buildService('http://127.0.0.1:${fakePb.port}');
-      await Future<void>.delayed(const Duration(milliseconds: 50));
+      await auth.ready;
       expect(auth.isLoggedIn, isFalse);
     });
+
+    test(
+      'erro transitório (429) na revalidação preserva o token persistido',
+      () async {
+        fakePb.refreshErrorStatus = 429;
+        _fakeSecureStorage['gestor_auth_token'] = _fakeJwt();
+        final auth = buildService('http://127.0.0.1:${fakePb.port}');
+        await auth.ready;
+        // Sem grant local, mas o token não é apagado — nova tentativa no
+        // próximo init ainda pode restaurar a sessão.
+        expect(auth.isLoggedIn, isFalse);
+        expect(_fakeSecureStorage['gestor_auth_token'], isNotNull);
+      },
+    );
 
     test('servidor indisponível na restauração não concede acesso', () async {
       final probe = await HttpServer.bind(InternetAddress.loopbackIPv4, 0);
@@ -263,7 +289,7 @@ void main() {
 
       _fakeSecureStorage['gestor_auth_token'] = _fakeJwt();
       final auth = buildService('http://127.0.0.1:$deadPort');
-      await Future<void>.delayed(const Duration(milliseconds: 50));
+      await auth.ready;
       expect(auth.isLoggedIn, isFalse);
     });
   });
