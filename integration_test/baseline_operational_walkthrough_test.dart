@@ -393,6 +393,16 @@ void main() {
     // ══════════════════════════════════════════════════════════════════════════
     // F. GESTOR SCREEN — login, 3 abas, PlaceFormScreen, logout
     // ══════════════════════════════════════════════════════════════════════════
+    // F0: fechar diálogos residuais antes de navegar
+    final dialogAberto = find.byType(AlertDialog);
+    if (dialogAberto.evaluate().isNotEmpty) {
+      debugPrint('[NAV] diálogo residual encontrado — fechando');
+      await tester.tapAt(const Offset(10, 10)); // toca fora p/ dispensar
+      for (int i = 0; i < 4; i++) {
+        await tester.pump(const Duration(milliseconds: 500));
+      }
+    }
+
     // F0: resetar para o SessionSelector antes de buscar ícone admin
     await _voltarAoSelector(tester);
 
