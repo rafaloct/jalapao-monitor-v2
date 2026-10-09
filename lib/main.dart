@@ -1,5 +1,8 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter/services.dart';
+// GlobalMaterialLocalizations vem do material_ui; oculta o duplicado do sdk
+import 'package:flutter_localizations/flutter_localizations.dart'
+    hide GlobalMaterialLocalizations;
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:provider/provider.dart';
 import 'models/visit.dart';
@@ -69,6 +72,14 @@ class JalapaoApp extends StatelessWidget {
       title: 'Jalapão Monitor 2.1-beta',
       debugShowCheckedModeBanner: false,
       theme: JalapaoTheme.themeData,
+      // Força pt_BR: 24h em TimeOfDay.format, seletor de data/hora em português
+      locale: const Locale('pt', 'BR'),
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [Locale('pt', 'BR'), Locale('en')],
       home: const HomeRouter(),
     );
   }

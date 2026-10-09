@@ -113,7 +113,6 @@ class _PlaceReservationScreenState extends State<PlaceReservationScreen> {
             ),
             content: const Text(
               'Dados locais são mantidos. Você será redirecionado para a seleção de local.',
-              style: TextStyle(color: Colors.white70),
             ),
             actions: [
               TextButton(
@@ -149,24 +148,23 @@ class _PlaceReservationScreenState extends State<PlaceReservationScreen> {
             builder:
                 (ctx, setDialogState) => Dialog(
                   backgroundColor: JalapaoTheme.background,
-                  insetPadding: const EdgeInsets.symmetric(
-                    horizontal: 24,
-                    vertical: 24,
+                  // Sobe o diálogo quando o teclado aparece
+                  insetPadding: EdgeInsets.fromLTRB(
+                    24,
+                    24,
+                    24,
+                    MediaQuery.of(ctx).viewInsets.bottom + 24,
                   ),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(24),
                   ),
-                  child: ConstrainedBox(
-                    constraints: BoxConstraints(
-                      maxHeight: MediaQuery.of(ctx).size.height * 0.82,
-                    ),
-                    child: SingleChildScrollView(
-                      padding: const EdgeInsets.all(32),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            '⚡ ENTRADA RÁPIDA',
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.all(32),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          '⚡ ENTRADA RÁPIDA',
                             style: Theme.of(context).textTheme.displayMedium
                                 ?.copyWith(color: JalapaoTheme.secondary),
                           ),
@@ -208,42 +206,22 @@ class _PlaceReservationScreenState extends State<PlaceReservationScreen> {
                           const SizedBox(height: 16),
                           TextField(
                             controller: groupNameCtrl,
-                            style: const TextStyle(color: Colors.white),
                             decoration: InputDecoration(
                               labelText: 'Nome do grupo (opcional)',
-                              labelStyle: TextStyle(
-                                color: JalapaoTheme.textSync.withOpacity(0.6),
-                              ),
                               hintText: 'Ex: Grupo Ipê',
-                              hintStyle: TextStyle(
-                                color: JalapaoTheme.textSync.withOpacity(0.3),
-                              ),
-                              filled: true,
-                              fillColor: Colors.white.withOpacity(0.05),
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(12),
-                                borderSide: BorderSide.none,
                               ),
                             ),
                           ),
                           const SizedBox(height: 10),
                           TextField(
                             controller: originCityCtrl,
-                            style: const TextStyle(color: Colors.white),
                             decoration: InputDecoration(
                               labelText: 'Cidade de origem (opcional)',
-                              labelStyle: TextStyle(
-                                color: JalapaoTheme.textSync.withOpacity(0.6),
-                              ),
                               hintText: 'Ex: Palmas, Brasília...',
-                              hintStyle: TextStyle(
-                                color: JalapaoTheme.textSync.withOpacity(0.3),
-                              ),
-                              filled: true,
-                              fillColor: Colors.white.withOpacity(0.05),
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(12),
-                                borderSide: BorderSide.none,
                               ),
                             ),
                           ),
@@ -300,7 +278,6 @@ class _PlaceReservationScreenState extends State<PlaceReservationScreen> {
                         ],
                       ),
                     ),
-                  ),
                 ),
           ),
     );
@@ -326,25 +303,24 @@ class _PlaceReservationScreenState extends State<PlaceReservationScreen> {
             builder:
                 (ctx, setDialogState) => Dialog(
                   backgroundColor: JalapaoTheme.background,
-                  insetPadding: const EdgeInsets.symmetric(
-                    horizontal: 24,
-                    vertical: 24,
+                  // Sobe o diálogo quando o teclado aparece
+                  insetPadding: EdgeInsets.fromLTRB(
+                    24,
+                    24,
+                    24,
+                    MediaQuery.of(ctx).viewInsets.bottom + 24,
                   ),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(24),
                   ),
-                  child: ConstrainedBox(
-                    constraints: BoxConstraints(
-                      maxHeight: MediaQuery.of(ctx).size.height * 0.82,
-                    ),
-                    child: SingleChildScrollView(
-                      padding: const EdgeInsets.all(32),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'NOVA RESERVA',
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.all(32),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'NOVA RESERVA',
                             style: Theme.of(context).textTheme.displayMedium
                                 ?.copyWith(color: JalapaoTheme.primary),
                           ),
@@ -416,7 +392,7 @@ class _PlaceReservationScreenState extends State<PlaceReservationScreen> {
                                     },
                                     icon: const Icon(Icons.schedule, size: 20),
                                     label: Text(
-                                      scheduledTime.format(ctx),
+                                      '${scheduledTime.hour.toString().padLeft(2, '0')}:${scheduledTime.minute.toString().padLeft(2, '0')}',
                                       style: const TextStyle(
                                         fontWeight: FontWeight.w900,
                                         fontSize: 15,
@@ -637,7 +613,6 @@ class _PlaceReservationScreenState extends State<PlaceReservationScreen> {
                         ],
                       ),
                     ),
-                  ),
                 ),
           ),
     );
