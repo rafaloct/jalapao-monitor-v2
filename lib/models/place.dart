@@ -98,12 +98,14 @@ class Place extends HiveObject {
       id: json['id'] ?? '',
       name: json['name'] ?? '',
       type: json['type'] ?? 'atrativo_cultural',
-      latitude: (json['latitude'] is String)
-          ? double.parse(json['latitude'])
-          : (json['latitude'] as num).toDouble(),
-      longitude: (json['longitude'] is String)
-          ? double.parse(json['longitude'])
-          : (json['longitude'] as num).toDouble(),
+      latitude:
+          (json['latitude'] is String)
+              ? double.parse(json['latitude'])
+              : (json['latitude'] as num).toDouble(),
+      longitude:
+          (json['longitude'] is String)
+              ? double.parse(json['longitude'])
+              : (json['longitude'] as num).toDouble(),
       capacityTotal: (json['capacity_total'] as num?)?.toInt() ?? 0,
       ownerName: json['owner_name'] ?? '',
       contactPhone: json['contact_phone'] ?? '',
@@ -111,12 +113,16 @@ class Place extends HiveObject {
       photoIds: List<String>.from(json['photo_ids'] ?? []),
       description: json['description'] ?? '',
       isSynced: json['isSynced'] ?? false,
-      createdAt: (json['created_at_v2'] ?? json['created']) != null
-          ? DateTime.parse((json['created_at_v2'] ?? json['created']) as String)
-          : DateTime.now(),
-      approvedAt: json['approved_at'] != null
-          ? DateTime.parse(json['approved_at'] as String)
-          : null,
+      createdAt:
+          (json['created_at_v2'] ?? json['created']) != null
+              ? DateTime.parse(
+                (json['created_at_v2'] ?? json['created']) as String,
+              )
+              : DateTime.now(),
+      approvedAt:
+          json['approved_at'] != null
+              ? DateTime.parse(json['approved_at'] as String)
+              : null,
       approvedBy: json['approved_by_user_id'],
       operatingHours: json['operating_hours'],
     );

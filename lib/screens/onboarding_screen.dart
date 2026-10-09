@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:provider/provider.dart';
 import '../providers/visit_provider.dart';
 
@@ -94,8 +94,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            const Icon(Icons.tablet_android,
-                                color: Color(0xFF58A6FF), size: 24),
+                            const Icon(
+                              Icons.tablet_android,
+                              color: Color(0xFF58A6FF),
+                              size: 24,
+                            ),
                             const SizedBox(width: 8),
                             Text(
                               'ID DO TABLET',
@@ -123,8 +126,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                             fillColor: const Color(0xFF0D1117),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(16),
-                              borderSide:
-                                  BorderSide(color: Colors.grey.shade800),
+                              borderSide: BorderSide(
+                                color: Colors.grey.shade800,
+                              ),
                             ),
                           ),
                         ),

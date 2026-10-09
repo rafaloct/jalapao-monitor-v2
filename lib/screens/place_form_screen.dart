@@ -1,5 +1,5 @@
 import 'dart:io';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
@@ -39,7 +39,7 @@ class _PlaceFormScreenState extends State<PlaceFormScreen> {
     'fazenda',
     'chacaras',
     'loja',
-    'atrativo_cultural'
+    'atrativo_cultural',
   ];
 
   static const Map<String, String> typeLabels = {
@@ -71,7 +71,9 @@ class _PlaceFormScreenState extends State<PlaceFormScreen> {
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('GPS desativado. Ative a localização no dispositivo.'),
+            content: Text(
+              'GPS desativado. Ative a localização no dispositivo.',
+            ),
             duration: Duration(seconds: 3),
           ),
         );
@@ -176,44 +178,45 @@ class _PlaceFormScreenState extends State<PlaceFormScreen> {
 
     showModalBottomSheet(
       context: context,
-      builder: (context) => Container(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ListTile(
-              leading: const Icon(Icons.camera_alt),
-              title: const Text('Câmera'),
-              onTap: () async {
-                Navigator.pop(context);
-                final image = await picker.pickImage(
-                  source: ImageSource.camera,
-                  imageQuality: 60,
-                  maxWidth: 1920,
-                );
-                if (image != null) {
-                  setState(() => _photoPaths.add(image.path));
-                }
-              },
+      builder:
+          (context) => Container(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ListTile(
+                  leading: const Icon(Icons.camera_alt),
+                  title: const Text('Câmera'),
+                  onTap: () async {
+                    Navigator.pop(context);
+                    final image = await picker.pickImage(
+                      source: ImageSource.camera,
+                      imageQuality: 60,
+                      maxWidth: 1920,
+                    );
+                    if (image != null) {
+                      setState(() => _photoPaths.add(image.path));
+                    }
+                  },
+                ),
+                ListTile(
+                  leading: const Icon(Icons.image),
+                  title: const Text('Galeria'),
+                  onTap: () async {
+                    Navigator.pop(context);
+                    final image = await picker.pickImage(
+                      source: ImageSource.gallery,
+                      imageQuality: 60,
+                      maxWidth: 1920,
+                    );
+                    if (image != null) {
+                      setState(() => _photoPaths.add(image.path));
+                    }
+                  },
+                ),
+              ],
             ),
-            ListTile(
-              leading: const Icon(Icons.image),
-              title: const Text('Galeria'),
-              onTap: () async {
-                Navigator.pop(context);
-                final image = await picker.pickImage(
-                  source: ImageSource.gallery,
-                  imageQuality: 60,
-                  maxWidth: 1920,
-                );
-                if (image != null) {
-                  setState(() => _photoPaths.add(image.path));
-                }
-              },
-            ),
-          ],
-        ),
-      ),
+          ),
     );
   }
 
@@ -225,7 +228,7 @@ class _PlaceFormScreenState extends State<PlaceFormScreen> {
   /// Salva o lugar offline
   Future<void> _savePlace() async {
     if (!_formKey.currentState!.validate()) return;
-    
+
     final lat = double.tryParse(_latTEC.text);
     final lon = double.tryParse(_lonTEC.text);
 
@@ -233,7 +236,9 @@ class _PlaceFormScreenState extends State<PlaceFormScreen> {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('GPS não informado ou inválido. Tente buscar ou digite manualmente (ex: -10.5, -46.6).'),
+          content: Text(
+            'GPS não informado ou inválido. Tente buscar ou digite manualmente (ex: -10.5, -46.6).',
+          ),
           duration: Duration(seconds: 4),
         ),
       );
@@ -245,7 +250,9 @@ class _PlaceFormScreenState extends State<PlaceFormScreen> {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Coordenadas fora da região do Jalapão! Verifique se esqueceu o sinal de menos (Ex: Lat -10.5, Lon -46.6)'),
+          content: Text(
+            'Coordenadas fora da região do Jalapão! Verifique se esqueceu o sinal de menos (Ex: Lat -10.5, Lon -46.6)',
+          ),
           duration: Duration(seconds: 5),
         ),
       );
@@ -263,7 +270,8 @@ class _PlaceFormScreenState extends State<PlaceFormScreen> {
       contactPhone: _phoneTC.text,
       description: _descriptionTEC.text,
       operatingHours: _hoursTC.text.isEmpty ? null : _hoursTC.text,
-      photoIds: const [], // upload de fotos não implementado — paths locais não vão ao PocketBase
+      photoIds:
+          const [], // upload de fotos não implementado — paths locais não vão ao PocketBase
     );
 
     if (!mounted) return;
@@ -272,7 +280,9 @@ class _PlaceFormScreenState extends State<PlaceFormScreen> {
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
-        content: Text('Local cadastrado com sucesso! Será sincronizado em breve.'),
+        content: Text(
+          'Local cadastrado com sucesso! Será sincronizado em breve.',
+        ),
         duration: Duration(seconds: 3),
       ),
     );
@@ -306,7 +316,8 @@ class _PlaceFormScreenState extends State<PlaceFormScreen> {
                     borderRadius: BorderRadius.circular(8),
                   ),
                 ),
-                validator: (v) => v?.isEmpty ?? true ? 'Campo obrigatório' : null,
+                validator:
+                    (v) => v?.isEmpty ?? true ? 'Campo obrigatório' : null,
               ),
               const SizedBox(height: 12),
 
@@ -320,13 +331,16 @@ class _PlaceFormScreenState extends State<PlaceFormScreen> {
                     borderRadius: BorderRadius.circular(8),
                   ),
                 ),
-                items: placeTypes.map((type) {
-                  return DropdownMenuItem(
-                    value: type,
-                    child: Text(typeLabels[type] ?? type),
-                  );
-                }).toList(),
-                onChanged: (value) => setState(() => _selectedType = value ?? 'fervedouro'),
+                items:
+                    placeTypes.map((type) {
+                      return DropdownMenuItem(
+                        value: type,
+                        child: Text(typeLabels[type] ?? type),
+                      );
+                    }).toList(),
+                onChanged:
+                    (value) =>
+                        setState(() => _selectedType = value ?? 'fervedouro'),
               ),
               const SizedBox(height: 12),
 
@@ -341,7 +355,8 @@ class _PlaceFormScreenState extends State<PlaceFormScreen> {
                   ),
                 ),
                 keyboardType: TextInputType.number,
-                validator: (v) => v?.isEmpty ?? true ? 'Campo obrigatório' : null,
+                validator:
+                    (v) => v?.isEmpty ?? true ? 'Campo obrigatório' : null,
               ),
               const SizedBox(height: 12),
 
@@ -363,13 +378,17 @@ class _PlaceFormScreenState extends State<PlaceFormScreen> {
                           ElevatedButton.icon(
                             onPressed: _locatingGPS ? null : _getGPS,
                             icon: const Icon(Icons.my_location),
-                            label: Text(_locatingGPS ? 'Buscando...' : 'Obter Localização'),
+                            label: Text(
+                              _locatingGPS
+                                  ? 'Buscando...'
+                                  : 'Obter Localização',
+                            ),
                           ),
                           if (_locatingGPS) ...[
                             const SizedBox(width: 16),
                             const SizedBox(
-                              width: 20, 
-                              height: 20, 
+                              width: 20,
+                              height: 20,
                               child: CircularProgressIndicator(strokeWidth: 2),
                             ),
                           ],
@@ -389,7 +408,11 @@ class _PlaceFormScreenState extends State<PlaceFormScreen> {
                                 filled: true,
                                 fillColor: Colors.white,
                               ),
-                              keyboardType: const TextInputType.numberWithOptions(decimal: true, signed: true),
+                              keyboardType:
+                                  const TextInputType.numberWithOptions(
+                                    decimal: true,
+                                    signed: true,
+                                  ),
                             ),
                           ),
                           const SizedBox(width: 8),
@@ -404,7 +427,11 @@ class _PlaceFormScreenState extends State<PlaceFormScreen> {
                                 filled: true,
                                 fillColor: Colors.white,
                               ),
-                              keyboardType: const TextInputType.numberWithOptions(decimal: true, signed: true),
+                              keyboardType:
+                                  const TextInputType.numberWithOptions(
+                                    decimal: true,
+                                    signed: true,
+                                  ),
                             ),
                           ),
                         ],
@@ -425,7 +452,8 @@ class _PlaceFormScreenState extends State<PlaceFormScreen> {
                     borderRadius: BorderRadius.circular(8),
                   ),
                 ),
-                validator: (v) => v?.isEmpty ?? true ? 'Campo obrigatório' : null,
+                validator:
+                    (v) => v?.isEmpty ?? true ? 'Campo obrigatório' : null,
               ),
               const SizedBox(height: 12),
 
@@ -488,31 +516,32 @@ class _PlaceFormScreenState extends State<PlaceFormScreen> {
                       crossAxisCount: 3,
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
-                      children: _photoPaths.asMap().entries.map((entry) {
-                        return Stack(
-                          children: [
-                            Image.file(
-                              File(entry.value),
-                              fit: BoxFit.cover,
-                            ),
-                            Positioned(
-                              top: 0,
-                              right: 0,
-                              child: GestureDetector(
-                                onTap: () => _removePhoto(entry.key),
-                                child: Container(
-                                  color: Colors.red,
-                                  child: const Icon(
-                                    Icons.close,
-                                    color: Colors.white,
-                                    size: 20,
+                      children:
+                          _photoPaths.asMap().entries.map((entry) {
+                            return Stack(
+                              children: [
+                                Image.file(
+                                  File(entry.value),
+                                  fit: BoxFit.cover,
+                                ),
+                                Positioned(
+                                  top: 0,
+                                  right: 0,
+                                  child: GestureDetector(
+                                    onTap: () => _removePhoto(entry.key),
+                                    child: Container(
+                                      color: Colors.red,
+                                      child: const Icon(
+                                        Icons.close,
+                                        color: Colors.white,
+                                        size: 20,
+                                      ),
+                                    ),
                                   ),
                                 ),
-                              ),
-                            ),
-                          ],
-                        );
-                      }).toList(),
+                              ],
+                            );
+                          }).toList(),
                     ),
                     const SizedBox(height: 8),
                     if (_photoPaths.length < 5)

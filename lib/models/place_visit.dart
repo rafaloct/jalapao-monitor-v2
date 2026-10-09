@@ -28,7 +28,7 @@ class PlaceVisit extends HiveObject {
   @HiveField(7)
   String? photoPath;
 
-  @HiveField(8)  // ← NOVO
+  @HiveField(8) // ← NOVO
   String? tabletId;
 
   @HiveField(9)
@@ -88,8 +88,10 @@ class PlaceVisit extends HiveObject {
     placeId: json['place_id'],
     paxQty: json['pax_qty'],
     arrivalTime: DateTime.parse(json['arrival_time']),
-    entryTime: json['entry_time'] != null ? DateTime.parse(json['entry_time']) : null,
-    exitTime: json['exit_time'] != null ? DateTime.parse(json['exit_time']) : null,
+    entryTime:
+        json['entry_time'] != null ? DateTime.parse(json['entry_time']) : null,
+    exitTime:
+        json['exit_time'] != null ? DateTime.parse(json['exit_time']) : null,
     status: json['status'] ?? 'visiting',
     tabletId: json['tablet_id'],
     notes: json['notes'],

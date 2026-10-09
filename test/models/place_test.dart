@@ -132,8 +132,8 @@ void main() {
         'id': 'abc123def456789',
         'name': 'Teste',
         'type': 'fervedouro',
-        'latitude': '-10.1234',   // string
-        'longitude': '-47.5678',  // string
+        'latitude': '-10.1234', // string
+        'longitude': '-47.5678', // string
         'capacity_total': 10,
         'owner_name': '',
         'contact_phone': '',

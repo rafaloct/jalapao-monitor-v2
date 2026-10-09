@@ -29,17 +29,17 @@ class SyncService {
     Box<PlaceVisit>? placeVisitsBox,
     Box<Reservation>? reservationsBox,
     this.onError,
-  })  : _visitsBox = visitsBox,
-        _placesBox = placesBox,
-        _placeVisitsBox = placeVisitsBox,
-        _reservationsBox = reservationsBox;
+  }) : _visitsBox = visitsBox,
+       _placesBox = placesBox,
+       _placeVisitsBox = placeVisitsBox,
+       _reservationsBox = reservationsBox;
 
   /// Backwards compatibility constructor
   SyncService.legacy(Box<Visit> visitsBox, {this.onError})
-      : _visitsBox = visitsBox,
-        _placesBox = null,
-        _placeVisitsBox = null,
-        _reservationsBox = null;
+    : _visitsBox = visitsBox,
+      _placesBox = null,
+      _placeVisitsBox = null,
+      _reservationsBox = null;
 
   void startPeriodicSync() {
     _timer?.cancel();
@@ -95,8 +95,7 @@ class SyncService {
   Future<void> _syncVisits() async {
     if (_visitsBox == null) return;
 
-    final unsyncedVisits =
-        _visitsBox.values.where((v) => !v.isSynced).toList();
+    final unsyncedVisits = _visitsBox.values.where((v) => !v.isSynced).toList();
 
     for (var visit in unsyncedVisits) {
       try {
@@ -125,9 +124,7 @@ class SyncService {
 
         // Try to update existing record first, create if not found
         try {
-          await _pb
-              .collection('visits')
-              .update(visit.id, body: visit.toJson());
+          await _pb.collection('visits').update(visit.id, body: visit.toJson());
         } on ClientException catch (e) {
           if (e.statusCode == 404) {
             await _pb.collection('visits').create(body: visit.toJson());
@@ -148,16 +145,13 @@ class SyncService {
   Future<void> _syncPlaces() async {
     if (_placesBox == null) return;
 
-    final unsyncedPlaces =
-        _placesBox.values.where((p) => !p.isSynced).toList();
+    final unsyncedPlaces = _placesBox.values.where((p) => !p.isSynced).toList();
 
     for (var place in unsyncedPlaces) {
       try {
         // Try to update existing record first, create if not found
         try {
-          await _pb
-              .collection('places')
-              .update(place.id, body: place.toJson());
+          await _pb.collection('places').update(place.id, body: place.toJson());
         } on ClientException catch (e) {
           if (e.statusCode == 404) {
             await _pb.collection('places').create(body: place.toJson());
@@ -169,7 +163,9 @@ class SyncService {
         await place.save();
       } catch (e) {
         debugPrint('Sync failed for place ${place.id}: $e');
-        onError?.call('Local "${place.name}" não sincronizado — verifique conexão');
+        onError?.call(
+          'Local "${place.name}" não sincronizado — verifique conexão',
+        );
       }
     }
   }
@@ -200,7 +196,9 @@ class SyncService {
         await visit.save();
       } catch (e) {
         debugPrint('Sync failed for place_visit ${visit.id}: $e');
-        onError?.call('Registro de visita não sincronizado — verifique conexão');
+        onError?.call(
+          'Registro de visita não sincronizado — verifique conexão',
+        );
       }
     }
   }
@@ -209,8 +207,7 @@ class SyncService {
   Future<void> _syncReservations() async {
     if (_reservationsBox == null) return;
 
-    final unsynced =
-        _reservationsBox.values.where((r) => !r.isSynced).toList();
+    final unsynced = _reservationsBox.values.where((r) => !r.isSynced).toList();
 
     for (var reservation in unsynced) {
       try {

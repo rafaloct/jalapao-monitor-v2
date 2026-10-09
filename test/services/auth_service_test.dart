@@ -84,8 +84,9 @@ class FakePocketBaseServer {
         // só o token do usuário sintético 'u1' continua válido — qualquer
         // outro simula token revogado/rotacionado.
         final authz = req.headers.value('authorization') ?? '';
-        final presented =
-            authz.startsWith('Bearer ') ? authz.substring(7) : authz;
+        final presented = authz.startsWith('Bearer ')
+            ? authz.substring(7)
+            : authz;
         if (presented == _fakeJwt(id: 'u1')) {
           req.response
             ..statusCode = 200
@@ -104,9 +105,9 @@ class FakePocketBaseServer {
         }
       } else if (req.method == 'POST' &&
           req.uri.path == '/api/collections/users/auth-with-password') {
-        final body =
-            jsonDecode(await utf8.decoder.bind(req).join())
-                as Map<String, dynamic>;
+        final body = jsonDecode(
+          await utf8.decoder.bind(req).join(),
+        ) as Map<String, dynamic>;
         if (body['identity'] == okEmail && body['password'] == okPassword) {
           req.response
             ..statusCode = 200
@@ -300,26 +301,23 @@ void main() {
       expect(auth.isLoggedIn, isFalse);
     });
 
-    test(
-      'token malformado de 3 segmentos não trava o init nem bloqueia login',
-      () async {
-        // JWT estruturalmente "válido" (3 segmentos) mas payload não-decodificável:
-        // isValid do AuthStore pode LANÇAR em vez de retornar false — sem guarda,
-        // ready falharia e todo login() travaria no `await ready`.
-        _fakeSecureStorage['gestor_auth_token'] = 'abc.@@@.def';
-        final auth = buildService('http://127.0.0.1:${fakePb.port}');
-        await auth.ready; // não pode lançar
-        expect(auth.isLoggedIn, isFalse);
-        expect(_fakeSecureStorage.containsKey('gestor_auth_token'), isFalse);
-        // Login interativo segue funcionando após o init.
-        final error = await auth.login(
-          FakePocketBaseServer.okEmail,
-          FakePocketBaseServer.okPassword,
-        );
-        expect(error, isNull);
-        expect(auth.isLoggedIn, isTrue);
-      },
-    );
+    test('token malformado de 3 segmentos não trava o init nem bloqueia login', () async {
+      // JWT estruturalmente "válido" (3 segmentos) mas payload não-decodificável:
+      // isValid do AuthStore pode LANÇAR em vez de retornar false — sem guarda,
+      // ready falharia e todo login() travaria no `await ready`.
+      _fakeSecureStorage['gestor_auth_token'] = 'abc.@@@.def';
+      final auth = buildService('http://127.0.0.1:${fakePb.port}');
+      await auth.ready; // não pode lançar
+      expect(auth.isLoggedIn, isFalse);
+      expect(_fakeSecureStorage.containsKey('gestor_auth_token'), isFalse);
+      // Login interativo segue funcionando após o init.
+      final error = await auth.login(
+        FakePocketBaseServer.okEmail,
+        FakePocketBaseServer.okPassword,
+      );
+      expect(error, isNull);
+      expect(auth.isLoggedIn, isTrue);
+    });
 
     test(
       'erro transitório (429) na revalidação preserva o token persistido',
