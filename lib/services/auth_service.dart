@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:hive/hive.dart';
@@ -81,6 +82,14 @@ class AuthService extends ChangeNotifier {
     try {
       // Revalida server-side: token revogado ou conta rotacionada falha aqui.
       await pb.collection('users').authRefresh();
+      // Mesmo gate de papel do login: conta rebaixada (ex.: gestor→operador)
+      // não restaura sessão administrativa.
+      final role = pb.authStore.record?.data['role'] as String?;
+      if (!const {'gestor', 'coordenador', 'admin'}.contains(role)) {
+        pb.authStore.clear();
+        await _ss.delete(key: _tokenKey);
+        return;
+      }
       await _ss.write(key: _tokenKey, value: pb.authStore.token);
       _isLoggedIn = true;
       _gestorName = _configBox.get(_nameKey) as String?;
@@ -111,9 +120,27 @@ class AuthService extends ChangeNotifier {
   Future<String?> login(String email, String password) async {
     // Serializa com a restauração de sessão em voo — um refresh de token
     // antigo não pode sobrescrever nem apagar o resultado deste login.
-    await ready;
+    // O wait é limitado: se o endpoint aceitar conexão mas nunca responder
+    // (rede patológica), o login interativo não pode ficar preso para sempre.
+    try {
+      await ready.timeout(const Duration(seconds: 15));
+    } on TimeoutException {
+      debugPrint('[AuthService] init timeout — seguindo para login direto');
+    }
     try {
       await pb.collection('users').authWithPassword(email, password);
+      // Autorização por papel (matriz #19/#13): o painel do gestor exige conta
+      // com papel gestor/coordenador/admin — um operador ou pesquisador com
+      // credencial válida NÃO recebe acesso administrativo.
+      final role = pb.authStore.record?.data['role'] as String?;
+      if (!const {'gestor', 'coordenador', 'admin'}.contains(role)) {
+        pb.authStore.clear();
+        debugPrint(
+          '[AuthService] login negado: papel "$role" sem acesso gestor',
+        );
+        return 'Conta sem permissão de gestor.\n'
+            'Peça o papel correto ao coordenador responsável.';
+      }
       await _ss.write(key: _tokenKey, value: pb.authStore.token);
       await _configBox.put(_nameKey, email); // nome não é sensível
       _isLoggedIn = true;

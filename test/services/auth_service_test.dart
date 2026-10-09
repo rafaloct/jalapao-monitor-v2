@@ -66,6 +66,7 @@ class FakePocketBaseServer {
 
   static const okEmail = 'gestor.teste@example.invalid';
   static const okPassword = 'senha-sintetica-de-teste';
+  static const operatorEmail = 'operador.teste@example.invalid';
 
   Future<void> start() async {
     _server = await HttpServer.bind(InternetAddress.loopbackIPv4, 0);
@@ -92,7 +93,7 @@ class FakePocketBaseServer {
             ..write(
               jsonEncode({
                 'token': _fakeJwt(),
-                'record': {'id': 'u1', 'email': okEmail},
+                'record': {'id': 'u1', 'email': okEmail, 'role': 'gestor'},
               }),
             );
         } else {
@@ -113,7 +114,23 @@ class FakePocketBaseServer {
             ..write(
               jsonEncode({
                 'token': _fakeJwt(),
-                'record': {'id': 'u1', 'email': okEmail},
+                'record': {'id': 'u1', 'email': okEmail, 'role': 'gestor'},
+              }),
+            );
+        } else if (body['identity'] == operatorEmail &&
+            body['password'] == okPassword) {
+          // Conta válida de papel operador — autentica, mas sem acesso gestor.
+          req.response
+            ..statusCode = 200
+            ..headers.contentType = ContentType.json
+            ..write(
+              jsonEncode({
+                'token': _fakeJwt(id: 'u-op'),
+                'record': {
+                  'id': 'u-op',
+                  'email': operatorEmail,
+                  'role': 'operador',
+                },
               }),
             );
         } else {
@@ -184,6 +201,21 @@ void main() {
         expect(auth.isLoggedIn, isTrue);
         expect(auth.gestorName, FakePocketBaseServer.okEmail);
         expect(_fakeSecureStorage['gestor_auth_token'], isNotEmpty);
+      },
+    );
+
+    test(
+      'conta autenticada sem papel gestor é negada (matriz de acesso)',
+      () async {
+        final auth = buildService('http://127.0.0.1:${fakePb.port}');
+        final error = await auth.login(
+          FakePocketBaseServer.operatorEmail,
+          FakePocketBaseServer.okPassword,
+        );
+        expect(error, contains('sem permissão'));
+        expect(auth.isLoggedIn, isFalse);
+        expect(_fakeSecureStorage.containsKey('gestor_auth_token'), isFalse);
+        expect(await auth.approvePlace('place-qualquer'), isFalse);
       },
     );
 

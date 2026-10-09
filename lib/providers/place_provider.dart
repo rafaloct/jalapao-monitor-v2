@@ -184,25 +184,30 @@ class PlaceProvider extends ChangeNotifier {
 
   // ── Gestão de Aprovação (Gestor only) ─────────────────
 
-  /// Aprova um place: confirma no PocketBase **antes** de mutar o estado local.
+  /// Aprova um place: confirma no PocketBase **antes** de mutar o status local.
   /// Aprovação não confirmada não altera o Hive e não é sucesso (#24 — elimina
   /// o falso positivo R3 de ponta a ponta).
   /// Registro criado localmente e ainda não sincronizado (isSynced=false) não
   /// existe no servidor — um update remoto retornaria 404; nesse caso faz
-  /// upsert do registro completo já com o status final.
+  /// upsert do registro completo já com o status final. O registro é marcado
+  /// isSynced=true durante a operação para que o sync de fundo não envie a
+  /// versão `pending` por cima do upsert confirmado (reverte em falha).
   Future<bool> approvePlace(String placeId, AuthService authService) async {
     final place = _placesBox.get(placeId);
     if (place != null && !place.isSynced) {
+      // Suprime o registro do sync de fundo sem mudar o status local.
+      await _placesBox.put(placeId, place.copyWith(isSynced: true));
       final updated = place.copyWith(
         status: 'active',
         approvedAt: DateTime.now(),
         isSynced: true,
       );
       final confirmed = await authService.upsertPlace(updated.toJson());
-      if (confirmed) {
-        await _placesBox.put(placeId, updated);
-        notifyListeners();
-      }
+      await _placesBox.put(
+        placeId,
+        confirmed ? updated : place, // falha: devolve pendente ao sync
+      );
+      notifyListeners();
       return confirmed;
     }
     final syncedRemote = await authService.approvePlace(placeId);
@@ -220,18 +225,18 @@ class PlaceProvider extends ChangeNotifier {
     return syncedRemote;
   }
 
-  /// Rejeita um place: confirma no PocketBase **antes** de mutar o estado local.
-  /// Mesmo caso do registro ainda não sincronizado (upsert primeiro).
+  /// Rejeita um place: confirma no PocketBase **antes** de mutar o status local.
+  /// Mesmo caso do registro ainda não sincronizado (upsert + supressão do
+  /// sync de fundo enquanto a confirmação não chega).
   /// Retorna o resultado remoto — rejeição não confirmada não é sucesso.
   Future<bool> rejectPlace(String placeId, AuthService authService) async {
     final place = _placesBox.get(placeId);
     if (place != null && !place.isSynced) {
+      await _placesBox.put(placeId, place.copyWith(isSynced: true));
       final updated = place.copyWith(status: 'rejected', isSynced: true);
       final confirmed = await authService.upsertPlace(updated.toJson());
-      if (confirmed) {
-        await _placesBox.put(placeId, updated);
-        notifyListeners();
-      }
+      await _placesBox.put(placeId, confirmed ? updated : place);
+      notifyListeners();
       return confirmed;
     }
     final syncedRemote = await authService.rejectPlace(placeId);
