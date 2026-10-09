@@ -393,6 +393,12 @@ void main() {
       await tester.pumpAndSettle(const Duration(seconds: 2));
 
       final loginFields = find.byType(TextFormField);
+      // Diagnóstico: distingue credencial vazia de campo de login ausente
+      debugPrint(
+        '[GESTOR] loginFields=${loginFields.evaluate().length} '
+        'email=${_testGestorEmail.isEmpty ? "<vazio>" : "ok"} '
+        'password=${_testGestorPassword.isEmpty ? "<vazio>" : "ok"}',
+      );
       if (loginFields.evaluate().isNotEmpty &&
           _testGestorEmail.isNotEmpty &&
           _testGestorPassword.isNotEmpty) {
