@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Cleartext APENAS para o emulador Android (10.0.2.2 = host loopback visto
+     pelo AVD). O flavor production não tem este arquivo — lá todo tráfego é
+     TLS (https://pb.neruds.org via Cloudflare Tunnel). -->
+<network-security-config>
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="false">10.0.2.2</domain>
+    </domain-config>
+</network-security-config>

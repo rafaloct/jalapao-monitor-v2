@@ -45,6 +45,36 @@ Os cenários em `integration_test/` abrem o app/Hive e podem iniciar sincroniza�
 
 `pumpAndSettle` pode conflitar com timers de sync. Novos cenários devem esperar condições observáveis e usar limites de tempo; ausência de exceção ou screenshot não substitui assertion funcional.
 
+## E2E sem device físico (issue #49)
+
+A baseline roda contra um PocketBase efêmero com o schema real exportado de
+produção (`ops/pocketbase/pb_migrations/`) — zero toque no backend real e sem
+tablet:
+
+```bash
+# 1) baixar o binário pinado do PB (0.36.2)
+curl -sLO https://github.com/pocketbase/pocketbase/releases/download/v0.36.2/pocketbase_0.36.2_linux_amd64.zip
+unzip -q pocketbase_0.36.2_linux_amd64.zip -d /tmp/pb-bin
+
+# 2) subir o backend efêmero (schema + dados sintéticos)
+PB_BIN=/tmp/pb-bin/pocketbase ./ops/pocketbase/seed_ci.sh
+
+# 3) zerar o estado do app no emulador (Hive/secure-storage persistem entre runs)
+adb -s emulator-5554 uninstall br.gov.to.jalapao.jalapao_monitor.staging
+
+# 4) rodar a walkthrough num emulador/AVD local
+flutter test integration_test/baseline_operational_walkthrough_test.dart \
+  -d emulator-5554 --flavor staging \
+  --dart-define=PB_URL=http://10.0.2.2:8090 \
+  --dart-define=TEST_GESTOR_EMAIL=gestor-e2e@example.invalid \
+  --dart-define=TEST_GESTOR_PASSWORD=e2e-gestor-sintetico
+```
+
+O job `ci/e2e-emulator` executa exatamente isso no GitHub Actions. Para smoke
+exploratório com IA (crawler que navega o APK sozinho), o console do Firebase
+oferece o App Testing agent — aponte um APK `staging` para `pb-staging` quando a
+instância existir; nunca aponte testes sintéticos para produção.
+
 ## Build Android
 
 Os arquivos Gradle e o manifest principal estão presentes, mas os scripts/JAR do wrapper não estão versionados. A #17 deve verificar como o ambiente Flutter prepara esse bootstrap; não declarar o build aprovado sem executá-lo.
