@@ -389,8 +389,11 @@ void main() {
 
     final adminIcon = find.byIcon(Icons.admin_panel_settings);
     if (adminIcon.evaluate().isNotEmpty) {
-      await tester.tap(adminIcon.first);
-      await tester.pumpAndSettle(const Duration(seconds: 2));
+      await tester.tap(adminIcon.first, warnIfMissed: false);
+      // Navigator.push precisa de frames para completar — pump extra
+      for (int i = 0; i < 6; i++) {
+        await tester.pump(const Duration(milliseconds: 500));
+      }
 
       final loginFields = find.byType(TextFormField);
       // Diagnóstico: distingue credencial vazia de campo de login ausente
