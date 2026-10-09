@@ -1,9 +1,12 @@
 # Ambientes — builds staging/produção sem retrabalho de credenciais
 
 - **Tarefa:** [Issue #39](https://github.com/rafaloct/jalapao-monitor-v2/issues/39)
-- **Invariante central:** desde a #24, **nenhuma credencial entra no build**.
-  Trocar de ambiente = trocar o arquivo de configuração externo; nunca reeditar
-  código, senha ou PIN.
+- **Invariante central (condição):** nenhuma credencial entra no build —
+  **válido somente a partir do merge do PR #38 (Issue #24)**, que remove o
+  fallback de PIN. Na main sem esse merge, `GESTOR_PIN` ainda existe e um
+  APK de produção ainda levaria credencial embutida se compilada com o
+  dart-define antigo. Trocar de ambiente = trocar o arquivo de configuração
+  externo; nunca reeditar código, senha ou PIN.
 
 ## 1. Modelo
 
@@ -29,18 +32,25 @@ ficam fora do repo. Conteúdo permitido: somente valores não secretos
 
 ## 3. Builds
 
-```bash
-# Staging
-flutter run     --dart-define-from-file=env/staging.local.json
-flutter build apk --dart-define-from-file=env/staging.local.json
+O projeto tem **flavors Android** (`staging`/`production` em
+`android/app/build.gradle.kts`): staging instala como
+`br.gov.to.jalapao.jalapao_monitor.staging` — pacote separado com Hive e
+secure storage próprios. Sem isso, instalar produção sobre staging herdaria
+todo o estado local (visitas, config, sessão) do ambiente errado.
 
-# Produção — mesmos inputs de código, só muda o arquivo de config
-flutter build apk --release --dart-define-from-file=env/production.local.json
+```bash
+# Staging — pacote .staging, PB de staging
+flutter run     --flavor staging    --dart-define-from-file=env/staging.local.json
+flutter build apk --flavor staging  --dart-define-from-file=env/staging.local.json
+
+# Produção — pacote sem sufixo, PB de produção
+flutter build apk --release --flavor production \
+  --dart-define-from-file=env/production.local.json
 ```
 
 Critério de promoção: o build de produção difere do de staging **somente** no
-arquivo `env/*.local.json`. Qualquer diferença além disso indica configuração
-vazada para o código — tratar como bug.
+flavor e no arquivo `env/*.local.json`. Qualquer diferença além disso indica
+configuração vazada para o código — tratar como bug.
 
 ## 4. Hub
 
@@ -69,9 +79,12 @@ token.
 | Evento | Ação | Rebuild? |
 |---|---|---|
 | Rotacionar senha de gestor | PocketBase Admin → usuário | Não |
-| Revogar token de tablet | Deletar sessão/token no backend | Não |
+| Revogar acesso de tablet/usuário | Desabilitar a conta ou trocar a senha no backend — tokens PocketBase são stateless (não há "sessão a deletar" server-side); o app descarta o token persistido na próxima revalidação (#24) | Não |
 | Trocar URL do backend | Novo build só com outro `env/*.local.json` | Sim — mas é só config |
 | Vazamento de credencial de staging | Rotacionar no PB de staging | Não |
+
+Tokens de vida curta com refresh rotativo (matriz §5.3) são o desenho-alvo do
+pareamento de dispositivos — ainda dependente da decisão D-E da ADR.
 
 ## 7. Não implementado aqui
 

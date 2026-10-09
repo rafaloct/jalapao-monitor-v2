@@ -42,7 +42,8 @@ cp ops/cloudflared/config.example.yml /etc/cloudflared/config.yml
 # Rotas DNS (uma por hostname):
 cloudflared tunnel route dns jalapao pb.SEU-DOMINIO
 cloudflared tunnel route dns jalapao hub.SEU-DOMINIO
-# staging, se usado:
+# staging — SOMENTE se a entrada de ingress pb-staging existir no config.yml;
+# sem ingress correspondente a rota responde 404:
 cloudflared tunnel route dns jalapao pb-staging.SEU-DOMINIO
 
 # Serviço:
@@ -57,10 +58,11 @@ O `credentials-file` e o `cert.pem` são segredos operacionais do VPS —
 
 | Controle | Onde | Efeito |
 |---|---|---|
-| Cloudflare Access | Painel CF → Zero Trust | `hub.*` e o admin `pb.*/_/` atrás de login Cloudflare (e-mail/Google) — defesa em profundidade além da auth do app |
-| Rate limiting | CF → Security | Limite em `/api/collections/users/auth-with-password` contra brute force |
+| Cloudflare Access | Painel CF → Zero Trust | `hub.*`, `pb.*/_/*` **e** `pb.*/api/collections/_superusers/auth-with-password` atrás de login Cloudflare — proteger só `/_/` deixa a API de superuser exposta |
+| Rate limiting | CF → Security | Limite em `/api/collections/*/auth-with-password` contra brute force |
 | WAF/managed rules | CF → Security | Proteção OWASP básica na API |
 | Cache | Desligado para `pb.*` | API e realtime nunca devem ser cacheados |
+| Bind loopback | VPS | `next start -H 127.0.0.1` (ou firewall) — `next start` padrão escuta 0.0.0.0 e bypassa o tunnel; idem PocketBase (`--http=127.0.0.1:8090`) |
 
 ## 5. Fechando o cleartext (R4)
 

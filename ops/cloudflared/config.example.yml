@@ -23,9 +23,20 @@ ingress:
       httpHostHeader: localhost
 
   # Hub Next.js — dashboard de coordenação
+  # ATENÇÃO: `next start` escuta em 0.0.0.0 por padrão — para o Hub ficar
+  # restrito à loopback (sem bypassar o tunnel), inicie com
+  # `next start -H 127.0.0.1` ou aplique firewall local na porta 3000.
   - hostname: hub.SEU-DOMINIO.example
     service: http://localhost:3000
     originRequest:
+      httpHostHeader: localhost
+
+  # Staging — só crie a rota DNS se esta entrada de ingress existir;
+  # hostname sem ingress casaria na regra final e responderia 404.
+  - hostname: pb-staging.SEU-DOMINIO.example
+    service: http://localhost:8091   # PocketBase de staging em porta própria
+    originRequest:
+      noHappyEyeballs: true
       httpHostHeader: localhost
 
   # Regra obrigatória de encerramento — tudo que não casar retorna 404
