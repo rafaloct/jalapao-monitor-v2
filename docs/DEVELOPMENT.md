@@ -78,12 +78,19 @@ numa única linha, sem continuação `\`).
 
 Para smoke exploratório (agente Gemini navega o APK sozinho em device de nuvem):
 
+0. Pré-requisito — PB de staging no ar: `curl -sf https://pb-staging.neruds.org/api/health`.
+   Se a instância não estiver provisionada, os testes falham sem locais — a rota
+   é criada conforme `docs/operations/ENVIRONMENTS.md` (PocketBase :8092 no VPS +
+   ingress no tunnel).
 1. Build do APK de staging apontando para o PB de staging:
    `flutter build apk --flavor staging --dart-define=PB_URL=https://pb-staging.neruds.org`
-2. Upload + execução dos test cases de `ops/firebase/` num device de nuvem:
-   `firebase apptesting:execute build/app/outputs/flutter-apk/app-staging-debug.apk --app <staging-app-id> --test-dir ops/firebase --test-devices "model=MediumPhone.arm,version=36,locale=pt_BR,orientation=portrait" --test-non-blocking`
-   (o comando sobe o APK e invoca os testes do agente; `--app` é o app id
-   **staging** do Firebase, `locale` usa underscore — `pt_BR`, não `pt-BR`)
+   → artefato: `build/app/outputs/flutter-apk/app-staging-release.apk`
+2. Upload + execução dos test cases de `ops/firebase/` num **tablet** de nuvem
+   (o app é desenhado para tablet e força landscape):
+   `firebase apptesting:execute build/app/outputs/flutter-apk/app-staging-release.apk --app <staging-app-id> --test-dir ops/firebase --test-devices "model=MediumTablet.arm,version=36,locale=pt_BR,orientation=landscape" --test-non-blocking`
+   (`--app` é o app id **staging** do Firebase; `locale` usa underscore —
+   `pt_BR`, não `pt-BR`. Sem `<apk>` o comando reusa o último release do
+   App Distribution.)
 3. Resultados: console Firebase → App Distribution → release → aba de testes.
    `appdistribution:distribute` sozinho só distribui para testers humanos e
    **não** executa os casos de `ops/firebase/app_test_cases.yaml` — sintéticos,
