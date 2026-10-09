@@ -70,10 +70,19 @@ flutter test integration_test/baseline_operational_walkthrough_test.dart \
   --dart-define=TEST_GESTOR_PASSWORD=e2e-gestor-sintetico
 ```
 
-O job `ci/e2e-emulator` executa exatamente isso no GitHub Actions. Para smoke
-exploratório com IA (crawler que navega o APK sozinho), o console do Firebase
-oferece o App Testing agent — aponte um APK `staging` para `pb-staging` quando a
-instância existir; nunca aponte testes sintéticos para produção.
+O job `ci/e2e-emulator` executa exatamente isso no GitHub Actions
+(`android-emulator-runner` roda uma linha por `sh -c` — o comando de teste fica
+numa única linha, sem continuação `\`).
+
+## Teste exploratório com IA (Firebase App Testing)
+
+Para smoke exploratório (agente Gemini navega o APK sozinho em device de nuvem):
+
+1. Build do APK de staging apontando para o PB de staging:
+   `flutter build apk --flavor staging --dart-define=PB_URL=https://pb-staging.neruds.org`
+2. Upload: `firebase appdistribution:distribute <apk> --app <staging-app-id> --groups testers`
+3. Test cases do agente: `ops/firebase/app_test_cases.yaml` (sintético — nunca
+   apontar o agente ou APK de teste para produção).
 
 ## Build Android
 

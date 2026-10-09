@@ -129,14 +129,12 @@ jobs:
           profile: Nexus 6
           disable-animations: true
           emulator-boot-timeout: 600
+          # NOTA: android-emulator-runner executa UMA linha por sh -c — sem continuação "\".
+          # O comando flutter test precisa ficar inteiro numa única linha.
           script: |
             # estado limpo: remove pacote staging remanescente (Hive/secure-storage)
             adb uninstall br.gov.to.jalapao.jalapao_monitor.staging || true
-            flutter test integration_test/baseline_operational_walkthrough_test.dart \
-              -d emulator-5554 --flavor staging \
-              --dart-define=PB_URL=http://10.0.2.2:8090 \
-              --dart-define=TEST_GESTOR_EMAIL=gestor-e2e@example.invalid \
-              --dart-define=TEST_GESTOR_PASSWORD=e2e-gestor-sintetico
+            flutter test integration_test/baseline_operational_walkthrough_test.dart -d emulator-5554 --flavor staging --dart-define=PB_URL=http://10.0.2.2:8090 --dart-define=TEST_GESTOR_EMAIL=gestor-e2e@example.invalid --dart-define=TEST_GESTOR_PASSWORD=e2e-gestor-sintetico
       - name: log do PB efêmero (falha)
         if: failure()
         run: cat /tmp/jalapao-e2e-pb.log || true
