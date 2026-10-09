@@ -25,18 +25,20 @@ Uma sessão de trabalho é autorizada quando **todos** os itens valem:
 
 | # | Condição | Como verificar |
 |---|---|---|
-| S1 | Issue existe e está `agent:working` | label na issue |
-| S2 | Executor da sessão bate com `agent:executor:*` | label + comentário CLAIM |
+| S0 | PR tem base `main` | `baseRefName` |
+| S1 | Issue existe e está `agent:working` **ou `agent:review`** | label na issue |
+| S2 | Executor autorizado (`agent:executor:*`) **e claimant do CLAIM bate com ele** (`agent:executor:any` aceita qualquer um) | label + campo `executor:` do CLAIM |
 | S3 | CLAIM postado na issue com branch e paths | comentário iniciando em `CLAIM` |
 | S4 | Sem `agent:blocked` e sem `human-gate` pendente | labels da issue |
-| S5 | Branch segue `agent/issue-<N>-*` e aponta para a issue claimada | nome do head ref |
-| S6 | Arquivos do diff ⊆ paths declarados no CLAIM (ou desvio justificado) | `claim_check.sh` |
-| S7 | CI verde no SHA do PR | `gh pr checks` |
-| S8 | Threads de revisão resolvidas | GraphQL `reviewThreads.isResolved` |
+| S5 | Branch segue `agent/issue-<N>-*` e aponta para a issue claimada — **sem fallback** por `Closes #N` | nome do head ref |
+| S6 | Arquivos do diff ⊆ paths declarados no CLAIM — fora do escopo **reprova** | `claim_check.sh` |
+| S7 | CI verde **e pipeline do repo completa**: os 5 checks `ci/*` presentes (CheckRun `COMPLETED+SUCCESS/NEUTRAL/SKIPPED` ou StatusContext `SUCCESS`) | `statusCheckRollup` |
+| S8 | Threads de revisão resolvidas — **resultado ilegível reprova** | GraphQL `reviewThreads.isResolved` |
 | S9 | Gate humano exigido pela issue registrado em ata (issue/comment) | verificação humana; o script reporta, não decide |
 
-`tooling/agents/claim_check.sh <pr>` executa S1–S8 e reporta S9 como aviso.
-Ele **falha fechado**: resultado incerto reprova o merge até verificação humana.
+`tooling/agents/claim_check.sh <pr>` executa S0–S8 e reporta S9 como aviso.
+Ele **falha fechado**: resultado incerto, ausente ou fora do padrão reprova
+o merge até verificação humana.
 
 ## 3. Autorização de executor por escopo
 
@@ -55,15 +57,20 @@ Regras:
 ## 4. Merge-train — algoritmo
 
 ```text
-para cada PR aberto de agente, na ordem [número do PR]:
+para cada PR aberto de agente com base main, na ordem topológica:
   1. claim_check → reprovado? para e reporta (o trem não passa por cima)
-  2. PR atrás da main? → rebase/merge da main exigido antes de prosseguir
+  2. head CONFLICTING ou BEHIND/DIRTY da main? → para; rebase + CI nova
+     exigidos (CI rodada na base antiga não vale como evidência)
   3. Integra (merge commit) → CI pós-merge deve ficar verde
   4. Fecha a issue com referência ao merge commit + etiqueta agent:done
+     (essa evidência é o que libera dependências futuras)
 ```
 
 Ordem por número de PR é o default; dependências explícitas na descrição da
-issue (`Depends on: #N`) têm precedência — `train.sh` lê e respeita.
+issue (`Depends on: #N` ou `Depende de #N`) têm precedência — `train.sh`
+ordena topologicamente. Dependência fechada **só conta se tiver evidência de
+integração** (PR que a fechou mergeado, ou label `agent:done`) — fechamento
+administrativo não prova gate.
 
 **Política de conflito:** se dois PRs tocam o mesmo arquivo, o segundo na fila
 precisa de rebase após o merge do primeiro — o orquestrador pausa o trem ali
