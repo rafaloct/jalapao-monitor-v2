@@ -89,9 +89,14 @@ class PlaceVisit extends HiveObject {
     paxQty: json['pax_qty'],
     arrivalTime: DateTime.parse(json['arrival_time']),
     entryTime:
-        json['entry_time'] != null ? DateTime.parse(json['entry_time']) : null,
+        json['entry_time'] != null &&
+                (json['entry_time'] as String).isNotEmpty
+            ? DateTime.parse(json['entry_time'])
+            : null,
     exitTime:
-        json['exit_time'] != null ? DateTime.parse(json['exit_time']) : null,
+        json['exit_time'] != null && (json['exit_time'] as String).isNotEmpty
+            ? DateTime.parse(json['exit_time'])
+            : null,
     status: json['status'] ?? 'visiting',
     tabletId: json['tablet_id'],
     notes: json['notes'],

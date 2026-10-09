@@ -114,13 +114,16 @@ class Place extends HiveObject {
       description: json['description'] ?? '',
       isSynced: json['isSynced'] ?? false,
       createdAt:
-          (json['created_at_v2'] ?? json['created']) != null
+          (json['created_at_v2'] ?? json['created']) != null &&
+                  ((json['created_at_v2'] ?? json['created']) as String)
+                      .isNotEmpty
               ? DateTime.parse(
                 (json['created_at_v2'] ?? json['created']) as String,
               )
               : DateTime.now(),
       approvedAt:
-          json['approved_at'] != null
+          json['approved_at'] != null &&
+                  (json['approved_at'] as String).isNotEmpty
               ? DateTime.parse(json['approved_at'] as String)
               : null,
       approvedBy: json['approved_by_user_id'],

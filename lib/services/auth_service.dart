@@ -251,7 +251,7 @@ class AuthService extends ChangeNotifier {
     try {
       final records = await pb
           .collection('places')
-          .getFullList(filter: 'status = "pending"', sort: '-created');
+          .getFullList(filter: 'status = "pending"', sort: '-created_at_v2');
       return records
           .map((r) => <String, dynamic>{'id': r.id, ...r.data})
           .toList();
