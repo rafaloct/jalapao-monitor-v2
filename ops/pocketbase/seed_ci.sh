@@ -6,7 +6,7 @@
 # Uso:
 #   PB_BIN=/caminho/pocketbase ./ops/pocketbase/seed_ci.sh
 #
-# Depois:  flutter test integration_test/baseline_operational_walkthrough.dart \
+# Depois:  flutter test integration_test/baseline_operational_walkthrough_test.dart \
 #            -d emulator-5554 \
 #            --dart-define=PB_URL=http://10.0.2.2:8090 \
 #            --dart-define=TEST_GESTOR_EMAIL=gestor-e2e@example.invalid \
@@ -66,9 +66,11 @@ curl -sf -X POST "http://$PB_ADDR/api/collections/users/records" \
 
 echo "[seed] locais sintéticos (status=active)"
 seed_place() {
+  # status=active exige approved_at preenchido — campo date vazio volta "" do PB
+  # e quebraria o DateTime.parse do Place.fromJson no syncDown do app.
   curl -sf -X POST "http://$PB_ADDR/api/collections/places/records" \
     -H "Authorization: $TOKEN" -H 'Content-Type: application/json' \
-    -d "{\"name\":\"$1\",\"type\":\"$2\",\"latitude\":-10.4,\"longitude\":-46.6,\"capacity_total\":$3,\"owner_name\":\"E2E CI\",\"status\":\"active\",\"created_at_v2\":\"2026-01-01 12:00:00.000Z\"}" >/dev/null
+    -d "{\"name\":\"$1\",\"type\":\"$2\",\"latitude\":-10.4,\"longitude\":-46.6,\"capacity_total\":$3,\"owner_name\":\"E2E CI\",\"status\":\"active\",\"created_at_v2\":\"2026-01-01 12:00:00.000Z\",\"approved_at\":\"2026-01-02 12:00:00.000Z\"}" >/dev/null
 }
 seed_place "Fervedouro da Ceiça"    fervedouro 10
 seed_place "Cachoeira da Formiga"   cachoeira  100

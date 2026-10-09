@@ -126,7 +126,9 @@ jobs:
           api-level: 30
           arch: x86_64
           target: default
-          profile: Nexus 6
+          # tablet: app é desenhado p/ tablet (SM-T835 ~1280dp); Nexus 6 (phone,
+          # ~731dp) causava RenderFlex overflow no dashboard_screen
+          profile: Nexus 10
           disable-animations: true
           emulator-boot-timeout: 600
           # NOTA: android-emulator-runner executa UMA linha por sh -c — sem continuação "\".
