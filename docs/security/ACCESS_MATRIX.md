@@ -1,11 +1,13 @@
 # Matriz de acesso — papel × recurso × ação
 
-- **Status:** `PROPOSED` — aguarda aprovação explícita de Rafael na
-  [Issue #13](https://github.com/rafaloct/jalapao-monitor-v2/issues/13),
-  com versão desta matriz. A implementação das APIs depende dessa aprovação.
+- **Status:** `APROVADO` — ata de decisão registrada pelo mantenedor na
+  [Issue #13](https://github.com/rafaloct/jalapao-monitor-v2/issues/13)
+  (2026-10-06): matriz de acesso e modelo de provisionamento §5 aprovados
+  na versão entregue pelo [PR #29](https://github.com/rafaloct/jalapao-monitor-v2/pull/29)
+  (merge `793958c`). Decisões institucionais D1–D4 e D6–D7 continuam pendentes (§8).
 - **Tarefa de elaboração:** [Issue #19](https://github.com/rafaloct/jalapao-monitor-v2/issues/19)
-- **Base:** `main @ a6d9bfe1507f9d75e6d4a872c17501c435204634`; reconciliação com a
-  ADR 0001 (`docs/adr/0001-authoritative-backend.md`, entregue no [PR #28](https://github.com/rafaloct/jalapao-monitor-v2/pull/28), `PROPOSED`) antes de qualquer aprovação.
+- **Base:** `main @ a6d9bfe1507f9d75e6d4a872c17501c435204634`; reconciliada com a
+  ADR 0001 (`docs/adr/0001-authoritative-backend.md`, [PR #28](https://github.com/rafaloct/jalapao-monitor-v2/pull/28)).
 - **Escopo:** definição de acesso. Não altera usuários, regras de banco, segredos
   ou dispositivos.
 
@@ -105,9 +107,9 @@ Proposta para substituir o modelo atual — nada embarcado no APK concede privil
 
 | # | Risco observado em `a6d9bfe` | Evidência |
 |---|---|---|
-| R1 | Fallback de PIN local com valor padrão literal não vazio; login local ocorre antes da auth PocketBase e concede fluxo de gestor sem servidor | `lib/services/auth_service.dart` |
+| R1 | ~~Fallback de PIN local com valor padrão literal não vazio; login local ocorre antes da auth PocketBase e concede fluxo de gestor sem servidor~~ **Resolvido na #24**: autenticação exclusiva por conta PocketBase; ver `docs/security/CREDENTIAL_TRANSITION.md` | `lib/services/auth_service.dart` |
 | R2 | Regras de collection **abertas** (`""`) documentadas — qualquer cliente escreve/lê sem autenticação; `SyncService` envia sem token | `docs/POCKETBASE_SCHEMA.md`, `lib/services/sync_service.dart` |
-| R3 | Aprovação de `places` em modo PIN retorna sucesso silencioso apenas local (falso positivo operacional) | `auth_service.approvePlace` |
+| R3 | ~~Aprovação de `places` em modo PIN retorna sucesso silencioso apenas local (falso positivo operacional)~~ **Resolvido na #24**: aprovação exige resposta do servidor | `auth_service.approvePlace` |
 | R4 | Transporte HTTP cleartext configurável (`PB_URL` http; exceção cleartext no `network_security_config.xml`) | `lib/config/app_config.dart`, `android/` |
 | R5 | Hub protegido por senha única compartilhada (`NEXT_PUBLIC_HUB_PASSWORD`), sem papel nem auditoria | `hub/README.md`, middleware |
 | R6 | Duplicata multi-tablet na janela de sync de 30s — mitigável por dedup server-side (#18), continua limitação | `docs/ARCHITECTURE.md` |
@@ -136,7 +138,7 @@ Proposta para substituir o modelo atual — nada embarcado no APK concede privil
 | D2 | Retenção de `pii` em `reservations` e de mídia (#10) | #13, epic #10 |
 | D3 | Política de consentimento para mídia/snapshot e avisos ao turista | #10 |
 | D4 | Direitos do titular (acesso/correção/exclusão) e prazo de resposta | #13 |
-| D5 | Aprovação desta matriz (versão/commit) e do modelo de provisionamento §5 | #13, depois #24 |
+| D5 | ~~Aprovação desta matriz (versão/commit) e do modelo de provisionamento §5~~ **Resolvido**: ata na #13 (2026-10-06) | #13, depois #24 |
 | D6 | MFA para `admin`/`coordenador`; política de sessão/token | #13 |
 | D7 | Prazo de validade e escopo dos tokens públicos (QR); turista é leitura `self` — auto-reserva via QR (epic #5) só após desenho com confirmação do operador | #5 |
 

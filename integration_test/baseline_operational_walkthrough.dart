@@ -3,8 +3,12 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:jalapao_monitor/main.dart' as app;
 
-/// PIN compilado via --dart-define=GESTOR_PIN=xxx
-const _testPin = String.fromEnvironment('GESTOR_PIN', defaultValue: 'trocar-na-primeira-vez');
+/// Credencial de teste do gestor — conta SINTÉTICA no PocketBase de teste,
+/// passada via --dart-define. Sem valor padrão: se ausente, a seção do gestor
+/// é pulada explicitamente (o PIN local de fallback foi removido na #24 —
+/// nenhuma credencial é embutida no app nem nos testes).
+const _testGestorEmail = String.fromEnvironment('TEST_GESTOR_EMAIL');
+const _testGestorPassword = String.fromEnvironment('TEST_GESTOR_PASSWORD');
 
 /// Helpers de navegação
 Future<void> _voltarAoSelector(WidgetTester tester) async {
@@ -389,11 +393,13 @@ void main() {
       await tester.pumpAndSettle(const Duration(seconds: 2));
 
       final loginFields = find.byType(TextFormField);
-      if (loginFields.evaluate().isNotEmpty) {
+      if (loginFields.evaluate().isNotEmpty &&
+          _testGestorEmail.isNotEmpty &&
+          _testGestorPassword.isNotEmpty) {
         await snap(tester, '32_gestor_login');
 
-        await tester.enterText(loginFields.at(0), 'gestor@jalapao');
-        await tester.enterText(loginFields.at(1), _testPin);
+        await tester.enterText(loginFields.at(0), _testGestorEmail);
+        await tester.enterText(loginFields.at(1), _testGestorPassword);
         await tester.tapAt(const Offset(10, 10));
         await tester.pump(const Duration(milliseconds: 300));
         final entrarBtn = find.text('ENTRAR');
@@ -451,15 +457,26 @@ void main() {
           }
           await snap(tester, '38_pos_logout_session_selector');
         } else {
-          debugPrint('[WARN] Login do gestor falhou — PIN ou rede');
+          // Credencial sintética FOI fornecida — rejeição ou indisponibilidade
+          // não é skip, é falha (#24: seção do gestor nunca confirma em verde).
           final backBtn = find.byType(BackButton);
           if (backBtn.evaluate().isNotEmpty) {
             await tester.tap(backBtn.first);
-          } else {
-            await tester.pageBack();
           }
-          await tester.pumpAndSettle();
+          await tester.pump(const Duration(seconds: 1));
+          fail(
+            'Login do gestor falhou com credencial sintética fornecida — '
+            'backend offline ou credencial recusada.',
+          );
         }
+      } else {
+        // #24: sem credencial sintética o walkthrough NÃO pode fingir cobertura
+        // do fluxo de autenticação — falha explicitamente em vez de reportar verde.
+        fail(
+          'Seção do gestor sem credencial de teste: defina '
+          '--dart-define=TEST_GESTOR_EMAIL e --dart-define=TEST_GESTOR_PASSWORD '
+          'apontando para conta sintética do PocketBase de teste.',
+        );
       }
     }
 

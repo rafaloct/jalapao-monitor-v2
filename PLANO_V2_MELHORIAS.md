@@ -19,7 +19,7 @@ Este plano cobre três frentes: **App (Tablet)**, **Testes/QA**, **Hub/Análise*
 ## FRENTE 1 — App Flutter (Tablet)
 
 ### 1.1 Segurança — GestorLogin [CONCLUÍDO]
-- [x] Remover a hint card que expõe PIN padrão `jalapao2026` e URL pública do PocketBase
+- [x] Remover a hint card que expõe PIN padrão `⟨valor redigido — Issue #24⟩` e URL pública do PocketBase
 - [x] A URL do PB nunca deve aparecer em tela de produção
 - [x] Alternativa: hint colapsado atrás de um toque longo (acessível ao técnico, invisível ao visitante)
 
