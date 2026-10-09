@@ -51,7 +51,7 @@ Os arquivos Gradle e o manifest principal estão presentes, mas os scripts/JAR d
 
 O bloco release atual usa configuração de assinatura debug. Um APK técnico gerado assim não é uma release de distribuição. Configurar assinatura, instalar em tablet de campo e publicar exigem tarefa e autorização específicas.
 
-Existem flavors `staging`/`production` (#39): staging instala como pacote `.staging` com estado isolado. Build por ambiente via `--flavor` + `--dart-define-from-file` — ver [operations/ENVIRONMENTS.md](operations/ENVIRONMENTS.md).
+Existem flavors `staging`/`production` (#39): staging instala como pacote `.staging` com estado isolado. Com flavors declarados, **`flutter run`/`flutter build` exigem `--flavor`** — o comando sem flavor falha. Build por ambiente via `--flavor` + `--dart-define-from-file` — ver [operations/ENVIRONMENTS.md](operations/ENVIRONMENTS.md).
 
 ## Hub
 

@@ -1,11 +1,13 @@
 # Matriz de acesso — papel × recurso × ação
 
-- **Status:** `PROPOSED` — aguarda aprovação explícita de Rafael na
-  [Issue #13](https://github.com/rafaloct/jalapao-monitor-v2/issues/13),
-  com versão desta matriz. A implementação das APIs depende dessa aprovação.
+- **Status:** `APROVADO` — ata de decisão registrada pelo mantenedor na
+  [Issue #13](https://github.com/rafaloct/jalapao-monitor-v2/issues/13)
+  (2026-10-06): matriz de acesso e modelo de provisionamento §5 aprovados
+  na versão entregue pelo [PR #29](https://github.com/rafaloct/jalapao-monitor-v2/pull/29)
+  (merge `793958c`). Decisões institucionais D1–D4 e D6–D7 continuam pendentes (§8).
 - **Tarefa de elaboração:** [Issue #19](https://github.com/rafaloct/jalapao-monitor-v2/issues/19)
-- **Base:** `main @ a6d9bfe1507f9d75e6d4a872c17501c435204634`; reconciliação com a
-  ADR 0001 (`docs/adr/0001-authoritative-backend.md`, entregue no [PR #28](https://github.com/rafaloct/jalapao-monitor-v2/pull/28), `PROPOSED`) antes de qualquer aprovação.
+- **Base:** `main @ a6d9bfe1507f9d75e6d4a872c17501c435204634`; reconciliada com a
+  ADR 0001 (`docs/adr/0001-authoritative-backend.md`, [PR #28](https://github.com/rafaloct/jalapao-monitor-v2/pull/28)).
 - **Escopo:** definição de acesso. Não altera usuários, regras de banco, segredos
   ou dispositivos.
 

@@ -33,6 +33,8 @@ android {
     // #39: flavors isolam staging de produção — APK staging instala como
     // pacote separado (.staging) com Hive/secure-storage próprios, evitando
     // contaminação de estado entre ambientes no mesmo tablet.
+    // Com flavors obrigatórios, `flutter run`/`flutter build` exigem sempre
+    // `--flavor staging|production` (ver docs/operations/ENVIRONMENTS.md §3).
     flavorDimensions += "env"
     productFlavors {
         create("staging") {
