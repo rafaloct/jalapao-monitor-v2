@@ -77,10 +77,12 @@ class FakePocketBaseServer {
           req.response
             ..statusCode = 200
             ..headers.contentType = ContentType.json
-            ..write(jsonEncode({
-              'token': _fakeJwt(),
-              'record': {'id': 'u1', 'email': okEmail},
-            }));
+            ..write(
+              jsonEncode({
+                'token': _fakeJwt(),
+                'record': {'id': 'u1', 'email': okEmail},
+              }),
+            );
         } else {
           req.response
             ..statusCode = 401
@@ -225,23 +227,27 @@ void main() {
   });
 
   group('restauração de sessão', () {
-    test('token válido persistido restaura sessão após revalidar no servidor',
-        () async {
-      _fakeSecureStorage['gestor_auth_token'] = _fakeJwt();
-      final auth = buildService('http://127.0.0.1:${fakePb.port}');
-      await Future<void>.delayed(const Duration(milliseconds: 50));
-      expect(auth.isLoggedIn, isTrue);
-    });
+    test(
+      'token válido persistido restaura sessão após revalidar no servidor',
+      () async {
+        _fakeSecureStorage['gestor_auth_token'] = _fakeJwt();
+        final auth = buildService('http://127.0.0.1:${fakePb.port}');
+        await Future<void>.delayed(const Duration(milliseconds: 50));
+        expect(auth.isLoggedIn, isTrue);
+      },
+    );
 
-    test('token revogado pelo servidor é descartado — sem grant local',
-        () async {
-      // Token de outro "usuário": o servidor falso rejeita no auth-refresh.
-      _fakeSecureStorage['gestor_auth_token'] = _fakeJwt(id: 'u-revogado');
-      final auth = buildService('http://127.0.0.1:${fakePb.port}');
-      await Future<void>.delayed(const Duration(milliseconds: 50));
-      expect(auth.isLoggedIn, isFalse);
-      expect(_fakeSecureStorage.containsKey('gestor_auth_token'), isFalse);
-    });
+    test(
+      'token revogado pelo servidor é descartado — sem grant local',
+      () async {
+        // Token de outro "usuário": o servidor falso rejeita no auth-refresh.
+        _fakeSecureStorage['gestor_auth_token'] = _fakeJwt(id: 'u-revogado');
+        final auth = buildService('http://127.0.0.1:${fakePb.port}');
+        await Future<void>.delayed(const Duration(milliseconds: 50));
+        expect(auth.isLoggedIn, isFalse);
+        expect(_fakeSecureStorage.containsKey('gestor_auth_token'), isFalse);
+      },
+    );
 
     test('token inválido persistido não restaura sessão', () async {
       _fakeSecureStorage['gestor_auth_token'] = 'lixo-nao-jwt';
