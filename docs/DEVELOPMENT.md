@@ -59,7 +59,10 @@ unzip -q pocketbase_0.36.2_linux_amd64.zip -d /tmp/pb-bin
 # 2) subir o backend efêmero (schema + dados sintéticos)
 PB_BIN=/tmp/pb-bin/pocketbase ./ops/pocketbase/seed_ci.sh
 
-# 3) rodar a walkthrough num emulador/AVD local
+# 3) zerar o estado do app no emulador (Hive/secure-storage persistem entre runs)
+adb -s emulator-5554 uninstall br.gov.to.jalapao.jalapao_monitor.staging
+
+# 4) rodar a walkthrough num emulador/AVD local
 flutter test integration_test/baseline_operational_walkthrough.dart \
   -d emulator-5554 --flavor staging \
   --dart-define=PB_URL=http://10.0.2.2:8090 \

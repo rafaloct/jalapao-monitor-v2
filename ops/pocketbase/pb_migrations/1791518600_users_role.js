@@ -5,8 +5,17 @@
 // O gate de papel do AuthService (PR #38) depende deste campo existir.
 // Backfill: a conta gestor@jalapao.br vira `coordenador` (papel que aprova
 // places na matriz — A(ter) T3).
+//
+// Segurança: `users` tem createRule aberta e updateRule de self-service,
+// então `role` não pode ser um campo comum — senão qualquer cliente cria
+// conta com role:"admin" ou promove a própria conta. As regras abaixo
+// rejeitam `role` no corpo da requisição; superuser ignora regras e segue
+// podendo atribuir papéis (admin UI / scripts ops).
 migrate((app) => {
   const users = app.findCollectionByNameOrId("users");
+
+  users.createRule = "@request.data.role:isset = false";
+  users.updateRule = "id = @request.auth.id && @request.data.role:isset = false";
 
   users.fields.add(new Field({
     name: "role",
@@ -46,5 +55,7 @@ migrate((app) => {
 }, (app) => {
   const users = app.findCollectionByNameOrId("users");
   users.fields.removeByName("role");
+  users.createRule = "";
+  users.updateRule = "id = @request.auth.id";
   app.save(users);
 });

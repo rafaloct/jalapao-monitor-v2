@@ -18,11 +18,22 @@ PB_DIR=${PB_DIR:-/tmp/jalapao-e2e-pbdata}
 PB_ADDR=${PB_ADDR:-127.0.0.1:8090}
 MIGRATIONS_DIR="$(cd "$(dirname "$0")" && pwd)/pb_migrations"
 LOG=${PB_LOG:-/tmp/jalapao-e2e-pb.log}
+PIDFILE=${PB_PIDFILE:-/tmp/jalapao-e2e-pb.pid}
 
 ADMIN_EMAIL="ci-admin@example.invalid"
 ADMIN_PASS="ci-superuser-not-secret"
 TEST_EMAIL="gestor-e2e@example.invalid"
 TEST_PASS="e2e-gestor-sintetico"
+
+# teardown: mata o PB anterior antes de apagar o data dir debaixo dele
+if [ -f "$PIDFILE" ] && kill -0 "$(cat "$PIDFILE")" 2>/dev/null; then
+  echo "[seed] encerrando PB anterior (pid $(cat "$PIDFILE"))"
+  kill "$(cat "$PIDFILE")" 2>/dev/null || true
+  for _ in $(seq 1 10); do
+    kill -0 "$(cat "$PIDFILE")" 2>/dev/null || break
+    sleep 1
+  done
+fi
 
 rm -rf "$PB_DIR"
 mkdir -p "$PB_DIR"
@@ -36,7 +47,7 @@ echo "[seed] criando superuser sintético"
 echo "[seed] subindo PocketBase em $PB_ADDR (log: $LOG)"
 "$PB_BIN" serve --http="$PB_ADDR" --dir="$PB_DIR" --migrationsDir="$MIGRATIONS_DIR" \
   >"$LOG" 2>&1 &
-echo $! > /tmp/jalapao-e2e-pb.pid
+echo $! > "$PIDFILE"
 
 for i in $(seq 1 30); do
   curl -sf "http://$PB_ADDR/api/health" >/dev/null 2>&1 && break
@@ -63,5 +74,5 @@ seed_place "Fervedouro da Ceiça"    fervedouro 10
 seed_place "Cachoeira da Formiga"   cachoeira  100
 seed_place "Pousada E2E"            pousada    30
 
-echo "[seed] OK — PB efêmero no ar em http://$PB_ADDR (pid $(cat /tmp/jalapao-e2e-pb.pid))"
+echo "[seed] OK — PB efêmero no ar em http://$PB_ADDR (pid $(cat "$PIDFILE"))"
 echo "[seed] credenciais sintéticas: $TEST_EMAIL / $TEST_PASS"
