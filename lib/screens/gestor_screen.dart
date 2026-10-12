@@ -1,5 +1,6 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:provider/provider.dart';
+
 import '../models/place.dart';
 import '../providers/place_provider.dart';
 import '../services/auth_service.dart';
@@ -47,15 +48,15 @@ class _GestorScreenState extends State<GestorScreen>
     final authService = context.read<AuthService>();
 
     final placeId = placeData['id'] as String;
-    final localPlace =
-        placeProvider.allPlaces.where((p) => p.id == placeId).firstOrNull;
+    final localPlace = placeProvider.allPlaces
+        .where((p) => p.id == placeId)
+        .firstOrNull;
 
     // #24: sucesso somente com confirmação do servidor — aprovação não
     // confirmada não é exibida como aplicada.
-    final success =
-        localPlace != null
-            ? await placeProvider.approvePlace(placeId, authService)
-            : await placeProvider.approvePlaceRemote(placeData, authService);
+    final success = localPlace != null
+        ? await placeProvider.approvePlace(placeId, authService)
+        : await placeProvider.approvePlaceRemote(placeData, authService);
 
     if (!mounted) return;
     if (success) {
@@ -67,11 +68,11 @@ class _GestorScreenState extends State<GestorScreen>
       SnackBar(
         content: Text(
           success
-              ? '✅ "${placeData['name']}" aprovado com sucesso!'
-              : '⚠️ "${placeData['name']}" não foi aprovado no servidor.\n'
-                  'Verifique a conexão e a sessão do gestor.',
+              ? '"${placeData['name']}" aprovado com sucesso!'
+              : '"${placeData['name']}" não foi aprovado no servidor.\n'
+                    'Verifique a conexão e a sessão do gestor.',
         ),
-        backgroundColor: success ? Colors.green : Colors.orange[700],
+        backgroundColor: success ? JalapaoTheme.ok : JalapaoTheme.warn,
         duration: Duration(seconds: success ? 3 : 5),
       ),
     );
@@ -80,27 +81,28 @@ class _GestorScreenState extends State<GestorScreen>
   Future<void> _rejectPlace(Map<String, dynamic> placeData) async {
     final confirmed = await showDialog<bool>(
       context: context,
-      builder:
-          (ctx) => AlertDialog(
-            title: const Text('Rejeitar local?'),
-            content: Text(
-              'Deseja rejeitar "${placeData['name']}"?\nO local não ficará disponível para operadores.',
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(ctx, false),
-                child: const Text('Cancelar'),
-              ),
-              ElevatedButton(
-                onPressed: () => Navigator.pop(ctx, true),
-                style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-                child: const Text(
-                  'Rejeitar',
-                  style: TextStyle(color: Colors.white),
-                ),
-              ),
-            ],
+      builder: (ctx) => AlertDialog(
+        title: const Text('Rejeitar local?'),
+        content: Text(
+          'Deseja rejeitar "${placeData['name']}"?\nO local não ficará disponível para operadores.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Cancelar'),
           ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: JalapaoTheme.danger,
+            ),
+            child: const Text(
+              'Rejeitar',
+              style: TextStyle(color: JalapaoTheme.onPrimary),
+            ),
+          ),
+        ],
+      ),
     );
 
     if (confirmed != true || !mounted) return;
@@ -109,8 +111,9 @@ class _GestorScreenState extends State<GestorScreen>
     final authService = context.read<AuthService>();
     final placeId = placeData['id'] as String;
 
-    final localPlace =
-        placeProvider.allPlaces.where((p) => p.id == placeId).firstOrNull;
+    final localPlace = placeProvider.allPlaces
+        .where((p) => p.id == placeId)
+        .firstOrNull;
 
     bool success;
     if (localPlace != null) {
@@ -129,11 +132,11 @@ class _GestorScreenState extends State<GestorScreen>
       SnackBar(
         content: Text(
           success
-              ? '❌ "${placeData['name']}" rejeitado.'
-              : '⚠️ "${placeData['name']}" não foi rejeitado no servidor.\n'
-                  'Verifique a conexão e a sessão do gestor.',
+              ? '"${placeData['name']}" rejeitado.'
+              : '"${placeData['name']}" não foi rejeitado no servidor.\n'
+                    'Verifique a conexão e a sessão do gestor.',
         ),
-        backgroundColor: success ? null : Colors.orange[700],
+        backgroundColor: success ? null : JalapaoTheme.warn,
         duration: Duration(seconds: success ? 3 : 5),
       ),
     );
@@ -142,21 +145,20 @@ class _GestorScreenState extends State<GestorScreen>
   void _logout() async {
     final confirmed = await showDialog<bool>(
       context: context,
-      builder:
-          (ctx) => AlertDialog(
-            title: const Text('Sair do painel?'),
-            content: const Text('Deseja encerrar a sessão do gestor?'),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(ctx, false),
-                child: const Text('Cancelar'),
-              ),
-              ElevatedButton(
-                onPressed: () => Navigator.pop(ctx, true),
-                child: const Text('Sair'),
-              ),
-            ],
+      builder: (ctx) => AlertDialog(
+        title: const Text('Sair do painel?'),
+        content: const Text('Deseja encerrar a sessão do gestor?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Cancelar'),
           ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('Sair'),
+          ),
+        ],
+      ),
     );
 
     if (confirmed != true || !mounted) return;
@@ -185,8 +187,8 @@ class _GestorScreenState extends State<GestorScreen>
             ),
           ],
         ),
-        backgroundColor: JalapaoTheme.primaryColor,
-        foregroundColor: Colors.white,
+        backgroundColor: JalapaoTheme.primaryDeep,
+        foregroundColor: JalapaoTheme.onPrimary,
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
@@ -201,9 +203,9 @@ class _GestorScreenState extends State<GestorScreen>
         ],
         bottom: TabBar(
           controller: _tabController,
-          labelColor: Colors.white,
-          unselectedLabelColor: Colors.white70,
-          indicatorColor: Colors.white,
+          labelColor: JalapaoTheme.onPrimary,
+          unselectedLabelColor: JalapaoTheme.onPrimary,
+          indicatorColor: JalapaoTheme.onPrimary,
           tabs: [
             Tab(
               text: 'PENDENTES',
@@ -227,15 +229,16 @@ class _GestorScreenState extends State<GestorScreen>
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed:
-            () => Navigator.of(
-              context,
-            ).push(MaterialPageRoute(builder: (_) => const PlaceFormScreen())),
-        backgroundColor: JalapaoTheme.primaryColor,
-        icon: const Icon(Icons.add_location_alt, color: Colors.white),
+        onPressed: () => Navigator.of(context)
+            .push(MaterialPageRoute(builder: (_) => const PlaceFormScreen())),
+        backgroundColor: JalapaoTheme.primaryDeep,
+        icon: const Icon(Icons.add_location_alt, color: JalapaoTheme.onPrimary),
         label: const Text(
           'Novo Local',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            color: JalapaoTheme.onPrimary,
+            fontWeight: FontWeight.bold,
+          ),
         ),
       ),
     );
@@ -247,17 +250,15 @@ class _GestorScreenState extends State<GestorScreen>
     return Consumer<PlaceProvider>(
       builder: (context, placeProvider, _) {
         // IDs já carregados do servidor (já sincronizados)
-        final remoteIds =
-            _remotePendingPlaces.map((p) => p['id'] as String).toSet();
+        final remoteIds = _remotePendingPlaces
+            .map((p) => p['id'] as String)
+            .toSet();
 
         // Places locais pendentes ainda não enviados ao PocketBase
-        final localOnlyPending =
-            placeProvider.pendingPlaces
-                .where((p) => !remoteIds.contains(p.id))
-                .map(
-                  (p) => <String, dynamic>{...p.toJson(), '_localOnly': true},
-                )
-                .toList();
+        final localOnlyPending = placeProvider.pendingPlaces
+            .where((p) => !remoteIds.contains(p.id))
+            .map((p) => <String, dynamic>{...p.toJson(), '_localOnly': true})
+            .toList();
 
         // Mescla: locais não sincronizados aparecem primeiro
         final allPending = [...localOnlyPending, ..._remotePendingPlaces];
@@ -274,12 +275,12 @@ class _GestorScreenState extends State<GestorScreen>
                 Icon(
                   Icons.check_circle_outline,
                   size: 64,
-                  color: Colors.green[300],
+                  color: JalapaoTheme.ok,
                 ),
                 const SizedBox(height: 16),
                 const Text(
                   'Nenhum local pendente de aprovação.',
-                  style: TextStyle(fontSize: 16, color: Colors.grey),
+                  style: TextStyle(fontSize: 16, color: JalapaoTheme.textFaint),
                 ),
                 const SizedBox(height: 8),
                 TextButton.icon(
@@ -325,16 +326,20 @@ class _GestorScreenState extends State<GestorScreen>
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.location_off, size: 64, color: Colors.grey[400]),
+                Icon(
+                  Icons.location_off,
+                  size: 64,
+                  color: JalapaoTheme.textFaint,
+                ),
                 const SizedBox(height: 16),
                 const Text(
                   'Nenhum local ativo.',
-                  style: TextStyle(fontSize: 16, color: Colors.grey),
+                  style: TextStyle(fontSize: 16, color: JalapaoTheme.textFaint),
                 ),
                 const SizedBox(height: 8),
                 const Text(
                   'Aprove places na aba "Pendentes".',
-                  style: TextStyle(fontSize: 13, color: Colors.grey),
+                  style: TextStyle(fontSize: 13, color: JalapaoTheme.textFaint),
                 ),
               ],
             ),
@@ -348,13 +353,14 @@ class _GestorScreenState extends State<GestorScreen>
             final place = active[index];
             final occupancy = placeProvider.getCurrentOccupancy(place.id);
             final avgStay = placeProvider.getAverageStay(place.id);
-            final todayVisits =
-                placeProvider.visitsByPlace(place.id).where((v) {
-                  final today = DateTime.now();
-                  return v.arrivalTime.year == today.year &&
-                      v.arrivalTime.month == today.month &&
-                      v.arrivalTime.day == today.day;
-                }).length;
+            final todayVisits = placeProvider.visitsByPlace(place.id).where((
+              v,
+            ) {
+              final today = DateTime.now();
+              return v.arrivalTime.year == today.year &&
+                  v.arrivalTime.month == today.month &&
+                  v.arrivalTime.day == today.day;
+            }).length;
 
             return _ActivePlaceCard(
               place: place,
@@ -381,7 +387,7 @@ class _GestorScreenState extends State<GestorScreen>
           return const Center(
             child: Text(
               'Aprove locais para ver o monitoramento.',
-              style: TextStyle(color: Colors.grey),
+              style: TextStyle(color: JalapaoTheme.textFaint),
             ),
           );
         }
@@ -403,7 +409,7 @@ class _GestorScreenState extends State<GestorScreen>
                     label: 'Locais Ativos',
                     value: '${active.length}',
                     icon: Icons.location_on,
-                    color: Colors.green,
+                    color: JalapaoTheme.ok,
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -412,7 +418,7 @@ class _GestorScreenState extends State<GestorScreen>
                     label: 'Visitantes Hoje',
                     value: '$todayVisitors',
                     icon: Icons.people,
-                    color: JalapaoTheme.primaryColor,
+                    color: JalapaoTheme.primaryDeep,
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -421,7 +427,7 @@ class _GestorScreenState extends State<GestorScreen>
                     label: 'Visitas Ativas',
                     value: '$activeVisits',
                     icon: Icons.person_pin_circle,
-                    color: Colors.blue,
+                    color: JalapaoTheme.info,
                   ),
                 ),
               ],
@@ -466,14 +472,14 @@ class _PendingPlaceCard extends StatelessWidget {
 
   String _typeLabel(String type) {
     const labels = {
-      'fervedouro': '🌊 Fervedouro',
-      'cachoeira': '💧 Cachoeira',
-      'restaurante': '🍽️ Restaurante',
-      'pousada': '🏨 Pousada',
-      'fazenda': '🌾 Fazenda',
-      'chacaras': '🏡 Chácara',
-      'loja': '🏪 Loja',
-      'atrativo_cultural': '🎭 Atrativo Cultural',
+      'fervedouro': 'Fervedouro',
+      'cachoeira': 'Cachoeira',
+      'restaurante': 'Restaurante',
+      'pousada': 'Pousada',
+      'fazenda': 'Fazenda',
+      'chacaras': 'Chácara',
+      'loja': 'Loja',
+      'atrativo_cultural': 'Atrativo Cultural',
     };
     return labels[type] ?? type;
   }
@@ -493,10 +499,9 @@ class _PendingPlaceCard extends StatelessWidget {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
         side: BorderSide(
-          color:
-              isLocalOnly
-                  ? Colors.blue.withOpacity(0.4)
-                  : Colors.orange.withOpacity(0.3),
+          color: isLocalOnly
+              ? JalapaoTheme.info.withValues(alpha: 0.4)
+              : JalapaoTheme.warn.withValues(alpha: 0.3),
         ),
       ),
       child: Padding(
@@ -512,19 +517,19 @@ class _PendingPlaceCard extends StatelessWidget {
                     vertical: 4,
                   ),
                   decoration: BoxDecoration(
-                    color:
-                        isLocalOnly
-                            ? Colors.blue.withOpacity(0.12)
-                            : Colors.orange.withOpacity(0.15),
+                    color: isLocalOnly
+                        ? JalapaoTheme.info.withValues(alpha: 0.12)
+                        : JalapaoTheme.warn.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
-                    isLocalOnly ? '📱 AGUARDANDO SYNC' : '⏳ PENDENTE',
+                    isLocalOnly ? 'AGUARDANDO SYNC' : 'PENDENTE',
                     style: TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.bold,
-                      color:
-                          isLocalOnly ? Colors.blue[700] : Colors.orange[700],
+                      color: isLocalOnly
+                          ? JalapaoTheme.info
+                          : JalapaoTheme.warn,
                     ),
                   ),
                 ),
@@ -540,18 +545,18 @@ class _PendingPlaceCard extends StatelessWidget {
             const SizedBox(height: 6),
             Row(
               children: [
-                Icon(Icons.person, size: 14, color: Colors.grey[600]),
+                Icon(Icons.person, size: 14, color: JalapaoTheme.textMuted),
                 const SizedBox(width: 4),
                 Text(
                   owner,
-                  style: TextStyle(fontSize: 13, color: Colors.grey[700]),
+                  style: TextStyle(fontSize: 13, color: JalapaoTheme.textMuted),
                 ),
                 const SizedBox(width: 16),
-                Icon(Icons.groups, size: 14, color: Colors.grey[600]),
+                Icon(Icons.groups, size: 14, color: JalapaoTheme.textMuted),
                 const SizedBox(width: 4),
                 Text(
                   'Cap: $capacity',
-                  style: TextStyle(fontSize: 13, color: Colors.grey[700]),
+                  style: TextStyle(fontSize: 13, color: JalapaoTheme.textMuted),
                 ),
               ],
             ),
@@ -559,11 +564,18 @@ class _PendingPlaceCard extends StatelessWidget {
               const SizedBox(height: 4),
               Row(
                 children: [
-                  Icon(Icons.location_on, size: 14, color: Colors.grey[600]),
+                  Icon(
+                    Icons.location_on,
+                    size: 14,
+                    color: JalapaoTheme.textMuted,
+                  ),
                   const SizedBox(width: 4),
                   Text(
                     '${(lat as num).toStringAsFixed(4)}, ${(lng as num).toStringAsFixed(4)}',
-                    style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: JalapaoTheme.textMuted,
+                    ),
                   ),
                 ],
               ),
@@ -574,13 +586,13 @@ class _PendingPlaceCard extends StatelessWidget {
                 Expanded(
                   child: OutlinedButton.icon(
                     onPressed: onReject,
-                    icon: const Icon(Icons.close, color: Colors.red),
+                    icon: const Icon(Icons.close, color: JalapaoTheme.danger),
                     label: const Text(
                       'Rejeitar',
-                      style: TextStyle(color: Colors.red),
+                      style: TextStyle(color: JalapaoTheme.danger),
                     ),
                     style: OutlinedButton.styleFrom(
-                      side: const BorderSide(color: Colors.red),
+                      side: const BorderSide(color: JalapaoTheme.danger),
                     ),
                   ),
                 ),
@@ -588,13 +600,16 @@ class _PendingPlaceCard extends StatelessWidget {
                 Expanded(
                   child: ElevatedButton.icon(
                     onPressed: onApprove,
-                    icon: const Icon(Icons.check, color: Colors.white),
+                    icon: const Icon(
+                      Icons.check,
+                      color: JalapaoTheme.onPrimary,
+                    ),
                     label: const Text(
                       'Aprovar',
-                      style: TextStyle(color: Colors.white),
+                      style: TextStyle(color: JalapaoTheme.onPrimary),
                     ),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.green,
+                      backgroundColor: JalapaoTheme.ok,
                     ),
                   ),
                 ),
@@ -621,24 +636,25 @@ class _ActivePlaceCard extends StatelessWidget {
   });
 
   Color _occupancyColor(int occ, int cap) {
-    if (cap <= 0) return Colors.grey;
+    if (cap <= 0) return JalapaoTheme.textFaint;
     final ratio = occ / cap;
-    if (ratio >= 1.0) return Colors.red;
-    if (ratio >= 0.7) return Colors.orange;
-    return Colors.green;
+    if (ratio >= 1.0) return JalapaoTheme.danger;
+    if (ratio >= 0.7) return JalapaoTheme.warn;
+    return JalapaoTheme.ok;
   }
 
   @override
   Widget build(BuildContext context) {
-    final ratio =
-        place.capacityTotal > 0 ? occupancy / place.capacityTotal : 0.0;
+    final ratio = place.capacityTotal > 0
+        ? occupancy / place.capacityTotal
+        : 0.0;
     final color = _occupancyColor(occupancy, place.capacityTotal);
 
     return Card(
       margin: const EdgeInsets.only(bottom: 10),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: color.withOpacity(0.3)),
+        side: BorderSide(color: color.withValues(alpha: 0.3)),
       ),
       child: Padding(
         padding: const EdgeInsets.all(14),
@@ -662,7 +678,7 @@ class _ActivePlaceCard extends StatelessWidget {
                     vertical: 4,
                   ),
                   decoration: BoxDecoration(
-                    color: color.withOpacity(0.15),
+                    color: color.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
@@ -682,7 +698,7 @@ class _ActivePlaceCard extends StatelessWidget {
               borderRadius: BorderRadius.circular(4),
               child: LinearProgressIndicator(
                 value: ratio.clamp(0.0, 1.0),
-                backgroundColor: Colors.grey[200],
+                backgroundColor: JalapaoTheme.surfaceMuted,
                 valueColor: AlwaysStoppedAnimation<Color>(color),
                 minHeight: 6,
               ),
@@ -720,15 +736,18 @@ class _StatChip extends StatelessWidget {
       margin: const EdgeInsets.only(right: 8),
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: Colors.grey[100],
+        color: JalapaoTheme.surfaceMuted,
         borderRadius: BorderRadius.circular(20),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 12, color: Colors.grey[600]),
+          Icon(icon, size: 12, color: JalapaoTheme.textMuted),
           const SizedBox(width: 4),
-          Text(label, style: TextStyle(fontSize: 12, color: Colors.grey[700])),
+          Text(
+            label,
+            style: TextStyle(fontSize: 12, color: JalapaoTheme.textMuted),
+          ),
         ],
       ),
     );
@@ -753,9 +772,9 @@ class _SummaryCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color.withOpacity(0.2)),
+        border: Border.all(color: color.withValues(alpha: 0.2)),
       ),
       child: Column(
         children: [
@@ -772,7 +791,7 @@ class _SummaryCard extends StatelessWidget {
           const SizedBox(height: 4),
           Text(
             label,
-            style: TextStyle(fontSize: 11, color: Colors.grey[600]),
+            style: TextStyle(fontSize: 11, color: JalapaoTheme.textMuted),
             textAlign: TextAlign.center,
           ),
         ],
@@ -795,42 +814,42 @@ class _PlaceTypeSection extends StatelessWidget {
 
   static const Map<String, Map<String, dynamic>> _typeInfo = {
     'fervedouro': {
-      'label': '🌊 Fervedouros',
+      'label': 'Fervedouros',
       'unit': 'pessoas',
       'metric': 'Ocupação (banho simultâneo)',
     },
     'cachoeira': {
-      'label': '💧 Cachoeiras',
+      'label': 'Cachoeiras',
       'unit': 'pessoas',
       'metric': 'Ocupação simultânea',
     },
     'restaurante': {
-      'label': '🍽️ Restaurantes',
+      'label': 'Restaurantes',
       'unit': 'mesas',
       'metric': 'Mesas ocupadas',
     },
     'pousada': {
-      'label': '🏨 Pousadas',
+      'label': 'Pousadas',
       'unit': 'camas',
       'metric': 'Camas ocupadas',
     },
     'fazenda': {
-      'label': '🌾 Fazendas',
+      'label': 'Fazendas',
       'unit': 'grupos',
       'metric': 'Tours ativos',
     },
     'chacaras': {
-      'label': '🏡 Chácaras',
+      'label': 'Chácaras',
       'unit': 'grupos',
       'metric': 'Tours ativos',
     },
     'loja': {
-      'label': '🏪 Lojas',
+      'label': 'Lojas',
       'unit': 'pessoas',
       'metric': 'Visitantes ativos',
     },
     'atrativo_cultural': {
-      'label': '🎭 Atrativos Culturais',
+      'label': 'Atrativos Culturais',
       'unit': 'pessoas',
       'metric': 'Visitantes ativos',
     },
@@ -872,7 +891,7 @@ class _PlaceTypeSection extends StatelessWidget {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           decoration: BoxDecoration(
-            color: JalapaoTheme.primaryColor.withOpacity(0.08),
+            color: JalapaoTheme.primaryDeep.withValues(alpha: 0.08),
             borderRadius: BorderRadius.circular(8),
           ),
           child: Row(
@@ -887,7 +906,7 @@ class _PlaceTypeSection extends StatelessWidget {
               const Spacer(),
               Text(
                 '${places.length} local${places.length > 1 ? 'is' : ''}',
-                style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                style: TextStyle(fontSize: 12, color: JalapaoTheme.textMuted),
               ),
             ],
           ),
@@ -912,14 +931,14 @@ class _PlaceTypeSection extends StatelessWidget {
         // Cada place do tipo
         ...places.map((place) {
           final occ = placeProvider.getCurrentOccupancy(place.id);
-          final ratio =
-              place.capacityTotal > 0 ? occ / place.capacityTotal : 0.0;
-          final color =
-              ratio >= 1.0
-                  ? Colors.red
-                  : ratio >= 0.7
-                  ? Colors.orange
-                  : Colors.green;
+          final ratio = place.capacityTotal > 0
+              ? occ / place.capacityTotal
+              : 0.0;
+          final color = ratio >= 1.0
+              ? JalapaoTheme.danger
+              : ratio >= 0.7
+              ? JalapaoTheme.warn
+              : JalapaoTheme.ok;
 
           return Padding(
             padding: const EdgeInsets.only(left: 8, bottom: 6),
@@ -952,7 +971,7 @@ class _PlaceTypeSection extends StatelessWidget {
                     borderRadius: BorderRadius.circular(4),
                     child: LinearProgressIndicator(
                       value: ratio.clamp(0.0, 1.0),
-                      backgroundColor: Colors.grey[200],
+                      backgroundColor: JalapaoTheme.surfaceMuted,
                       valueColor: AlwaysStoppedAnimation<Color>(color),
                       minHeight: 6,
                     ),

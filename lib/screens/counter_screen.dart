@@ -1,13 +1,18 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+
 import '../models/place.dart';
 import '../models/place_visit.dart';
 import '../providers/place_provider.dart';
 import '../services/auth_service.dart';
 import '../widgets/pax_selector.dart';
 import 'gestor_login_screen.dart';
+
 import 'package:jalapao_monitor/theme/jalapao_theme.dart';
+
+import '../theme/place_type_style.dart';
+import '../widgets/screen_header.dart';
 
 /// Tela de monitoramento para cachoeira, atrativo_cultural, camping, loja.
 /// Grupos chegam juntos, entram em momentos distintos, saem juntos.
@@ -54,72 +59,69 @@ class _CounterScreenState extends State<CounterScreen> {
     final originCityCtrl = TextEditingController();
     showDialog(
       context: context,
-      builder:
-          (ctx) => AlertDialog(
-            backgroundColor: JalapaoTheme.background,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20),
-            ),
-            title: const Text(
-              'Confirmar chegada',
-              style: TextStyle(color: JalapaoTheme.textSync),
-            ),
-            content: SingleChildScrollView(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  TextField(
-                    controller: groupNameCtrl,
-                    autofocus: false,
-                    decoration: InputDecoration(
-                      labelText: 'Nome do grupo (opcional)',
-                      hintText: 'Ex: Grupo Ipê',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  TextField(
-                    controller: originCityCtrl,
-                    decoration: InputDecoration(
-                      labelText: 'Cidade de origem (opcional)',
-                      hintText: 'Ex: Palmas, Brasília...',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(ctx),
-                child: Text(
-                  'CANCELAR',
-                  style: TextStyle(
-                    color: JalapaoTheme.textSync.withOpacity(0.5),
+      builder: (ctx) => AlertDialog(
+        backgroundColor: JalapaoTheme.background,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: const Text(
+          'Confirmar chegada',
+          style: TextStyle(color: JalapaoTheme.textSync),
+        ),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: groupNameCtrl,
+                autofocus: false,
+                decoration: InputDecoration(
+                  labelText: 'Nome do grupo (opcional)',
+                  hintText: 'Ex: Grupo Ipê',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
                   ),
                 ),
               ),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.pop(ctx);
-                  _registerArrival(
-                    pp,
-                    placeId,
-                    groupName: groupNameCtrl.text,
-                    originCity: originCityCtrl.text,
-                  );
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: JalapaoTheme.primary,
+              const SizedBox(height: 12),
+              TextField(
+                controller: originCityCtrl,
+                decoration: InputDecoration(
+                  labelText: 'Cidade de origem (opcional)',
+                  hintText: 'Ex: Palmas, Brasília...',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                 ),
-                child: const Text('CONFIRMAR'),
               ),
             ],
           ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: Text(
+              'CANCELAR',
+              style: TextStyle(
+                color: JalapaoTheme.textSync.withValues(alpha: 0.5),
+              ),
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(ctx);
+              _registerArrival(
+                pp,
+                placeId,
+                groupName: groupNameCtrl.text,
+                originCity: originCityCtrl.text,
+              );
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: JalapaoTheme.primary,
+            ),
+            child: const Text('CONFIRMAR'),
+          ),
+        ],
+      ),
     );
   }
 
@@ -144,8 +146,10 @@ class _CounterScreenState extends State<CounterScreen> {
         pp.visitsByPlace(placeId).where((v) => v.status == 'visiting').toList()
           ..sort((a, b) => a.arrivalTime.compareTo(b.arrivalTime));
 
-    final todayExited =
-        pp.visitsByPlace(placeId).where((v) => v.status == 'exited').toList();
+    final todayExited = pp
+        .visitsByPlace(placeId)
+        .where((v) => v.status == 'exited')
+        .toList();
 
     final occupancy = activeVisits.fold<int>(0, (s, v) => s + v.paxQty);
     final todayTotal = [
@@ -192,113 +196,71 @@ class _CounterScreenState extends State<CounterScreen> {
     int occupancy,
     bool over,
   ) {
-    // 1.6: Gradiente de cores por limiar de capacidade
-    final Color capColor;
-    if (place.capacityTotal <= 0) {
-      capColor = const Color(0xFF58A6FF); // sem limite → azul neutro
-    } else {
-      final ratio = occupancy / place.capacityTotal;
-      if (ratio >= 1.0) {
-        capColor = const Color(0xFFFF7B72); // vermelho: lotado
-      } else if (ratio >= 0.8) {
-        capColor = const Color(0xFFD29922); // amarelo: 80%+
-      } else {
-        capColor = const Color(0xFF3FB950); // verde: normal
-      }
-    }
+    final capColor = JalapaoTheme.occupancyColor(
+      occupancy,
+      place.capacityTotal,
+    );
+    final capText = place.capacityTotal > 0
+        ? '$occupancy / ${place.capacityTotal}'
+        : '$occupancy';
 
-    final capText =
-        place.capacityTotal > 0
-            ? '$occupancy / ${place.capacityTotal}'
-            : '$occupancy';
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-      decoration: BoxDecoration(
-        color: JalapaoTheme.background,
-        border: Border(
-          bottom: BorderSide(
-            color: JalapaoTheme.textSync.withValues(alpha: 0.1),
-          ),
+    return ScreenHeader(
+      leading: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8),
+        child: Icon(
+          PlaceTypeStyle.icon(place.type),
+          color: PlaceTypeStyle.color(place.type),
+          size: 28,
         ),
       ),
-      child: Row(
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  place.name,
-                  style: const TextStyle(
-                    color: JalapaoTheme.textSync,
-                    fontSize: 20,
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
-                Text(
-                  place.type.toUpperCase().replaceAll('_', ' '),
-                  style: TextStyle(
-                    color: JalapaoTheme.textSync.withValues(alpha: 0.5),
-                    fontSize: 11,
-                    letterSpacing: 1.2,
-                  ),
-                ),
-              ],
+      title: Text(place.name),
+      subtitle: Text(PlaceTypeStyle.label(place.type).toUpperCase()),
+      center: Container(
+        constraints: const BoxConstraints(minHeight: 40),
+        padding: const EdgeInsets.symmetric(horizontal: 14),
+        decoration: BoxDecoration(
+          color: capColor.withValues(alpha: 0.12),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: capColor, width: 2),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.people, color: capColor, size: 22),
+            const SizedBox(width: 6),
+            Text(
+              capText,
+              style: TextStyle(
+                color: capColor,
+                fontSize: 18,
+                fontWeight: FontWeight.w900,
+              ),
             ),
-          ),
-          // Occupancy badge
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            decoration: BoxDecoration(
-              color: capColor.withValues(alpha: 0.15),
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: capColor.withValues(alpha: 0.4)),
-            ),
-            child: Row(
-              children: [
-                Icon(Icons.people, color: capColor, size: 18),
-                const SizedBox(width: 6),
-                Text(
-                  capText,
-                  style: TextStyle(
-                    color: capColor,
-                    fontSize: 18,
-                    fontWeight: FontWeight.w900,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(width: 12),
-          Consumer<AuthService>(
-            builder:
-                (context, authService, _) => IconButton(
-                  onPressed:
-                      () => Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (_) => const GestorLoginScreen(),
-                        ),
-                      ),
-                  icon: Icon(
-                    Icons.admin_panel_settings,
-                    color:
-                        authService.isLoggedIn
-                            ? Colors.green
-                            : Colors.grey[500],
-                  ),
-                  tooltip: 'Gestor',
-                ),
-          ),
-          // Change session button
-          IconButton(
-            onPressed: () => _confirmChangeSession(context),
-            icon: const Icon(Icons.swap_horiz),
-            color: Colors.grey.shade500,
-            tooltip: 'Trocar local',
-          ),
-        ],
+          ],
+        ),
       ),
+      actions: [
+        Consumer<AuthService>(
+          builder: (context, authService, _) => IconButton(
+            onPressed: () => Navigator.of(context).push(
+              MaterialPageRoute(builder: (_) => const GestorLoginScreen()),
+            ),
+            icon: Icon(
+              Icons.admin_panel_settings,
+              color: authService.isLoggedIn
+                  ? JalapaoTheme.ok
+                  : JalapaoTheme.textFaint,
+            ),
+            tooltip: 'Gestor',
+          ),
+        ),
+        IconButton(
+          onPressed: () => _confirmChangeSession(context),
+          icon: const Icon(Icons.swap_horiz),
+          color: JalapaoTheme.textMuted,
+          tooltip: 'Trocar local',
+        ),
+      ],
     );
   }
 
@@ -332,7 +294,7 @@ class _CounterScreenState extends State<CounterScreen> {
                   // 1.2: maxPax dinâmico baseado na capacidade do lugar; fallback 30
                   maxPax: place.capacityTotal > 0 ? place.capacityTotal : 30,
                   selectedCount: _pendingPax,
-                  activeColor: const Color(0xFF3FB950),
+                  activeColor: JalapaoTheme.ok,
                   label: 'Pessoas no grupo',
                   onChanged: (v) => setState(() => _pendingPax = v),
                 ),
@@ -367,8 +329,9 @@ class _CounterScreenState extends State<CounterScreen> {
             width: double.infinity,
             height: 56,
             child: ElevatedButton.icon(
-              onPressed:
-                  _registering ? null : () => _showRegisterDialog(pp, placeId),
+              onPressed: _registering
+                  ? null
+                  : () => _showRegisterDialog(pp, placeId),
               icon: const Icon(Icons.add_circle_outline, size: 22),
               label: Text(
                 'CHEGOU — $_pendingPax pessoa${_pendingPax > 1 ? "s" : ""}',
@@ -379,7 +342,7 @@ class _CounterScreenState extends State<CounterScreen> {
               ),
               style: ElevatedButton.styleFrom(
                 backgroundColor: JalapaoTheme.primary,
-                foregroundColor: Colors.white,
+                foregroundColor: JalapaoTheme.onPrimary,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
@@ -400,7 +363,7 @@ class _CounterScreenState extends State<CounterScreen> {
       return Center(
         child: Text(
           'Nenhum grupo registrado',
-          style: TextStyle(color: Colors.grey.shade600, fontSize: 14),
+          style: TextStyle(color: JalapaoTheme.textMuted, fontSize: 14),
         ),
       );
     }
@@ -415,8 +378,9 @@ class _CounterScreenState extends State<CounterScreen> {
             (v) => _VisitTile(
               visit: v,
               fmt: _fmt,
-              onEntry:
-                  v.entryTime == null ? () => _registerEntry(pp, v.id) : null,
+              onEntry: v.entryTime == null
+                  ? () => _registerEntry(pp, v.id)
+                  : null,
               onExit: () => _registerExit(pp, v.id),
             ),
           ),
@@ -455,27 +419,26 @@ class _CounterScreenState extends State<CounterScreen> {
   Future<void> _confirmChangeSession(BuildContext context) async {
     final confirmed = await showDialog<bool>(
       context: context,
-      builder:
-          (_) => AlertDialog(
-            backgroundColor: JalapaoTheme.cardQueue, // Cor Adobe
-            title: const Text('Trocar local?'),
-            content: const Text(
-              'Dados locais são mantidos. Você será redirecionado para a seleção de local.',
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context, false),
-                child: const Text('Cancelar'),
-              ),
-              TextButton(
-                onPressed: () => Navigator.pop(context, true),
-                child: const Text(
-                  'Trocar',
-                  style: TextStyle(color: Color(0xFFFF7B72)),
-                ),
-              ),
-            ],
+      builder: (_) => AlertDialog(
+        backgroundColor: JalapaoTheme.cardQueue, // Cor Adobe
+        title: const Text('Trocar local?'),
+        content: const Text(
+          'Dados locais são mantidos. Você será redirecionado para a seleção de local.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancelar'),
           ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text(
+              'Trocar',
+              style: TextStyle(color: JalapaoTheme.danger),
+            ),
+          ),
+        ],
+      ),
     );
     if (confirmed == true && context.mounted) {
       await context.read<PlaceProvider>().clearActiveSession();
@@ -500,22 +463,20 @@ class _VisitTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final isExited = visit.status == 'exited';
     final hasEntry = visit.entryTime != null;
-    final baseColor = isExited ? Colors.grey.shade700 : const Color(0xFF3FB950);
+    final baseColor = isExited ? JalapaoTheme.textMuted : JalapaoTheme.ok;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
       decoration: BoxDecoration(
-        color:
-            isExited
-                ? JalapaoTheme.textSync.withValues(alpha: 0.03)
-                : Colors.white,
+        color: isExited
+            ? JalapaoTheme.textSync.withValues(alpha: 0.03)
+            : JalapaoTheme.onPrimary,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color:
-              isExited
-                  ? JalapaoTheme.textSync.withValues(alpha: 0.1)
-                  : JalapaoTheme.primary.withValues(alpha: 0.3),
+          color: isExited
+              ? JalapaoTheme.textSync.withValues(alpha: 0.1)
+              : JalapaoTheme.primary.withValues(alpha: 0.3),
         ),
         boxShadow: [
           BoxShadow(
@@ -587,7 +548,7 @@ class _VisitTile extends StatelessWidget {
                     child: Text(
                       'Espera: ${visit.waitMinutes} min',
                       style: TextStyle(
-                        color: Colors.grey.shade500,
+                        color: JalapaoTheme.textFaint,
                         fontSize: 11,
                       ),
                     ),
@@ -601,7 +562,7 @@ class _VisitTile extends StatelessWidget {
               _actionBtn(
                 icon: Icons.directions_walk,
                 label: 'ENTROU',
-                color: const Color(0xFF58A6FF),
+                color: JalapaoTheme.info,
                 onTap: onEntry!,
               ),
             const SizedBox(width: 6),

@@ -1,5 +1,6 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:provider/provider.dart';
+
 import '../services/auth_service.dart';
 import '../theme/jalapao_theme.dart';
 import 'gestor_screen.dart';
@@ -37,7 +38,7 @@ class _GestorLoginScreenState extends State<GestorLoginScreen> {
 
     if (error != null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(error), backgroundColor: Colors.red),
+        SnackBar(content: Text(error), backgroundColor: JalapaoTheme.danger),
       );
     } else {
       // Login com sucesso → ir para painel do gestor
@@ -53,8 +54,8 @@ class _GestorLoginScreenState extends State<GestorLoginScreen> {
       backgroundColor: JalapaoTheme.background,
       appBar: AppBar(
         title: const Text('Acesso do Gestor'),
-        backgroundColor: JalapaoTheme.primaryColor,
-        foregroundColor: Colors.white,
+        backgroundColor: JalapaoTheme.primaryDeep,
+        foregroundColor: JalapaoTheme.onPrimary,
         actions: [
           // Hint técnico — visível APENAS com long press (invisível ao visitante)
           GestureDetector(
@@ -63,7 +64,7 @@ class _GestorLoginScreenState extends State<GestorLoginScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Icon(
                 Icons.info_outline,
-                color: Colors.white.withOpacity(0.4),
+                color: JalapaoTheme.onPrimary.withValues(alpha: 0.4),
                 semanticLabel: 'Informatções técnicas',
               ),
             ),
@@ -84,7 +85,7 @@ class _GestorLoginScreenState extends State<GestorLoginScreen> {
                   Container(
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
-                      color: JalapaoTheme.primaryColor.withOpacity(0.1),
+                      color: JalapaoTheme.primaryDeep.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(16),
                     ),
                     child: Column(
@@ -92,7 +93,7 @@ class _GestorLoginScreenState extends State<GestorLoginScreen> {
                         Icon(
                           Icons.admin_panel_settings,
                           size: 56,
-                          color: JalapaoTheme.primaryColor,
+                          color: JalapaoTheme.primaryDeep,
                         ),
                         const SizedBox(height: 8),
                         Text(
@@ -100,7 +101,7 @@ class _GestorLoginScreenState extends State<GestorLoginScreen> {
                           style: TextStyle(
                             fontSize: 22,
                             fontWeight: FontWeight.bold,
-                            color: JalapaoTheme.primaryColor,
+                            color: JalapaoTheme.primaryDeep,
                           ),
                         ),
                         const SizedBox(height: 4),
@@ -108,7 +109,7 @@ class _GestorLoginScreenState extends State<GestorLoginScreen> {
                           'Aprovação de locais e monitoramento',
                           style: TextStyle(
                             fontSize: 13,
-                            color: Colors.grey[600],
+                            color: JalapaoTheme.textMuted,
                           ),
                           textAlign: TextAlign.center,
                         ),
@@ -152,18 +153,16 @@ class _GestorLoginScreenState extends State<GestorLoginScreen> {
                               ? Icons.visibility_off
                               : Icons.visibility,
                         ),
-                        onPressed:
-                            () => setState(
-                              () => _obscurePassword = !_obscurePassword,
-                            ),
+                        onPressed: () => setState(
+                          () => _obscurePassword = !_obscurePassword,
+                        ),
                       ),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
                     ),
-                    validator:
-                        (v) =>
-                            v == null || v.isEmpty ? 'Campo obrigatório' : null,
+                    validator: (v) =>
+                        v == null || v.isEmpty ? 'Campo obrigatório' : null,
                   ),
                   const SizedBox(height: 24),
 
@@ -171,31 +170,30 @@ class _GestorLoginScreenState extends State<GestorLoginScreen> {
                   ElevatedButton(
                     onPressed: _loading ? null : _login,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: JalapaoTheme.primaryColor,
-                      foregroundColor: Colors.white,
+                      backgroundColor: JalapaoTheme.primaryDeep,
+                      foregroundColor: JalapaoTheme.onPrimary,
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
                     ),
-                    child:
-                        _loading
-                            ? const SizedBox(
-                              height: 20,
-                              width: 20,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                color: Colors.white,
-                              ),
-                            )
-                            : const Text(
-                              'ENTRAR',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                letterSpacing: 1,
-                              ),
+                    child: _loading
+                        ? const SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: JalapaoTheme.onPrimary,
                             ),
+                          )
+                        : const Text(
+                            'ENTRAR',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              letterSpacing: 1,
+                            ),
+                          ),
                   ),
                   const SizedBox(height: 16),
 
@@ -204,21 +202,21 @@ class _GestorLoginScreenState extends State<GestorLoginScreen> {
                     Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: Colors.orange.withOpacity(0.06),
+                        color: JalapaoTheme.warn.withValues(alpha: 0.06),
                         borderRadius: BorderRadius.circular(8),
                         border: Border.all(
-                          color: Colors.orange.withOpacity(0.25),
+                          color: JalapaoTheme.warn.withValues(alpha: 0.25),
                         ),
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           const Text(
-                            '🔧 Info técnica (manter confidencial)',
+                            'Info técnica (manter confidencial)',
                             style: TextStyle(
                               fontSize: 11,
                               fontWeight: FontWeight.bold,
-                              color: Colors.deepOrange,
+                              color: JalapaoTheme.warn,
                             ),
                           ),
                           const SizedBox(height: 6),
@@ -228,7 +226,7 @@ class _GestorLoginScreenState extends State<GestorLoginScreen> {
                             '• Suporte técnico: configurações do app',
                             style: TextStyle(
                               fontSize: 11,
-                              color: Colors.grey[700],
+                              color: JalapaoTheme.textMuted,
                               height: 1.5,
                             ),
                           ),

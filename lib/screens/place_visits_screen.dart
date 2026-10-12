@@ -1,5 +1,6 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:provider/provider.dart';
+
 import '../models/place.dart';
 import '../providers/place_provider.dart';
 import '../theme/jalapao_theme.dart';
@@ -20,8 +21,8 @@ class _PlaceVisitsScreenState extends State<PlaceVisitsScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Rastreio de Visitantes'),
-        backgroundColor: JalapaoTheme.primaryColor,
-        foregroundColor: Colors.white,
+        backgroundColor: JalapaoTheme.primaryDeep,
+        foregroundColor: JalapaoTheme.onPrimary,
       ),
       body: Consumer<PlaceProvider>(
         builder: (context, placeProvider, _) {
@@ -33,11 +34,18 @@ class _PlaceVisitsScreenState extends State<PlaceVisitsScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(Icons.location_off, size: 64, color: Colors.grey),
+                  const Icon(
+                    Icons.location_off,
+                    size: 64,
+                    color: JalapaoTheme.textFaint,
+                  ),
                   const SizedBox(height: 16),
                   const Text(
                     'Nenhum local aprovado ainda.',
-                    style: TextStyle(fontSize: 16, color: Colors.grey),
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: JalapaoTheme.textFaint,
+                    ),
                   ),
                   const SizedBox(height: 32),
                   ElevatedButton(
@@ -71,13 +79,12 @@ class _PlaceVisitsScreenState extends State<PlaceVisitsScreen> {
                         isExpanded: true,
                         value: _selectedPlaceId,
                         hint: const Text('Escolha um local'),
-                        items:
-                            approvedPlaces.map((place) {
-                              return DropdownMenuItem(
-                                value: place.id,
-                                child: Text(place.name),
-                              );
-                            }).toList(),
+                        items: approvedPlaces.map((place) {
+                          return DropdownMenuItem(
+                            value: place.id,
+                            child: Text(place.name),
+                          );
+                        }).toList(),
                         onChanged: (value) {
                           setState(() {
                             _selectedPlaceId = value;
@@ -109,18 +116,18 @@ class _PlaceVisitsScreenState extends State<PlaceVisitsScreen> {
                           children: [
                             IconButton(
                               icon: const Icon(Icons.remove),
-                              onPressed:
-                                  _selectedPaxCount > 1
-                                      ? () =>
-                                          setState(() => _selectedPaxCount--)
-                                      : null,
+                              onPressed: _selectedPaxCount > 1
+                                  ? () => setState(() => _selectedPaxCount--)
+                                  : null,
                             ),
                             Expanded(
                               child: Container(
                                 alignment: Alignment.center,
                                 padding: const EdgeInsets.all(12),
                                 decoration: BoxDecoration(
-                                  border: Border.all(color: Colors.grey),
+                                  border: Border.all(
+                                    color: JalapaoTheme.textFaint,
+                                  ),
                                   borderRadius: BorderRadius.circular(8),
                                 ),
                                 child: Text(
@@ -134,8 +141,8 @@ class _PlaceVisitsScreenState extends State<PlaceVisitsScreen> {
                             ),
                             IconButton(
                               icon: const Icon(Icons.add),
-                              onPressed:
-                                  () => setState(() => _selectedPaxCount++),
+                              onPressed: () =>
+                                  setState(() => _selectedPaxCount++),
                             ),
                           ],
                         ),
@@ -143,13 +150,13 @@ class _PlaceVisitsScreenState extends State<PlaceVisitsScreen> {
                         SizedBox(
                           width: double.infinity,
                           child: ElevatedButton.icon(
-                            onPressed:
-                                () => _registerArrival(context, placeProvider),
+                            onPressed: () =>
+                                _registerArrival(context, placeProvider),
                             icon: const Icon(Icons.login),
                             label: const Text('Registrar Entrada'),
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.green,
-                              foregroundColor: Colors.white,
+                              backgroundColor: JalapaoTheme.ok,
+                              foregroundColor: JalapaoTheme.onPrimary,
                               padding: const EdgeInsets.symmetric(vertical: 12),
                             ),
                           ),
@@ -170,24 +177,23 @@ class _PlaceVisitsScreenState extends State<PlaceVisitsScreen> {
                 ...activeVisits.map((visit) {
                   final place = approvedPlaces.firstWhere(
                     (p) => p.id == visit.placeId,
-                    orElse:
-                        () => Place(
-                          id: '',
-                          name: 'Desconhecido',
-                          type: '',
-                          latitude: 0,
-                          longitude: 0,
-                          capacityTotal: 0,
-                          ownerName: '',
-                          contactPhone: '',
-                        ),
+                    orElse: () => Place(
+                      id: '',
+                      name: 'Desconhecido',
+                      type: '',
+                      latitude: 0,
+                      longitude: 0,
+                      capacityTotal: 0,
+                      ownerName: '',
+                      contactPhone: '',
+                    ),
                   );
 
                   return _VisitCard(
                     visit: visit,
                     place: place,
-                    onExit:
-                        () => _registerExit(context, placeProvider, visit.id),
+                    onExit: () =>
+                        _registerExit(context, placeProvider, visit.id),
                   );
                 }).toList(),
               ] else
@@ -196,7 +202,10 @@ class _PlaceVisitsScreenState extends State<PlaceVisitsScreen> {
                     padding: const EdgeInsets.symmetric(vertical: 32),
                     child: Text(
                       'Nenhum visitante ativo',
-                      style: TextStyle(color: Colors.grey[600], fontSize: 14),
+                      style: TextStyle(
+                        color: JalapaoTheme.textMuted,
+                        fontSize: 14,
+                      ),
                     ),
                   ),
                 ),
@@ -287,7 +296,7 @@ class _VisitCard extends StatelessWidget {
                       const SizedBox(height: 4),
                       Text(
                         '${visit.paxQty} visitante${visit.paxQty > 1 ? 's' : ''}',
-                        style: const TextStyle(color: Colors.grey),
+                        style: const TextStyle(color: JalapaoTheme.textFaint),
                       ),
                     ],
                   ),
@@ -305,7 +314,7 @@ class _VisitCard extends StatelessWidget {
                     '$minutes min',
                     style: const TextStyle(
                       fontWeight: FontWeight.bold,
-                      color: Colors.blue,
+                      color: JalapaoTheme.info,
                     ),
                   ),
                 ),
@@ -319,8 +328,8 @@ class _VisitCard extends StatelessWidget {
                 icon: const Icon(Icons.logout),
                 label: const Text('Registrar Saída'),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red,
-                  foregroundColor: Colors.white,
+                  backgroundColor: JalapaoTheme.danger,
+                  foregroundColor: JalapaoTheme.onPrimary,
                 ),
               ),
             ),

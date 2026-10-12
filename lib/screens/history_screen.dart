@@ -1,8 +1,10 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+
 import '../models/visit.dart';
 import '../providers/visit_provider.dart';
+import '../theme/jalapao_theme.dart';
 
 class HistoryScreen extends StatelessWidget {
   const HistoryScreen({super.key});
@@ -10,17 +12,14 @@ class HistoryScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0D1117),
       appBar: AppBar(
-        backgroundColor: const Color(0xFF161B22),
-        elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.pop(context),
         ),
         title: const Text(
           'Histórico de Hoje',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          style: TextStyle(fontWeight: FontWeight.bold),
         ),
         actions: [
           Padding(
@@ -28,10 +27,11 @@ class HistoryScreen extends StatelessWidget {
             child: ElevatedButton.icon(
               onPressed: () => context.read<VisitProvider>().exportCsv(),
               icon: const Icon(Icons.share, size: 20),
-              label: const Text('PORTAR CSV'),
+              label: const Text('EXPORTAR CSV'),
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF238636),
-                foregroundColor: Colors.white,
+                backgroundColor: JalapaoTheme.onPrimary,
+                foregroundColor: JalapaoTheme.primaryDeep,
+                elevation: 0,
               ),
             ),
           ),
@@ -46,11 +46,18 @@ class HistoryScreen extends StatelessWidget {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(Icons.history, size: 64, color: Colors.grey.shade800),
+                  const Icon(
+                    Icons.history,
+                    size: 64,
+                    color: JalapaoTheme.textFaint,
+                  ),
                   const SizedBox(height: 16),
                   Text(
                     'Nenhuma visita registrada hoje',
-                    style: TextStyle(color: Colors.grey.shade600, fontSize: 16),
+                    style: TextStyle(
+                      color: JalapaoTheme.textMuted,
+                      fontSize: 16,
+                    ),
                   ),
                 ],
               ),
@@ -72,33 +79,32 @@ class HistoryScreen extends StatelessWidget {
 
   Widget _buildHistoryCard(Visit visit) {
     final timeFormat = DateFormat('HH:mm');
-    final duration =
-        visit.entryTime != null && visit.exitTime != null
-            ? visit.exitTime!.difference(visit.entryTime!)
-            : null;
+    final duration = visit.entryTime != null && visit.exitTime != null
+        ? visit.exitTime!.difference(visit.entryTime!)
+        : null;
 
     Color statusColor;
     String statusText;
     switch (visit.status) {
       case 'fila':
-        statusColor = const Color(0xFF58A6FF);
+        statusColor = JalapaoTheme.info;
         statusText = 'NA FILA';
         break;
       case 'agua':
-        statusColor = const Color(0xFFFF9800);
+        statusColor = JalapaoTheme.warn;
         statusText = 'NA ÁGUA';
         break;
       default:
-        statusColor = Colors.grey.shade500;
+        statusColor = JalapaoTheme.textFaint;
         statusText = 'CONCLUÍDO';
     }
 
     return Card(
-      color: const Color(0xFF161B22),
+      color: JalapaoTheme.surface,
       margin: const EdgeInsets.only(bottom: 8),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: Colors.grey.shade800),
+        side: const BorderSide(color: JalapaoTheme.outline),
       ),
       child: ExpansionTile(
         leading: Container(
@@ -121,7 +127,7 @@ class HistoryScreen extends StatelessWidget {
         title: Text(
           'Chegada: ${timeFormat.format(visit.arrivalTime)}',
           style: const TextStyle(
-            color: Colors.white,
+            color: JalapaoTheme.textPrimary,
             fontWeight: FontWeight.w600,
           ),
         ),
@@ -153,7 +159,7 @@ class HistoryScreen extends StatelessWidget {
               _buildDetail(
                 'Sync',
                 visit.isSynced ? 'OK' : 'Pendente',
-                color: visit.isSynced ? Colors.green : Colors.orange,
+                color: visit.isSynced ? JalapaoTheme.ok : JalapaoTheme.warn,
               ),
             ],
           ),
@@ -169,7 +175,7 @@ class HistoryScreen extends StatelessWidget {
         Text(
           label.toUpperCase(),
           style: TextStyle(
-            color: Colors.grey.shade600,
+            color: JalapaoTheme.textMuted,
             fontSize: 10,
             fontWeight: FontWeight.bold,
           ),
@@ -178,7 +184,7 @@ class HistoryScreen extends StatelessWidget {
         Text(
           value,
           style: TextStyle(
-            color: color ?? Colors.grey.shade300,
+            color: color ?? JalapaoTheme.textPrimary,
             fontSize: 14,
             fontWeight: FontWeight.w600,
           ),
