@@ -59,69 +59,72 @@ class _CounterScreenState extends State<CounterScreen> {
     final originCityCtrl = TextEditingController();
     showDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: JalapaoTheme.background,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Text(
-          'Confirmar chegada',
-          style: TextStyle(color: JalapaoTheme.textSync),
-        ),
-        content: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: groupNameCtrl,
-                autofocus: false,
-                decoration: InputDecoration(
-                  labelText: 'Nome do grupo (opcional)',
-                  hintText: 'Ex: Grupo Ipê',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
+      builder:
+          (ctx) => AlertDialog(
+            backgroundColor: JalapaoTheme.background,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+            ),
+            title: const Text(
+              'Confirmar chegada',
+              style: TextStyle(color: JalapaoTheme.textSync),
+            ),
+            content: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextField(
+                    controller: groupNameCtrl,
+                    autofocus: false,
+                    decoration: InputDecoration(
+                      labelText: 'Nome do grupo (opcional)',
+                      hintText: 'Ex: Grupo Ipê',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: originCityCtrl,
+                    decoration: InputDecoration(
+                      labelText: 'Cidade de origem (opcional)',
+                      hintText: 'Ex: Palmas, Brasília...',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(ctx),
+                child: Text(
+                  'CANCELAR',
+                  style: TextStyle(
+                    color: JalapaoTheme.textSync.withValues(alpha: 0.5),
                   ),
                 ),
               ),
-              const SizedBox(height: 12),
-              TextField(
-                controller: originCityCtrl,
-                decoration: InputDecoration(
-                  labelText: 'Cidade de origem (opcional)',
-                  hintText: 'Ex: Palmas, Brasília...',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.pop(ctx);
+                  _registerArrival(
+                    pp,
+                    placeId,
+                    groupName: groupNameCtrl.text,
+                    originCity: originCityCtrl.text,
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: JalapaoTheme.primary,
                 ),
+                child: const Text('CONFIRMAR'),
               ),
             ],
           ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: Text(
-              'CANCELAR',
-              style: TextStyle(
-                color: JalapaoTheme.textSync.withValues(alpha: 0.5),
-              ),
-            ),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(ctx);
-              _registerArrival(
-                pp,
-                placeId,
-                groupName: groupNameCtrl.text,
-                originCity: originCityCtrl.text,
-              );
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: JalapaoTheme.primary,
-            ),
-            child: const Text('CONFIRMAR'),
-          ),
-        ],
-      ),
     );
   }
 
@@ -146,10 +149,8 @@ class _CounterScreenState extends State<CounterScreen> {
         pp.visitsByPlace(placeId).where((v) => v.status == 'visiting').toList()
           ..sort((a, b) => a.arrivalTime.compareTo(b.arrivalTime));
 
-    final todayExited = pp
-        .visitsByPlace(placeId)
-        .where((v) => v.status == 'exited')
-        .toList();
+    final todayExited =
+        pp.visitsByPlace(placeId).where((v) => v.status == 'exited').toList();
 
     final occupancy = activeVisits.fold<int>(0, (s, v) => s + v.paxQty);
     final todayTotal = [
@@ -200,9 +201,10 @@ class _CounterScreenState extends State<CounterScreen> {
       occupancy,
       place.capacityTotal,
     );
-    final capText = place.capacityTotal > 0
-        ? '$occupancy / ${place.capacityTotal}'
-        : '$occupancy';
+    final capText =
+        place.capacityTotal > 0
+            ? '$occupancy / ${place.capacityTotal}'
+            : '$occupancy';
 
     return ScreenHeader(
       leading: Padding(
@@ -241,18 +243,23 @@ class _CounterScreenState extends State<CounterScreen> {
       ),
       actions: [
         Consumer<AuthService>(
-          builder: (context, authService, _) => IconButton(
-            onPressed: () => Navigator.of(context).push(
-              MaterialPageRoute(builder: (_) => const GestorLoginScreen()),
-            ),
-            icon: Icon(
-              Icons.admin_panel_settings,
-              color: authService.isLoggedIn
-                  ? JalapaoTheme.ok
-                  : JalapaoTheme.textFaint,
-            ),
-            tooltip: 'Gestor',
-          ),
+          builder:
+              (context, authService, _) => IconButton(
+                onPressed:
+                    () => Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => const GestorLoginScreen(),
+                      ),
+                    ),
+                icon: Icon(
+                  Icons.admin_panel_settings,
+                  color:
+                      authService.isLoggedIn
+                          ? JalapaoTheme.ok
+                          : JalapaoTheme.textFaint,
+                ),
+                tooltip: 'Gestor',
+              ),
         ),
         IconButton(
           onPressed: () => _confirmChangeSession(context),
@@ -329,9 +336,8 @@ class _CounterScreenState extends State<CounterScreen> {
             width: double.infinity,
             height: 56,
             child: ElevatedButton.icon(
-              onPressed: _registering
-                  ? null
-                  : () => _showRegisterDialog(pp, placeId),
+              onPressed:
+                  _registering ? null : () => _showRegisterDialog(pp, placeId),
               icon: const Icon(Icons.add_circle_outline, size: 22),
               label: Text(
                 'CHEGOU — $_pendingPax pessoa${_pendingPax > 1 ? "s" : ""}',
@@ -378,9 +384,8 @@ class _CounterScreenState extends State<CounterScreen> {
             (v) => _VisitTile(
               visit: v,
               fmt: _fmt,
-              onEntry: v.entryTime == null
-                  ? () => _registerEntry(pp, v.id)
-                  : null,
+              onEntry:
+                  v.entryTime == null ? () => _registerEntry(pp, v.id) : null,
               onExit: () => _registerExit(pp, v.id),
             ),
           ),
@@ -419,26 +424,27 @@ class _CounterScreenState extends State<CounterScreen> {
   Future<void> _confirmChangeSession(BuildContext context) async {
     final confirmed = await showDialog<bool>(
       context: context,
-      builder: (_) => AlertDialog(
-        backgroundColor: JalapaoTheme.cardQueue, // Cor Adobe
-        title: const Text('Trocar local?'),
-        content: const Text(
-          'Dados locais são mantidos. Você será redirecionado para a seleção de local.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancelar'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: const Text(
-              'Trocar',
-              style: TextStyle(color: JalapaoTheme.danger),
+      builder:
+          (_) => AlertDialog(
+            backgroundColor: JalapaoTheme.cardQueue, // Cor Adobe
+            title: const Text('Trocar local?'),
+            content: const Text(
+              'Dados locais são mantidos. Você será redirecionado para a seleção de local.',
             ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: const Text('Cancelar'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.pop(context, true),
+                child: const Text(
+                  'Trocar',
+                  style: TextStyle(color: JalapaoTheme.danger),
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
     );
     if (confirmed == true && context.mounted) {
       await context.read<PlaceProvider>().clearActiveSession();
@@ -469,14 +475,16 @@ class _VisitTile extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 8),
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
       decoration: BoxDecoration(
-        color: isExited
-            ? JalapaoTheme.textSync.withValues(alpha: 0.03)
-            : JalapaoTheme.onPrimary,
+        color:
+            isExited
+                ? JalapaoTheme.textSync.withValues(alpha: 0.03)
+                : JalapaoTheme.onPrimary,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: isExited
-              ? JalapaoTheme.textSync.withValues(alpha: 0.1)
-              : JalapaoTheme.primary.withValues(alpha: 0.3),
+          color:
+              isExited
+                  ? JalapaoTheme.textSync.withValues(alpha: 0.1)
+                  : JalapaoTheme.primary.withValues(alpha: 0.3),
         ),
         boxShadow: [
           BoxShadow(

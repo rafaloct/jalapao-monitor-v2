@@ -180,44 +180,45 @@ class _PlaceFormScreenState extends State<PlaceFormScreen> {
 
     showModalBottomSheet(
       context: context,
-      builder: (context) => Container(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ListTile(
-              leading: const Icon(Icons.camera_alt),
-              title: const Text('Câmera'),
-              onTap: () async {
-                Navigator.pop(context);
-                final image = await picker.pickImage(
-                  source: ImageSource.camera,
-                  imageQuality: 60,
-                  maxWidth: 1920,
-                );
-                if (image != null) {
-                  setState(() => _photoPaths.add(image.path));
-                }
-              },
+      builder:
+          (context) => Container(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ListTile(
+                  leading: const Icon(Icons.camera_alt),
+                  title: const Text('Câmera'),
+                  onTap: () async {
+                    Navigator.pop(context);
+                    final image = await picker.pickImage(
+                      source: ImageSource.camera,
+                      imageQuality: 60,
+                      maxWidth: 1920,
+                    );
+                    if (image != null) {
+                      setState(() => _photoPaths.add(image.path));
+                    }
+                  },
+                ),
+                ListTile(
+                  leading: const Icon(Icons.image),
+                  title: const Text('Galeria'),
+                  onTap: () async {
+                    Navigator.pop(context);
+                    final image = await picker.pickImage(
+                      source: ImageSource.gallery,
+                      imageQuality: 60,
+                      maxWidth: 1920,
+                    );
+                    if (image != null) {
+                      setState(() => _photoPaths.add(image.path));
+                    }
+                  },
+                ),
+              ],
             ),
-            ListTile(
-              leading: const Icon(Icons.image),
-              title: const Text('Galeria'),
-              onTap: () async {
-                Navigator.pop(context);
-                final image = await picker.pickImage(
-                  source: ImageSource.gallery,
-                  imageQuality: 60,
-                  maxWidth: 1920,
-                );
-                if (image != null) {
-                  setState(() => _photoPaths.add(image.path));
-                }
-              },
-            ),
-          ],
-        ),
-      ),
+          ),
     );
   }
 
@@ -271,7 +272,8 @@ class _PlaceFormScreenState extends State<PlaceFormScreen> {
       contactPhone: _phoneTC.text,
       description: _descriptionTEC.text,
       operatingHours: _hoursTC.text.isEmpty ? null : _hoursTC.text,
-      photoIds: const [], // upload de fotos não implementado — paths locais não vão ao PocketBase
+      photoIds:
+          const [], // upload de fotos não implementado — paths locais não vão ao PocketBase
     );
 
     if (!mounted) return;
@@ -316,8 +318,8 @@ class _PlaceFormScreenState extends State<PlaceFormScreen> {
                     borderRadius: BorderRadius.circular(8),
                   ),
                 ),
-                validator: (v) =>
-                    v?.isEmpty ?? true ? 'Campo obrigatório' : null,
+                validator:
+                    (v) => v?.isEmpty ?? true ? 'Campo obrigatório' : null,
               ),
               const SizedBox(height: 12),
 
@@ -331,14 +333,16 @@ class _PlaceFormScreenState extends State<PlaceFormScreen> {
                     borderRadius: BorderRadius.circular(8),
                   ),
                 ),
-                items: placeTypes.map((type) {
-                  return DropdownMenuItem(
-                    value: type,
-                    child: Text(typeLabels[type] ?? type),
-                  );
-                }).toList(),
-                onChanged: (value) =>
-                    setState(() => _selectedType = value ?? 'fervedouro'),
+                items:
+                    placeTypes.map((type) {
+                      return DropdownMenuItem(
+                        value: type,
+                        child: Text(typeLabels[type] ?? type),
+                      );
+                    }).toList(),
+                onChanged:
+                    (value) =>
+                        setState(() => _selectedType = value ?? 'fervedouro'),
               ),
               const SizedBox(height: 12),
 
@@ -353,8 +357,8 @@ class _PlaceFormScreenState extends State<PlaceFormScreen> {
                   ),
                 ),
                 keyboardType: TextInputType.number,
-                validator: (v) =>
-                    v?.isEmpty ?? true ? 'Campo obrigatório' : null,
+                validator:
+                    (v) => v?.isEmpty ?? true ? 'Campo obrigatório' : null,
               ),
               const SizedBox(height: 12),
 
@@ -450,8 +454,8 @@ class _PlaceFormScreenState extends State<PlaceFormScreen> {
                     borderRadius: BorderRadius.circular(8),
                   ),
                 ),
-                validator: (v) =>
-                    v?.isEmpty ?? true ? 'Campo obrigatório' : null,
+                validator:
+                    (v) => v?.isEmpty ?? true ? 'Campo obrigatório' : null,
               ),
               const SizedBox(height: 12),
 
@@ -514,28 +518,32 @@ class _PlaceFormScreenState extends State<PlaceFormScreen> {
                       crossAxisCount: 3,
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
-                      children: _photoPaths.asMap().entries.map((entry) {
-                        return Stack(
-                          children: [
-                            Image.file(File(entry.value), fit: BoxFit.cover),
-                            Positioned(
-                              top: 0,
-                              right: 0,
-                              child: GestureDetector(
-                                onTap: () => _removePhoto(entry.key),
-                                child: Container(
-                                  color: JalapaoTheme.danger,
-                                  child: const Icon(
-                                    Icons.close,
-                                    color: JalapaoTheme.onPrimary,
-                                    size: 20,
+                      children:
+                          _photoPaths.asMap().entries.map((entry) {
+                            return Stack(
+                              children: [
+                                Image.file(
+                                  File(entry.value),
+                                  fit: BoxFit.cover,
+                                ),
+                                Positioned(
+                                  top: 0,
+                                  right: 0,
+                                  child: GestureDetector(
+                                    onTap: () => _removePhoto(entry.key),
+                                    child: Container(
+                                      color: JalapaoTheme.danger,
+                                      child: const Icon(
+                                        Icons.close,
+                                        color: JalapaoTheme.onPrimary,
+                                        size: 20,
+                                      ),
+                                    ),
                                   ),
                                 ),
-                              ),
-                            ),
-                          ],
-                        );
-                      }).toList(),
+                              ],
+                            );
+                          }).toList(),
                     ),
                     const SizedBox(height: 8),
                     if (_photoPaths.length < 5)

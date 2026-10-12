@@ -1,7 +1,6 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-
 import '../models/visit.dart';
 import '../providers/visit_provider.dart';
 import '../theme/jalapao_theme.dart';
@@ -79,9 +78,10 @@ class HistoryScreen extends StatelessWidget {
 
   Widget _buildHistoryCard(Visit visit) {
     final timeFormat = DateFormat('HH:mm');
-    final duration = visit.entryTime != null && visit.exitTime != null
-        ? visit.exitTime!.difference(visit.entryTime!)
-        : null;
+    final duration =
+        visit.entryTime != null && visit.exitTime != null
+            ? visit.exitTime!.difference(visit.entryTime!)
+            : null;
 
     Color statusColor;
     String statusText;

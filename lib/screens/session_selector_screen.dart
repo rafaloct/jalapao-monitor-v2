@@ -41,11 +41,12 @@ class _SessionSelectorScreenState extends State<SessionSelectorScreen> {
           children: [
             _buildHeader(visitProvider.tabletId),
             Expanded(
-              child: _loading
-                  ? const Center(child: CircularProgressIndicator())
-                  : activePlaces.isEmpty
-                  ? _buildEmptyState(placeProvider)
-                  : _buildPlaceGrid(context, activePlaces, placeProvider),
+              child:
+                  _loading
+                      ? const Center(child: CircularProgressIndicator())
+                      : activePlaces.isEmpty
+                      ? _buildEmptyState(placeProvider)
+                      : _buildPlaceGrid(context, activePlaces, placeProvider),
             ),
           ],
         ),
@@ -69,18 +70,23 @@ class _SessionSelectorScreenState extends State<SessionSelectorScreen> {
       ),
       actions: [
         Consumer<AuthService>(
-          builder: (context, authService, _) => IconButton(
-            onPressed: () => Navigator.of(context).push(
-              MaterialPageRoute(builder: (_) => const GestorLoginScreen()),
-            ),
-            icon: Icon(
-              Icons.admin_panel_settings,
-              color: authService.isLoggedIn
-                  ? JalapaoTheme.ok
-                  : JalapaoTheme.textFaint,
-            ),
-            tooltip: 'Gestor',
-          ),
+          builder:
+              (context, authService, _) => IconButton(
+                onPressed:
+                    () => Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => const GestorLoginScreen(),
+                      ),
+                    ),
+                icon: Icon(
+                  Icons.admin_panel_settings,
+                  color:
+                      authService.isLoggedIn
+                          ? JalapaoTheme.ok
+                          : JalapaoTheme.textFaint,
+                ),
+                tooltip: 'Gestor',
+              ),
         ),
       ],
     );
@@ -307,9 +313,8 @@ class _OccupancyBadge extends StatelessWidget {
   Widget build(BuildContext context) {
     final ratio = total > 0 ? current / total : 0.0;
     final badgeColor = JalapaoTheme.occupancyColor(current, total);
-    final label = ratio >= 1.0
-        ? '$current / $total — LOTADO'
-        : '$current / $total agora';
+    final label =
+        ratio >= 1.0 ? '$current / $total — LOTADO' : '$current / $total agora';
 
     return Padding(
       padding: const EdgeInsets.only(top: 4),

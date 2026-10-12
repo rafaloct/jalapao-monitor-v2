@@ -1,6 +1,5 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:provider/provider.dart';
-
 import '../models/place.dart';
 import '../providers/place_provider.dart';
 import '../theme/jalapao_theme.dart';
@@ -79,12 +78,13 @@ class _PlaceVisitsScreenState extends State<PlaceVisitsScreen> {
                         isExpanded: true,
                         value: _selectedPlaceId,
                         hint: const Text('Escolha um local'),
-                        items: approvedPlaces.map((place) {
-                          return DropdownMenuItem(
-                            value: place.id,
-                            child: Text(place.name),
-                          );
-                        }).toList(),
+                        items:
+                            approvedPlaces.map((place) {
+                              return DropdownMenuItem(
+                                value: place.id,
+                                child: Text(place.name),
+                              );
+                            }).toList(),
                         onChanged: (value) {
                           setState(() {
                             _selectedPlaceId = value;
@@ -116,9 +116,11 @@ class _PlaceVisitsScreenState extends State<PlaceVisitsScreen> {
                           children: [
                             IconButton(
                               icon: const Icon(Icons.remove),
-                              onPressed: _selectedPaxCount > 1
-                                  ? () => setState(() => _selectedPaxCount--)
-                                  : null,
+                              onPressed:
+                                  _selectedPaxCount > 1
+                                      ? () =>
+                                          setState(() => _selectedPaxCount--)
+                                      : null,
                             ),
                             Expanded(
                               child: Container(
@@ -141,8 +143,8 @@ class _PlaceVisitsScreenState extends State<PlaceVisitsScreen> {
                             ),
                             IconButton(
                               icon: const Icon(Icons.add),
-                              onPressed: () =>
-                                  setState(() => _selectedPaxCount++),
+                              onPressed:
+                                  () => setState(() => _selectedPaxCount++),
                             ),
                           ],
                         ),
@@ -150,8 +152,8 @@ class _PlaceVisitsScreenState extends State<PlaceVisitsScreen> {
                         SizedBox(
                           width: double.infinity,
                           child: ElevatedButton.icon(
-                            onPressed: () =>
-                                _registerArrival(context, placeProvider),
+                            onPressed:
+                                () => _registerArrival(context, placeProvider),
                             icon: const Icon(Icons.login),
                             label: const Text('Registrar Entrada'),
                             style: ElevatedButton.styleFrom(
@@ -177,23 +179,24 @@ class _PlaceVisitsScreenState extends State<PlaceVisitsScreen> {
                 ...activeVisits.map((visit) {
                   final place = approvedPlaces.firstWhere(
                     (p) => p.id == visit.placeId,
-                    orElse: () => Place(
-                      id: '',
-                      name: 'Desconhecido',
-                      type: '',
-                      latitude: 0,
-                      longitude: 0,
-                      capacityTotal: 0,
-                      ownerName: '',
-                      contactPhone: '',
-                    ),
+                    orElse:
+                        () => Place(
+                          id: '',
+                          name: 'Desconhecido',
+                          type: '',
+                          latitude: 0,
+                          longitude: 0,
+                          capacityTotal: 0,
+                          ownerName: '',
+                          contactPhone: '',
+                        ),
                   );
 
                   return _VisitCard(
                     visit: visit,
                     place: place,
-                    onExit: () =>
-                        _registerExit(context, placeProvider, visit.id),
+                    onExit:
+                        () => _registerExit(context, placeProvider, visit.id),
                   );
                 }).toList(),
               ] else

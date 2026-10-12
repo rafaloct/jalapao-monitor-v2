@@ -153,16 +153,18 @@ class _GestorLoginScreenState extends State<GestorLoginScreen> {
                               ? Icons.visibility_off
                               : Icons.visibility,
                         ),
-                        onPressed: () => setState(
-                          () => _obscurePassword = !_obscurePassword,
-                        ),
+                        onPressed:
+                            () => setState(
+                              () => _obscurePassword = !_obscurePassword,
+                            ),
                       ),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
                     ),
-                    validator: (v) =>
-                        v == null || v.isEmpty ? 'Campo obrigatório' : null,
+                    validator:
+                        (v) =>
+                            v == null || v.isEmpty ? 'Campo obrigatório' : null,
                   ),
                   const SizedBox(height: 24),
 
@@ -177,23 +179,24 @@ class _GestorLoginScreenState extends State<GestorLoginScreen> {
                         borderRadius: BorderRadius.circular(12),
                       ),
                     ),
-                    child: _loading
-                        ? const SizedBox(
-                            height: 20,
-                            width: 20,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              color: JalapaoTheme.onPrimary,
+                    child:
+                        _loading
+                            ? const SizedBox(
+                              height: 20,
+                              width: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: JalapaoTheme.onPrimary,
+                              ),
+                            )
+                            : const Text(
+                              'ENTRAR',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                letterSpacing: 1,
+                              ),
                             ),
-                          )
-                        : const Text(
-                            'ENTRAR',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              letterSpacing: 1,
-                            ),
-                          ),
                   ),
                   const SizedBox(height: 16),
 

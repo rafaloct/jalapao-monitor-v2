@@ -48,15 +48,15 @@ class _GestorScreenState extends State<GestorScreen>
     final authService = context.read<AuthService>();
 
     final placeId = placeData['id'] as String;
-    final localPlace = placeProvider.allPlaces
-        .where((p) => p.id == placeId)
-        .firstOrNull;
+    final localPlace =
+        placeProvider.allPlaces.where((p) => p.id == placeId).firstOrNull;
 
     // #24: sucesso somente com confirmação do servidor — aprovação não
     // confirmada não é exibida como aplicada.
-    final success = localPlace != null
-        ? await placeProvider.approvePlace(placeId, authService)
-        : await placeProvider.approvePlaceRemote(placeData, authService);
+    final success =
+        localPlace != null
+            ? await placeProvider.approvePlace(placeId, authService)
+            : await placeProvider.approvePlaceRemote(placeData, authService);
 
     if (!mounted) return;
     if (success) {
@@ -70,7 +70,7 @@ class _GestorScreenState extends State<GestorScreen>
           success
               ? '"${placeData['name']}" aprovado com sucesso!'
               : '"${placeData['name']}" não foi aprovado no servidor.\n'
-                    'Verifique a conexão e a sessão do gestor.',
+                  'Verifique a conexão e a sessão do gestor.',
         ),
         backgroundColor: success ? JalapaoTheme.ok : JalapaoTheme.warn,
         duration: Duration(seconds: success ? 3 : 5),
@@ -81,28 +81,29 @@ class _GestorScreenState extends State<GestorScreen>
   Future<void> _rejectPlace(Map<String, dynamic> placeData) async {
     final confirmed = await showDialog<bool>(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Rejeitar local?'),
-        content: Text(
-          'Deseja rejeitar "${placeData['name']}"?\nO local não ficará disponível para operadores.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('Cancelar'),
-          ),
-          ElevatedButton(
-            onPressed: () => Navigator.pop(ctx, true),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: JalapaoTheme.danger,
+      builder:
+          (ctx) => AlertDialog(
+            title: const Text('Rejeitar local?'),
+            content: Text(
+              'Deseja rejeitar "${placeData['name']}"?\nO local não ficará disponível para operadores.',
             ),
-            child: const Text(
-              'Rejeitar',
-              style: TextStyle(color: JalapaoTheme.onPrimary),
-            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(ctx, false),
+                child: const Text('Cancelar'),
+              ),
+              ElevatedButton(
+                onPressed: () => Navigator.pop(ctx, true),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: JalapaoTheme.danger,
+                ),
+                child: const Text(
+                  'Rejeitar',
+                  style: TextStyle(color: JalapaoTheme.onPrimary),
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
     );
 
     if (confirmed != true || !mounted) return;
@@ -111,9 +112,8 @@ class _GestorScreenState extends State<GestorScreen>
     final authService = context.read<AuthService>();
     final placeId = placeData['id'] as String;
 
-    final localPlace = placeProvider.allPlaces
-        .where((p) => p.id == placeId)
-        .firstOrNull;
+    final localPlace =
+        placeProvider.allPlaces.where((p) => p.id == placeId).firstOrNull;
 
     bool success;
     if (localPlace != null) {
@@ -134,7 +134,7 @@ class _GestorScreenState extends State<GestorScreen>
           success
               ? '"${placeData['name']}" rejeitado.'
               : '"${placeData['name']}" não foi rejeitado no servidor.\n'
-                    'Verifique a conexão e a sessão do gestor.',
+                  'Verifique a conexão e a sessão do gestor.',
         ),
         backgroundColor: success ? null : JalapaoTheme.warn,
         duration: Duration(seconds: success ? 3 : 5),
@@ -145,20 +145,21 @@ class _GestorScreenState extends State<GestorScreen>
   void _logout() async {
     final confirmed = await showDialog<bool>(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Sair do painel?'),
-        content: const Text('Deseja encerrar a sessão do gestor?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('Cancelar'),
+      builder:
+          (ctx) => AlertDialog(
+            title: const Text('Sair do painel?'),
+            content: const Text('Deseja encerrar a sessão do gestor?'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(ctx, false),
+                child: const Text('Cancelar'),
+              ),
+              ElevatedButton(
+                onPressed: () => Navigator.pop(ctx, true),
+                child: const Text('Sair'),
+              ),
+            ],
           ),
-          ElevatedButton(
-            onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('Sair'),
-          ),
-        ],
-      ),
     );
 
     if (confirmed != true || !mounted) return;
@@ -229,8 +230,10 @@ class _GestorScreenState extends State<GestorScreen>
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => Navigator.of(context)
-            .push(MaterialPageRoute(builder: (_) => const PlaceFormScreen())),
+        onPressed:
+            () => Navigator.of(
+              context,
+            ).push(MaterialPageRoute(builder: (_) => const PlaceFormScreen())),
         backgroundColor: JalapaoTheme.primaryDeep,
         icon: const Icon(Icons.add_location_alt, color: JalapaoTheme.onPrimary),
         label: const Text(
@@ -250,15 +253,17 @@ class _GestorScreenState extends State<GestorScreen>
     return Consumer<PlaceProvider>(
       builder: (context, placeProvider, _) {
         // IDs já carregados do servidor (já sincronizados)
-        final remoteIds = _remotePendingPlaces
-            .map((p) => p['id'] as String)
-            .toSet();
+        final remoteIds =
+            _remotePendingPlaces.map((p) => p['id'] as String).toSet();
 
         // Places locais pendentes ainda não enviados ao PocketBase
-        final localOnlyPending = placeProvider.pendingPlaces
-            .where((p) => !remoteIds.contains(p.id))
-            .map((p) => <String, dynamic>{...p.toJson(), '_localOnly': true})
-            .toList();
+        final localOnlyPending =
+            placeProvider.pendingPlaces
+                .where((p) => !remoteIds.contains(p.id))
+                .map(
+                  (p) => <String, dynamic>{...p.toJson(), '_localOnly': true},
+                )
+                .toList();
 
         // Mescla: locais não sincronizados aparecem primeiro
         final allPending = [...localOnlyPending, ..._remotePendingPlaces];
@@ -353,14 +358,13 @@ class _GestorScreenState extends State<GestorScreen>
             final place = active[index];
             final occupancy = placeProvider.getCurrentOccupancy(place.id);
             final avgStay = placeProvider.getAverageStay(place.id);
-            final todayVisits = placeProvider.visitsByPlace(place.id).where((
-              v,
-            ) {
-              final today = DateTime.now();
-              return v.arrivalTime.year == today.year &&
-                  v.arrivalTime.month == today.month &&
-                  v.arrivalTime.day == today.day;
-            }).length;
+            final todayVisits =
+                placeProvider.visitsByPlace(place.id).where((v) {
+                  final today = DateTime.now();
+                  return v.arrivalTime.year == today.year &&
+                      v.arrivalTime.month == today.month &&
+                      v.arrivalTime.day == today.day;
+                }).length;
 
             return _ActivePlaceCard(
               place: place,
@@ -499,9 +503,10 @@ class _PendingPlaceCard extends StatelessWidget {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
         side: BorderSide(
-          color: isLocalOnly
-              ? JalapaoTheme.info.withValues(alpha: 0.4)
-              : JalapaoTheme.warn.withValues(alpha: 0.3),
+          color:
+              isLocalOnly
+                  ? JalapaoTheme.info.withValues(alpha: 0.4)
+                  : JalapaoTheme.warn.withValues(alpha: 0.3),
         ),
       ),
       child: Padding(
@@ -517,9 +522,10 @@ class _PendingPlaceCard extends StatelessWidget {
                     vertical: 4,
                   ),
                   decoration: BoxDecoration(
-                    color: isLocalOnly
-                        ? JalapaoTheme.info.withValues(alpha: 0.12)
-                        : JalapaoTheme.warn.withValues(alpha: 0.15),
+                    color:
+                        isLocalOnly
+                            ? JalapaoTheme.info.withValues(alpha: 0.12)
+                            : JalapaoTheme.warn.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
@@ -527,9 +533,8 @@ class _PendingPlaceCard extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.bold,
-                      color: isLocalOnly
-                          ? JalapaoTheme.info
-                          : JalapaoTheme.warn,
+                      color:
+                          isLocalOnly ? JalapaoTheme.info : JalapaoTheme.warn,
                     ),
                   ),
                 ),
@@ -645,9 +650,8 @@ class _ActivePlaceCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ratio = place.capacityTotal > 0
-        ? occupancy / place.capacityTotal
-        : 0.0;
+    final ratio =
+        place.capacityTotal > 0 ? occupancy / place.capacityTotal : 0.0;
     final color = _occupancyColor(occupancy, place.capacityTotal);
 
     return Card(
@@ -931,14 +935,14 @@ class _PlaceTypeSection extends StatelessWidget {
         // Cada place do tipo
         ...places.map((place) {
           final occ = placeProvider.getCurrentOccupancy(place.id);
-          final ratio = place.capacityTotal > 0
-              ? occ / place.capacityTotal
-              : 0.0;
-          final color = ratio >= 1.0
-              ? JalapaoTheme.danger
-              : ratio >= 0.7
-              ? JalapaoTheme.warn
-              : JalapaoTheme.ok;
+          final ratio =
+              place.capacityTotal > 0 ? occ / place.capacityTotal : 0.0;
+          final color =
+              ratio >= 1.0
+                  ? JalapaoTheme.danger
+                  : ratio >= 0.7
+                  ? JalapaoTheme.warn
+                  : JalapaoTheme.ok;
 
           return Padding(
             padding: const EdgeInsets.only(left: 8, bottom: 6),

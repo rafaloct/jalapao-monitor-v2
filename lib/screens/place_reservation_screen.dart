@@ -87,29 +87,30 @@ class _PlaceReservationScreenState extends State<PlaceReservationScreen> {
   Future<void> _confirmChangeSession(BuildContext context) async {
     final confirmed = await showDialog<bool>(
       context: context,
-      builder: (_) => AlertDialog(
-        backgroundColor: JalapaoTheme.background,
-        title: const Text(
-          'Trocar local?',
-          style: TextStyle(color: JalapaoTheme.textSync),
-        ),
-        content: const Text(
-          'Dados locais são mantidos. Você será redirecionado para a seleção de local.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancelar'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: const Text(
-              'Trocar',
-              style: TextStyle(color: JalapaoTheme.error),
+      builder:
+          (_) => AlertDialog(
+            backgroundColor: JalapaoTheme.background,
+            title: const Text(
+              'Trocar local?',
+              style: TextStyle(color: JalapaoTheme.textSync),
             ),
+            content: const Text(
+              'Dados locais são mantidos. Você será redirecionado para a seleção de local.',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: const Text('Cancelar'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.pop(context, true),
+                child: const Text(
+                  'Trocar',
+                  style: TextStyle(color: JalapaoTheme.error),
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
     );
     if (confirmed == true && context.mounted) {
       await context.read<PlaceProvider>().clearActiveSession();
@@ -125,135 +126,141 @@ class _PlaceReservationScreenState extends State<PlaceReservationScreen> {
 
     showDialog(
       context: context,
-      builder: (ctx) => StatefulBuilder(
-        builder: (ctx, setDialogState) => Dialog(
-          backgroundColor: JalapaoTheme.background,
-          // Sobe o diálogo quando o teclado aparece
-          insetPadding: EdgeInsets.fromLTRB(
-            24,
-            24,
-            24,
-            MediaQuery.of(ctx).viewInsets.bottom + 24,
-          ),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(24),
-          ),
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(32),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  'ENTRADA RÁPIDA',
-                  style: Theme.of(context).textTheme.displayMedium
-                      ?.copyWith(color: JalapaoTheme.secondary),
-                ),
-                Text(
-                  _selectedPlace!.name,
-                  style: TextStyle(
-                    fontSize: 13,
-                    color: JalapaoTheme.textSync.withValues(alpha: 0.6),
+      builder:
+          (ctx) => StatefulBuilder(
+            builder:
+                (ctx, setDialogState) => Dialog(
+                  backgroundColor: JalapaoTheme.background,
+                  // Sobe o diálogo quando o teclado aparece
+                  insetPadding: EdgeInsets.fromLTRB(
+                    24,
+                    24,
+                    24,
+                    MediaQuery.of(ctx).viewInsets.bottom + 24,
                   ),
-                ),
-                const SizedBox(height: 8),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 6,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(24),
                   ),
-                  decoration: BoxDecoration(
-                    color: JalapaoTheme.secondary.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: const Text(
-                    'Sem reserva prévia — registra chegada imediata',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: JalapaoTheme.secondary,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-                const SizedBox(height: 24),
-                PaxSelector(
-                  selectedCount: paxCount,
-                  maxPax: _selectedPlace!.capacityTotal,
-                  activeColor: JalapaoTheme.secondary,
-                  label: _unitLabel(_selectedPlace!.type),
-                  onChanged: (v) => setDialogState(() => paxCount = v),
-                ),
-                const SizedBox(height: 16),
-                TextField(
-                  controller: groupNameCtrl,
-                  decoration: InputDecoration(
-                    labelText: 'Nome do grupo (opcional)',
-                    hintText: 'Ex: Grupo Ipê',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 10),
-                TextField(
-                  controller: originCityCtrl,
-                  decoration: InputDecoration(
-                    labelText: 'Cidade de origem (opcional)',
-                    hintText: 'Ex: Palmas, Brasília...',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 24),
-                Row(
-                  children: [
-                    Expanded(
-                      child: TextButton(
-                        onPressed: () => Navigator.pop(ctx),
-                        child: Text(
-                          'CANCELAR',
-                          style: TextStyle(
-                            color: JalapaoTheme.textSync.withValues(alpha: 0.5),
-                            fontWeight: FontWeight.bold,
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.all(32),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          'ENTRADA RÁPIDA',
+                            style: Theme.of(context).textTheme.displayMedium
+                                ?.copyWith(color: JalapaoTheme.secondary),
                           ),
-                        ),
+                          Text(
+                            _selectedPlace!.name,
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: JalapaoTheme.textSync.withValues(alpha: 0.6),
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 6,
+                            ),
+                            decoration: BoxDecoration(
+                              color: JalapaoTheme.secondary.withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: const Text(
+                              'Sem reserva prévia — registra chegada imediata',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: JalapaoTheme.secondary,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                          const SizedBox(height: 24),
+                          PaxSelector(
+                            selectedCount: paxCount,
+                            maxPax: _selectedPlace!.capacityTotal,
+                            activeColor: JalapaoTheme.secondary,
+                            label: _unitLabel(_selectedPlace!.type),
+                            onChanged:
+                                (v) => setDialogState(() => paxCount = v),
+                          ),
+                          const SizedBox(height: 16),
+                          TextField(
+                            controller: groupNameCtrl,
+                            decoration: InputDecoration(
+                              labelText: 'Nome do grupo (opcional)',
+                              hintText: 'Ex: Grupo Ipê',
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          TextField(
+                            controller: originCityCtrl,
+                            decoration: InputDecoration(
+                              labelText: 'Cidade de origem (opcional)',
+                              hintText: 'Ex: Palmas, Brasília...',
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 24),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: TextButton(
+                                  onPressed: () => Navigator.pop(ctx),
+                                  child: Text(
+                                    'CANCELAR',
+                                    style: TextStyle(
+                                      color: JalapaoTheme.textSync.withValues(alpha: 0.5),
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 16),
+                              Expanded(
+                                flex: 2,
+                                child: SizedBox(
+                                  height: 56,
+                                  child: ElevatedButton.icon(
+                                    onPressed:
+                                        paxCount > 0
+                                            ? () {
+                                              provider.quickEntry(
+                                                placeId: _selectedPlace!.id,
+                                                paxQty: paxCount,
+                                                groupName: groupNameCtrl.text,
+                                                originCity: originCityCtrl.text,
+                                              );
+                                              Navigator.pop(ctx);
+                                            }
+                                            : null,
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: JalapaoTheme.secondary,
+                                    ),
+                                    icon: const Icon(Icons.login, size: 20),
+                                    label: const Text(
+                                      'REGISTRAR ENTRADA',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.w900,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
                       ),
                     ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      flex: 2,
-                      child: SizedBox(
-                        height: 56,
-                        child: ElevatedButton.icon(
-                          onPressed: paxCount > 0
-                              ? () {
-                                  provider.quickEntry(
-                                    placeId: _selectedPlace!.id,
-                                    paxQty: paxCount,
-                                    groupName: groupNameCtrl.text,
-                                    originCity: originCityCtrl.text,
-                                  );
-                                  Navigator.pop(ctx);
-                                }
-                              : null,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: JalapaoTheme.secondary,
-                          ),
-                          icon: const Icon(Icons.login, size: 20),
-                          label: const Text(
-                            'REGISTRAR ENTRADA',
-                            style: TextStyle(fontWeight: FontWeight.w900),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
                 ),
-              ],
-            ),
           ),
-        ),
-      ),
     );
   }
 
@@ -272,288 +279,316 @@ class _PlaceReservationScreenState extends State<PlaceReservationScreen> {
 
     showDialog(
       context: context,
-      builder: (ctx) => StatefulBuilder(
-        builder: (ctx, setDialogState) => Dialog(
-          backgroundColor: JalapaoTheme.background,
-          // Sobe o diálogo quando o teclado aparece
-          insetPadding: EdgeInsets.fromLTRB(
-            24,
-            24,
-            24,
-            MediaQuery.of(ctx).viewInsets.bottom + 24,
-          ),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(24),
-          ),
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(32),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'NOVA RESERVA',
-                  style: Theme.of(context).textTheme.displayMedium
-                      ?.copyWith(color: JalapaoTheme.primary),
-                ),
-                Text(
-                  _selectedPlace!.name,
-                  style: TextStyle(
-                    fontSize: 13,
-                    color: JalapaoTheme.textSync.withValues(alpha: 0.6),
-                    fontWeight: FontWeight.w600,
+      builder:
+          (ctx) => StatefulBuilder(
+            builder:
+                (ctx, setDialogState) => Dialog(
+                  backgroundColor: JalapaoTheme.background,
+                  // Sobe o diálogo quando o teclado aparece
+                  insetPadding: EdgeInsets.fromLTRB(
+                    24,
+                    24,
+                    24,
+                    MediaQuery.of(ctx).viewInsets.bottom + 24,
                   ),
-                ),
-                const SizedBox(height: 24),
-
-                // Data e Hora lado a lado (touch targets grandes)
-                Row(
-                  children: [
-                    Expanded(
-                      child: SizedBox(
-                        height: 56,
-                        child: OutlinedButton.icon(
-                          onPressed: () async {
-                            final picked = await showDatePicker(
-                              context: ctx,
-                              initialDate: scheduledDate,
-                              firstDate: DateTime.now().subtract(
-                                const Duration(days: 1),
-                              ),
-                              lastDate: DateTime.now().add(
-                                const Duration(days: 365),
-                              ),
-                            );
-                            if (picked != null) {
-                              setDialogState(() => scheduledDate = picked);
-                            }
-                          },
-                          icon: const Icon(Icons.calendar_today, size: 20),
-                          label: Text(
-                            DateFormat('dd/MM/yyyy').format(scheduledDate),
-                            style: const TextStyle(
-                              fontWeight: FontWeight.w900,
-                              fontSize: 15,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: SizedBox(
-                        height: 56,
-                        child: OutlinedButton.icon(
-                          onPressed: () async {
-                            final picked = await showTimePicker(
-                              context: ctx,
-                              initialTime: scheduledTime,
-                            );
-                            if (picked != null) {
-                              setDialogState(() => scheduledTime = picked);
-                            }
-                          },
-                          icon: const Icon(Icons.schedule, size: 20),
-                          label: Text(
-                            '${scheduledTime.hour.toString().padLeft(2, '0')}:${scheduledTime.minute.toString().padLeft(2, '0')}',
-                            style: const TextStyle(
-                              fontWeight: FontWeight.w900,
-                              fontSize: 15,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 20),
-
-                // Número de pessoas
-                PaxSelector(
-                  selectedCount: paxCount,
-                  maxPax: _selectedPlace!.capacityTotal,
-                  activeColor: JalapaoTheme.primary,
-                  label: _unitLabel(_selectedPlace!.type),
-                  onChanged: (v) => setDialogState(() => paxCount = v),
-                ),
-                const SizedBox(height: 20),
-
-                // Nome: campo + botão anônimo lado a lado
-                Row(
-                  children: [
-                    Expanded(
-                      child: TextField(
-                        controller: guestNameCtrl,
-                        enabled: !isAnonymous,
-                        decoration: InputDecoration(
-                          labelText: 'Nome do responsável',
-                          prefixIcon: const Icon(Icons.person_outline),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                        onChanged: (_) => setDialogState(() {}),
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    // Botão ANÔNIMO — elimina barreira do teclado
-                    SizedBox(
-                      height: 56,
-                      child: ElevatedButton(
-                        onPressed: () {
-                          setDialogState(() {
-                            isAnonymous = !isAnonymous;
-                            if (isAnonymous) {
-                              guestNameCtrl.text = '';
-                            }
-                          });
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: isAnonymous
-                              ? JalapaoTheme.primary
-                              : JalapaoTheme.primary.withValues(alpha: 0.15),
-                          foregroundColor: isAnonymous
-                              ? JalapaoTheme.onPrimary
-                              : JalapaoTheme.primary,
-                          elevation: isAnonymous ? 4 : 0,
-                          padding: const EdgeInsets.symmetric(horizontal: 12),
-                        ),
-                        child: const Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.person, size: 22),
-                            Text(
-                              'Anônimo',
-                              style: TextStyle(
-                                fontSize: 10,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-
-                // Telefone
-                TextField(
-                  controller: phoneCtrl,
-                  decoration: InputDecoration(
-                    labelText: 'Telefone (opcional)',
-                    prefixIcon: const Icon(Icons.phone_outlined),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(24),
                   ),
-                  keyboardType: TextInputType.phone,
-                ),
-                const SizedBox(height: 12),
-
-                // Observações
-                TextField(
-                  controller: notesCtrl,
-                  decoration: InputDecoration(
-                    labelText: 'Observações (opcional)',
-                    prefixIcon: const Icon(Icons.note_outlined),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  maxLines: 2,
-                ),
-                const SizedBox(height: 12),
-
-                // Cidade de Origem
-                TextField(
-                  controller: originCityCtrl,
-                  decoration: InputDecoration(
-                    labelText: 'Cidade de origem (opcional)',
-                    prefixIcon: const Icon(Icons.location_city_outlined),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    hintText: 'Ex: Palmas, Brasília...',
-                  ),
-                ),
-                const SizedBox(height: 24),
-
-                Row(
-                  children: [
-                    Expanded(
-                      child: TextButton(
-                        onPressed: () => Navigator.pop(ctx),
-                        child: Text(
-                          'CANCELAR',
-                          style: TextStyle(
-                            color: JalapaoTheme.textSync.withValues(alpha: 0.5),
-                            fontWeight: FontWeight.bold,
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.all(32),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'NOVA RESERVA',
+                            style: Theme.of(context).textTheme.displayMedium
+                                ?.copyWith(color: JalapaoTheme.primary),
                           ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      flex: 2,
-                      child: SizedBox(
-                        height: 56,
-                        child: ElevatedButton(
-                          onPressed: paxCount > 0
-                              ? () {
-                                  final dt = DateTime(
-                                    scheduledDate.year,
-                                    scheduledDate.month,
-                                    scheduledDate.day,
-                                    scheduledTime.hour,
-                                    scheduledTime.minute,
-                                  );
-                                  String name;
-                                  if (isAnonymous) {
-                                    name = 'Grupo #${_anonCounter++}';
-                                  } else if (guestNameCtrl.text.isEmpty) {
-                                    name = 'Grupo #${_anonCounter++}';
-                                  } else {
-                                    name = guestNameCtrl.text;
-                                  }
-                                  provider.addReservation(
-                                    placeId: _selectedPlace!.id,
-                                    paxQty: paxCount,
-                                    guestName: name,
-                                    scheduledTime: dt,
-                                    contactPhone: phoneCtrl.text.isEmpty
-                                        ? null
-                                        : phoneCtrl.text,
-                                    notes: notesCtrl.text.isEmpty
-                                        ? null
-                                        : notesCtrl.text,
-                                    originCity: originCityCtrl.text.isEmpty
-                                        ? null
-                                        : originCityCtrl.text,
-                                  );
-                                  Navigator.pop(ctx);
-                                }
-                              : null,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: JalapaoTheme.primary,
-                          ),
-                          child: const Text(
-                            'CONFIRMAR RESERVA',
+                          Text(
+                            _selectedPlace!.name,
                             style: TextStyle(
-                              fontWeight: FontWeight.w900,
-                              fontSize: 15,
+                              fontSize: 13,
+                              color: JalapaoTheme.textSync.withValues(alpha: 0.6),
+                              fontWeight: FontWeight.w600,
                             ),
                           ),
-                        ),
+                          const SizedBox(height: 24),
+
+                          // Data e Hora lado a lado (touch targets grandes)
+                          Row(
+                            children: [
+                              Expanded(
+                                child: SizedBox(
+                                  height: 56,
+                                  child: OutlinedButton.icon(
+                                    onPressed: () async {
+                                      final picked = await showDatePicker(
+                                        context: ctx,
+                                        initialDate: scheduledDate,
+                                        firstDate: DateTime.now().subtract(
+                                          const Duration(days: 1),
+                                        ),
+                                        lastDate: DateTime.now().add(
+                                          const Duration(days: 365),
+                                        ),
+                                      );
+                                      if (picked != null) {
+                                        setDialogState(
+                                          () => scheduledDate = picked,
+                                        );
+                                      }
+                                    },
+                                    icon: const Icon(
+                                      Icons.calendar_today,
+                                      size: 20,
+                                    ),
+                                    label: Text(
+                                      DateFormat(
+                                        'dd/MM/yyyy',
+                                      ).format(scheduledDate),
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.w900,
+                                        fontSize: 15,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: SizedBox(
+                                  height: 56,
+                                  child: OutlinedButton.icon(
+                                    onPressed: () async {
+                                      final picked = await showTimePicker(
+                                        context: ctx,
+                                        initialTime: scheduledTime,
+                                      );
+                                      if (picked != null) {
+                                        setDialogState(
+                                          () => scheduledTime = picked,
+                                        );
+                                      }
+                                    },
+                                    icon: const Icon(Icons.schedule, size: 20),
+                                    label: Text(
+                                      '${scheduledTime.hour.toString().padLeft(2, '0')}:${scheduledTime.minute.toString().padLeft(2, '0')}',
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.w900,
+                                        fontSize: 15,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 20),
+
+                          // Número de pessoas
+                          PaxSelector(
+                            selectedCount: paxCount,
+                            maxPax: _selectedPlace!.capacityTotal,
+                            activeColor: JalapaoTheme.primary,
+                            label: _unitLabel(_selectedPlace!.type),
+                            onChanged:
+                                (v) => setDialogState(() => paxCount = v),
+                          ),
+                          const SizedBox(height: 20),
+
+                          // Nome: campo + botão anônimo lado a lado
+                          Row(
+                            children: [
+                              Expanded(
+                                child: TextField(
+                                  controller: guestNameCtrl,
+                                  enabled: !isAnonymous,
+                                  decoration: InputDecoration(
+                                    labelText: 'Nome do responsável',
+                                    prefixIcon: const Icon(
+                                      Icons.person_outline,
+                                    ),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                  ),
+                                  onChanged: (_) => setDialogState(() {}),
+                                ),
+                              ),
+                              const SizedBox(width: 10),
+                              // Botão ANÔNIMO — elimina barreira do teclado
+                              SizedBox(
+                                height: 56,
+                                child: ElevatedButton(
+                                  onPressed: () {
+                                    setDialogState(() {
+                                      isAnonymous = !isAnonymous;
+                                      if (isAnonymous) {
+                                        guestNameCtrl.text = '';
+                                      }
+                                    });
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor:
+                                        isAnonymous
+                                            ? JalapaoTheme.primary
+                                            : JalapaoTheme.primary.withValues(alpha: 0.15),
+                                    foregroundColor:
+                                        isAnonymous
+                                            ? JalapaoTheme.onPrimary
+                                            : JalapaoTheme.primary,
+                                    elevation: isAnonymous ? 4 : 0,
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 12,
+                                    ),
+                                  ),
+                                  child: const Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(Icons.person, size: 22),
+                                      Text(
+                                        'Anônimo',
+                                        style: TextStyle(
+                                          fontSize: 10,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 12),
+
+                          // Telefone
+                          TextField(
+                            controller: phoneCtrl,
+                            decoration: InputDecoration(
+                              labelText: 'Telefone (opcional)',
+                              prefixIcon: const Icon(Icons.phone_outlined),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                            keyboardType: TextInputType.phone,
+                          ),
+                          const SizedBox(height: 12),
+
+                          // Observações
+                          TextField(
+                            controller: notesCtrl,
+                            decoration: InputDecoration(
+                              labelText: 'Observações (opcional)',
+                              prefixIcon: const Icon(Icons.note_outlined),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                            maxLines: 2,
+                          ),
+                          const SizedBox(height: 12),
+
+                          // Cidade de Origem
+                          TextField(
+                            controller: originCityCtrl,
+                            decoration: InputDecoration(
+                              labelText: 'Cidade de origem (opcional)',
+                              prefixIcon: const Icon(
+                                Icons.location_city_outlined,
+                              ),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              hintText: 'Ex: Palmas, Brasília...',
+                            ),
+                          ),
+                          const SizedBox(height: 24),
+
+                          Row(
+                            children: [
+                              Expanded(
+                                child: TextButton(
+                                  onPressed: () => Navigator.pop(ctx),
+                                  child: Text(
+                                    'CANCELAR',
+                                    style: TextStyle(
+                                      color: JalapaoTheme.textSync.withValues(alpha: 0.5),
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 16),
+                              Expanded(
+                                flex: 2,
+                                child: SizedBox(
+                                  height: 56,
+                                  child: ElevatedButton(
+                                    onPressed:
+                                        paxCount > 0
+                                            ? () {
+                                              final dt = DateTime(
+                                                scheduledDate.year,
+                                                scheduledDate.month,
+                                                scheduledDate.day,
+                                                scheduledTime.hour,
+                                                scheduledTime.minute,
+                                              );
+                                              String name;
+                                              if (isAnonymous) {
+                                                name =
+                                                    'Grupo #${_anonCounter++}';
+                                              } else if (guestNameCtrl
+                                                  .text
+                                                  .isEmpty) {
+                                                name =
+                                                    'Grupo #${_anonCounter++}';
+                                              } else {
+                                                name = guestNameCtrl.text;
+                                              }
+                                              provider.addReservation(
+                                                placeId: _selectedPlace!.id,
+                                                paxQty: paxCount,
+                                                guestName: name,
+                                                scheduledTime: dt,
+                                                contactPhone:
+                                                    phoneCtrl.text.isEmpty
+                                                        ? null
+                                                        : phoneCtrl.text,
+                                                notes:
+                                                    notesCtrl.text.isEmpty
+                                                        ? null
+                                                        : notesCtrl.text,
+                                                originCity:
+                                                    originCityCtrl.text.isEmpty
+                                                        ? null
+                                                        : originCityCtrl.text,
+                                              );
+                                              Navigator.pop(ctx);
+                                            }
+                                            : null,
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: JalapaoTheme.primary,
+                                    ),
+                                    child: const Text(
+                                      'CONFIRMAR RESERVA',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.w900,
+                                        fontSize: 15,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
                       ),
                     ),
-                  ],
                 ),
-              ],
-            ),
           ),
-        ),
-      ),
     );
   }
 
@@ -568,13 +603,12 @@ class _PlaceReservationScreenState extends State<PlaceReservationScreen> {
 
             if (_selectedPlace == null) {
               final sessionId = provider.activeSessionPlaceId;
-              final sessionPlace = sessionId != null
-                  ? provider.getPlace(sessionId)
-                  : null;
+              final sessionPlace =
+                  sessionId != null ? provider.getPlace(sessionId) : null;
               final target =
                   (sessionPlace != null && sessionPlace.status == 'active')
-                  ? sessionPlace
-                  : (places.isNotEmpty ? places.first : null);
+                      ? sessionPlace
+                      : (places.isNotEmpty ? places.first : null);
               if (target != null) {
                 WidgetsBinding.instance.addPostFrameCallback((_) {
                   if (mounted) setState(() => _selectedPlace = target);
@@ -582,21 +616,25 @@ class _PlaceReservationScreenState extends State<PlaceReservationScreen> {
               }
             }
 
-            final reservations = _selectedPlace != null
-                ? provider.reservationsByPlace(
-                    _selectedPlace!.id,
-                    _selectedDate,
-                  )
-                : <Reservation>[];
-            final onSite = _selectedPlace != null
-                ? provider.onSiteByPlace(_selectedPlace!.id)
-                : <Reservation>[];
-            final stale = _selectedPlace != null
-                ? provider.staleCheckIns(_selectedPlace!.id)
-                : <Reservation>[];
-            final occupancy = _selectedPlace != null
-                ? provider.getReservationOccupancy(_selectedPlace!.id)
-                : 0;
+            final reservations =
+                _selectedPlace != null
+                    ? provider.reservationsByPlace(
+                      _selectedPlace!.id,
+                      _selectedDate,
+                    )
+                    : <Reservation>[];
+            final onSite =
+                _selectedPlace != null
+                    ? provider.onSiteByPlace(_selectedPlace!.id)
+                    : <Reservation>[];
+            final stale =
+                _selectedPlace != null
+                    ? provider.staleCheckIns(_selectedPlace!.id)
+                    : <Reservation>[];
+            final occupancy =
+                _selectedPlace != null
+                    ? provider.getReservationOccupancy(_selectedPlace!.id)
+                    : 0;
             final capacity = _selectedPlace?.capacityTotal ?? 1;
             final ratio = (occupancy / capacity).clamp(0.0, 1.5);
             final isOverCapacity = occupancy >= capacity;
@@ -761,18 +799,19 @@ class _PlaceReservationScreenState extends State<PlaceReservationScreen> {
           // Seletor de local
           Expanded(
             flex: 3,
-            child: places.isEmpty
-                ? Text(
-                    'Nenhum local ativo',
-                    style: TextStyle(
-                      color: JalapaoTheme.textSync.withValues(alpha: 0.5),
+            child:
+                places.isEmpty
+                    ? Text(
+                      'Nenhum local ativo',
+                      style: TextStyle(
+                        color: JalapaoTheme.textSync.withValues(alpha: 0.5),
+                      ),
+                    )
+                    : PlaceSelectorButton(
+                      places: places,
+                      selected: _selectedPlace,
+                      onSelected: (p) => setState(() => _selectedPlace = p),
                     ),
-                  )
-                : PlaceSelectorButton(
-                    places: places,
-                    selected: _selectedPlace,
-                    onSelected: (p) => setState(() => _selectedPlace = p),
-                  ),
           ),
           const SizedBox(width: 12),
 
@@ -837,18 +876,23 @@ class _PlaceReservationScreenState extends State<PlaceReservationScreen> {
             ),
           const SizedBox(width: 12),
           Consumer<AuthService>(
-            builder: (context, authService, _) => IconButton(
-              onPressed: () => Navigator.of(context).push(
-                MaterialPageRoute(builder: (_) => const GestorLoginScreen()),
-              ),
-              icon: Icon(
-                Icons.admin_panel_settings,
-                color: authService.isLoggedIn
-                    ? JalapaoTheme.ok
-                    : JalapaoTheme.textFaint,
-              ),
-              tooltip: 'Gestor',
-            ),
+            builder:
+                (context, authService, _) => IconButton(
+                  onPressed:
+                      () => Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => const GestorLoginScreen(),
+                        ),
+                      ),
+                  icon: Icon(
+                    Icons.admin_panel_settings,
+                    color:
+                        authService.isLoggedIn
+                            ? JalapaoTheme.ok
+                            : JalapaoTheme.textFaint,
+                  ),
+                  tooltip: 'Gestor',
+                ),
           ),
         ],
       ),
@@ -911,35 +955,37 @@ class _PlaceReservationScreenState extends State<PlaceReservationScreen> {
 
         // Lista de reservas com destaque na próxima
         Expanded(
-          child: reservations.isEmpty
-              ? _buildEmptyState(
-                  'Sem Reservas',
-                  'Nenhuma reserva para este dia.',
-                  JalapaoTheme.primary,
-                )
-              : () {
-                  final now = DateTime.now();
-                  int highlightIndex = -1;
-                  // Encontra a primeira reserva que não passou (ou atraso < 30m)
-                  for (int i = 0; i < reservations.length; i++) {
-                    if (reservations[i].scheduledTime.isAfter(
-                      now.subtract(const Duration(minutes: 30)),
-                    )) {
-                      highlightIndex = i;
-                      break;
+          child:
+              reservations.isEmpty
+                  ? _buildEmptyState(
+                    'Sem Reservas',
+                    'Nenhuma reserva para este dia.',
+                    JalapaoTheme.primary,
+                  )
+                  : () {
+                    final now = DateTime.now();
+                    int highlightIndex = -1;
+                    // Encontra a primeira reserva que não passou (ou atraso < 30m)
+                    for (int i = 0; i < reservations.length; i++) {
+                      if (reservations[i].scheduledTime.isAfter(
+                        now.subtract(const Duration(minutes: 30)),
+                      )) {
+                        highlightIndex = i;
+                        break;
+                      }
                     }
-                  }
 
-                  return ListView.builder(
-                    padding: const EdgeInsets.symmetric(horizontal: 12),
-                    itemCount: reservations.length,
-                    itemBuilder: (context, i) => _buildReservationCard(
-                      provider,
-                      reservations[i],
-                      isNext: i == highlightIndex,
-                    ),
-                  );
-                }(),
+                    return ListView.builder(
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      itemCount: reservations.length,
+                      itemBuilder:
+                          (context, i) => _buildReservationCard(
+                            provider,
+                            reservations[i],
+                            isNext: i == highlightIndex,
+                          ),
+                    );
+                  }(),
         ),
 
         // Botões na base — touch targets grandes
@@ -952,9 +998,10 @@ class _PlaceReservationScreenState extends State<PlaceReservationScreen> {
                 width: double.infinity,
                 height: 44,
                 child: ElevatedButton.icon(
-                  onPressed: _selectedPlace != null
-                      ? () => _showQuickEntryDialog(provider)
-                      : null,
+                  onPressed:
+                      _selectedPlace != null
+                          ? () => _showQuickEntryDialog(provider)
+                          : null,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: JalapaoTheme.secondary,
                     foregroundColor: JalapaoTheme.onPrimary,
@@ -976,9 +1023,10 @@ class _PlaceReservationScreenState extends State<PlaceReservationScreen> {
                 width: double.infinity,
                 height: 52,
                 child: OutlinedButton.icon(
-                  onPressed: _selectedPlace != null
-                      ? () => _showAddReservationDialog(provider)
-                      : null,
+                  onPressed:
+                      _selectedPlace != null
+                          ? () => _showAddReservationDialog(provider)
+                          : null,
                   style: OutlinedButton.styleFrom(
                     side: BorderSide(
                       color: JalapaoTheme.primary.withValues(alpha: 0.6),
@@ -1032,19 +1080,21 @@ class _PlaceReservationScreenState extends State<PlaceReservationScreen> {
       decoration: BoxDecoration(
         color: JalapaoTheme.cardQueue,
         borderRadius: BorderRadius.circular(16),
-        border: isNext
-            ? Border.all(color: JalapaoTheme.secondary, width: 3)
-            : (isLate
-                  ? Border.all(
+        border:
+            isNext
+                ? Border.all(color: JalapaoTheme.secondary, width: 3)
+                : (isLate
+                    ? Border.all(
                       color: JalapaoTheme.error.withValues(alpha: 0.5),
                       width: 2,
                     )
-                  : Border.all(color: Colors.transparent)),
+                    : Border.all(color: Colors.transparent)),
         boxShadow: [
           BoxShadow(
-            color: isNext
-                ? JalapaoTheme.secondary.withValues(alpha: 0.2)
-                : JalapaoTheme.textSync.withValues(alpha: 0.04),
+            color:
+                isNext
+                    ? JalapaoTheme.secondary.withValues(alpha: 0.2)
+                    : JalapaoTheme.textSync.withValues(alpha: 0.04),
             blurRadius: isNext ? 12 : 6,
             offset: const Offset(0, 3),
           ),
@@ -1256,18 +1306,19 @@ class _PlaceReservationScreenState extends State<PlaceReservationScreen> {
             ),
           ),
           Expanded(
-            child: onSite.isEmpty
-                ? _buildEmptyState(
-                    'Ninguém no Local',
-                    'Aguardando check-ins.',
-                    JalapaoTheme.secondary,
-                  )
-                : ListView.builder(
-                    padding: const EdgeInsets.symmetric(horizontal: 12),
-                    itemCount: onSite.length,
-                    itemBuilder: (context, i) =>
-                        _buildOnSiteCard(provider, onSite[i]),
-                  ),
+            child:
+                onSite.isEmpty
+                    ? _buildEmptyState(
+                      'Ninguém no Local',
+                      'Aguardando check-ins.',
+                      JalapaoTheme.secondary,
+                    )
+                    : ListView.builder(
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      itemCount: onSite.length,
+                      itemBuilder:
+                          (context, i) => _buildOnSiteCard(provider, onSite[i]),
+                    ),
           ),
         ],
       ),
@@ -1285,9 +1336,10 @@ class _PlaceReservationScreenState extends State<PlaceReservationScreen> {
       decoration: BoxDecoration(
         color: JalapaoTheme.cardWater,
         borderRadius: BorderRadius.circular(16),
-        border: isLongStay
-            ? Border.all(color: JalapaoTheme.warn, width: 2)
-            : Border.all(color: Colors.transparent),
+        border:
+            isLongStay
+                ? Border.all(color: JalapaoTheme.warn, width: 2)
+                : Border.all(color: Colors.transparent),
         boxShadow: [
           BoxShadow(
             color: JalapaoTheme.secondary.withValues(alpha: 0.08),
@@ -1339,9 +1391,10 @@ class _PlaceReservationScreenState extends State<PlaceReservationScreen> {
                     _elapsed(checkInTime),
                     style: TextStyle(
                       fontSize: 12,
-                      color: isLongStay
-                          ? JalapaoTheme.warn
-                          : JalapaoTheme.secondary,
+                      color:
+                          isLongStay
+                              ? JalapaoTheme.warn
+                              : JalapaoTheme.secondary,
                       fontWeight: FontWeight.w700,
                     ),
                   ),

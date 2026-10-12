@@ -46,9 +46,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
           vp.saveConfig(
             atrativo: place.name,
             tabletId: vp.tabletId,
-            poolCapacity: place.capacityTotal > 0
-                ? place.capacityTotal
-                : vp.poolCapacity,
+            poolCapacity:
+                place.capacityTotal > 0 ? place.capacityTotal : vp.poolCapacity,
             bathTimeMinutes: vp.bathTimeMinutes > 0 ? vp.bathTimeMinutes : 20,
           );
         }
@@ -69,109 +68,116 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final originCityCtrl = TextEditingController();
     final placeProvider = context.read<PlaceProvider>();
     final activePlaceId = placeProvider.activeSessionPlaceId;
-    final activePlace = activePlaceId != null
-        ? placeProvider.getPlace(activePlaceId)
-        : null;
-    final int maxPax = (activePlace != null && activePlace.capacityTotal > 0)
-        ? activePlace.capacityTotal
-        : 30;
+    final activePlace =
+        activePlaceId != null ? placeProvider.getPlace(activePlaceId) : null;
+    final int maxPax =
+        (activePlace != null && activePlace.capacityTotal > 0)
+            ? activePlace.capacityTotal
+            : 30;
     showDialog(
       context: context,
-      builder: (ctx) => StatefulBuilder(
-        builder: (ctx, setDialogState) => Dialog(
-          backgroundColor: JalapaoTheme.background,
-          // Sobe o diálogo quando o teclado aparece
-          insetPadding: EdgeInsets.fromLTRB(
-            40,
-            24,
-            40,
-            MediaQuery.of(ctx).viewInsets.bottom + 24,
-          ),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(24),
-          ),
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(32),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  'CHEGADA DE GRUPO',
-                  textAlign: TextAlign.center,
-                  style: Theme.of(context).textTheme.displayMedium
-                      ?.copyWith(color: JalapaoTheme.primary),
-                ),
-                const SizedBox(height: 24),
-                PaxSelector(
-                  maxPax: maxPax,
-                  selectedCount: selected,
-                  activeColor: JalapaoTheme.primary,
-                  label: 'Quantas Pessoas?',
-                  onChanged: (v) => setDialogState(() => selected = v),
-                ),
-                const SizedBox(height: 20),
-                TextField(
-                  controller: groupNameCtrl,
-                  decoration: InputDecoration(
-                    labelText: 'Nome do grupo (opcional)',
-                    hintText: 'Ex: Grupo Ipê',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
+      builder:
+          (ctx) => StatefulBuilder(
+            builder:
+                (ctx, setDialogState) => Dialog(
+                  backgroundColor: JalapaoTheme.background,
+                  // Sobe o diálogo quando o teclado aparece
+                  insetPadding: EdgeInsets.fromLTRB(
+                    40,
+                    24,
+                    40,
+                    MediaQuery.of(ctx).viewInsets.bottom + 24,
                   ),
-                ),
-                const SizedBox(height: 12),
-                TextField(
-                  controller: originCityCtrl,
-                  decoration: InputDecoration(
-                    labelText: 'Cidade de origem (opcional)',
-                    hintText: 'Ex: Palmas, Brasília...',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(24),
                   ),
-                ),
-                const SizedBox(height: 24),
-                Row(
-                  children: [
-                    Expanded(
-                      child: TextButton(
-                        onPressed: () => Navigator.pop(ctx),
-                        child: Text(
-                          'CANCELAR',
-                          style: TextStyle(
-                            color: JalapaoTheme.textSync.withValues(alpha: 0.6),
-                            fontWeight: FontWeight.bold,
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.all(32),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          'CHEGADA DE GRUPO',
+                          textAlign: TextAlign.center,
+                          style: Theme.of(context).textTheme.displayMedium
+                              ?.copyWith(color: JalapaoTheme.primary),
+                        ),
+                        const SizedBox(height: 24),
+                        PaxSelector(
+                          maxPax: maxPax,
+                          selectedCount: selected,
+                          activeColor: JalapaoTheme.primary,
+                          label: 'Quantas Pessoas?',
+                          onChanged:
+                              (v) => setDialogState(() => selected = v),
+                        ),
+                        const SizedBox(height: 20),
+                        TextField(
+                          controller: groupNameCtrl,
+                          decoration: InputDecoration(
+                            labelText: 'Nome do grupo (opcional)',
+                            hintText: 'Ex: Grupo Ipê',
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
                           ),
                         ),
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: ElevatedButton(
-                        onPressed: selected > 0
-                            ? () {
-                                context.read<VisitProvider>().addToQueue(
-                                  selected,
-                                  groupName: groupNameCtrl.text,
-                                  originCity: originCityCtrl.text,
-                                );
-                                Navigator.pop(ctx);
-                              }
-                            : null,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: JalapaoTheme.primary,
+                        const SizedBox(height: 12),
+                        TextField(
+                          controller: originCityCtrl,
+                          decoration: InputDecoration(
+                            labelText: 'Cidade de origem (opcional)',
+                            hintText: 'Ex: Palmas, Brasília...',
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
                         ),
-                        child: const Text('CONFIRMAR FILA'),
+                          const SizedBox(height: 24),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: TextButton(
+                                  onPressed: () => Navigator.pop(ctx),
+                                  child: Text(
+                                    'CANCELAR',
+                                    style: TextStyle(
+                                      color: JalapaoTheme.textSync.withValues(alpha: 0.6),
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 16),
+                              Expanded(
+                                child: ElevatedButton(
+                                  onPressed:
+                                      selected > 0
+                                          ? () {
+                                            context
+                                                .read<VisitProvider>()
+                                                .addToQueue(
+                                                  selected,
+                                                  groupName: groupNameCtrl.text,
+                                                  originCity:
+                                                      originCityCtrl.text,
+                                                );
+                                            Navigator.pop(ctx);
+                                          }
+                                          : null,
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: JalapaoTheme.primary,
+                                  ),
+                                  child: const Text('CONFIRMAR FILA'),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
                       ),
                     ),
-                  ],
                 ),
-              ],
-            ),
           ),
-        ),
-      ),
     );
   }
 
@@ -185,105 +191,112 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
     showDialog(
       context: context,
-      builder: (ctx) => StatefulBuilder(
-        builder: (ctx, setDialogState) => Dialog(
-          backgroundColor: JalapaoTheme.background,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(24),
-          ),
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(32),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  'ENTRAR NO FERVEDOURO',
-                  textAlign: TextAlign.center,
-                  style: Theme.of(context).textTheme.displayMedium
-                      ?.copyWith(color: JalapaoTheme.secondary),
-                ),
-                const SizedBox(height: 8),
-                isOverCapacity
-                    ? Text(
-                        'Piscina Lotada! (${maxAllowed.abs()} acima)',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: JalapaoTheme.error,
-                          fontWeight: FontWeight.bold,
+      builder:
+          (ctx) => StatefulBuilder(
+            builder:
+                (ctx, setDialogState) => Dialog(
+                  backgroundColor: JalapaoTheme.background,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(24),
+                  ),
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.all(32),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          'ENTRAR NO FERVEDOURO',
+                          textAlign: TextAlign.center,
+                          style: Theme.of(context).textTheme.displayMedium
+                              ?.copyWith(color: JalapaoTheme.secondary),
                         ),
-                      )
-                    : Text(
-                        'Vagas disponíveis: $maxAllowed',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: JalapaoTheme.textSync.withValues(alpha: 0.7),
-                          fontWeight: FontWeight.w600,
+                        const SizedBox(height: 8),
+                        isOverCapacity
+                            ? Text(
+                              'Piscina Lotada! (${maxAllowed.abs()} acima)',
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: JalapaoTheme.error,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            )
+                            : Text(
+                              'Vagas disponíveis: $maxAllowed',
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: JalapaoTheme.textSync.withValues(alpha: 0.7),
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                        const SizedBox(height: 24),
+                        PaxSelector(
+                          maxPax: maxSelectable,
+                          selectedCount: selected,
+                          activeColor: JalapaoTheme.secondary,
+                          label: 'Mergulhando',
+                          onChanged: (v) => setDialogState(() => selected = v),
                         ),
-                      ),
-                const SizedBox(height: 24),
-                PaxSelector(
-                  maxPax: maxSelectable,
-                  selectedCount: selected,
-                  activeColor: JalapaoTheme.secondary,
-                  label: 'Mergulhando',
-                  onChanged: (v) => setDialogState(() => selected = v),
-                ),
-                const SizedBox(height: 24),
-                Row(
-                  children: [
-                    Expanded(
-                      child: TextButton(
-                        onPressed: () => Navigator.pop(ctx),
-                        child: Text(
-                          'CANCELAR',
-                          style: TextStyle(
-                            color: JalapaoTheme.textSync.withValues(alpha: 0.6),
-                            fontWeight: FontWeight.bold,
-                          ),
+                        const SizedBox(height: 24),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: TextButton(
+                                onPressed: () => Navigator.pop(ctx),
+                                child: Text(
+                                  'CANCELAR',
+                                  style: TextStyle(
+                                    color: JalapaoTheme.textSync.withValues(
+                                      alpha: 0.6,
+                                    ),
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: ElevatedButton(
+                                onPressed:
+                                    selected > 0
+                                        ? () {
+                                          final entryNow = DateTime.now();
+                                          provider.moveToWater(visit, selected);
+                                          // Gera PlaceVisit para o Hub (v2.1)
+                                          final placeProvider =
+                                              context.read<PlaceProvider>();
+                                          final sessionPlaceId =
+                                              placeProvider
+                                                  .activeSessionPlaceId;
+                                          if (sessionPlaceId != null) {
+                                            placeProvider.registerArrival(
+                                              placeId: sessionPlaceId,
+                                              paxQty: selected,
+                                              id:
+                                                  visit.groupId.isNotEmpty
+                                                      ? visit.groupId
+                                                      : visit.id,
+                                              arrivalTime: visit.arrivalTime,
+                                              entryTime: entryNow,
+                                              groupName: visit.groupName,
+                                              originCity: visit.originCity,
+                                            );
+                                          }
+                                          Navigator.pop(ctx);
+                                        }
+                                        : null,
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: JalapaoTheme.secondary,
+                                ),
+                                child: const Text('ENTRAR NA ÁGUA'),
+                              ),
+                            ),
+                          ],
                         ),
-                      ),
+                      ],
                     ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: ElevatedButton(
-                        onPressed: selected > 0
-                            ? () {
-                                final entryNow = DateTime.now();
-                                provider.moveToWater(visit, selected);
-                                // Gera PlaceVisit para o Hub (v2.1)
-                                final placeProvider = context
-                                    .read<PlaceProvider>();
-                                final sessionPlaceId =
-                                    placeProvider.activeSessionPlaceId;
-                                if (sessionPlaceId != null) {
-                                  placeProvider.registerArrival(
-                                    placeId: sessionPlaceId,
-                                    paxQty: selected,
-                                    id: visit.groupId.isNotEmpty
-                                        ? visit.groupId
-                                        : visit.id,
-                                    arrivalTime: visit.arrivalTime,
-                                    entryTime: entryNow,
-                                    groupName: visit.groupName,
-                                    originCity: visit.originCity,
-                                  );
-                                }
-                                Navigator.pop(ctx);
-                              }
-                            : null,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: JalapaoTheme.secondary,
-                        ),
-                        child: const Text('ENTRAR NA ÁGUA'),
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
-              ],
-            ),
           ),
-        ),
-      ),
     );
   }
 
@@ -307,111 +320,123 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
     showDialog(
       context: context,
-      builder: (ctx) => StatefulBuilder(
-        builder: (ctx, setDialogState) => Dialog(
-          backgroundColor: JalapaoTheme.background,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(24),
-          ),
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(32),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  'SAÍDA DO BANHO',
-                  textAlign: TextAlign.center,
-                  style: Theme.of(context).textTheme.displayMedium
-                      ?.copyWith(color: JalapaoTheme.ok),
-                ),
-                const SizedBox(height: 24),
-                PaxSelector(
-                  maxPax: visit.paxQty,
-                  selectedCount: selected,
-                  activeColor: JalapaoTheme.ok,
-                  label: 'Saindo...',
-                  onChanged: (v) => setDialogState(() => selected = v),
-                ),
-                const SizedBox(height: 24),
-                Row(
-                  children: [
-                    Expanded(
-                      child: TextButton(
-                        onPressed: () => Navigator.pop(ctx),
-                        child: Text(
-                          'CANCELAR',
-                          style: TextStyle(
-                            color: JalapaoTheme.textSync.withValues(alpha: 0.6),
-                            fontWeight: FontWeight.bold,
-                          ),
+      builder:
+          (ctx) => StatefulBuilder(
+            builder:
+                (ctx, setDialogState) => Dialog(
+                  backgroundColor: JalapaoTheme.background,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(24),
+                  ),
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.all(32),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          'SAÍDA DO BANHO',
+                          textAlign: TextAlign.center,
+                          style: Theme.of(context).textTheme.displayMedium
+                              ?.copyWith(color: JalapaoTheme.ok),
                         ),
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: ElevatedButton(
-                        onPressed: selected > 0
-                            ? () {
-                                context.read<VisitProvider>().releasePartially(
-                                  visit,
-                                  selected,
-                                );
-                                // Fecha PlaceVisit quando todo o grupo sai
-                                if (selected >= visit.paxQty) {
-                                  final placeProvider = context
-                                      .read<PlaceProvider>();
-                                  if (placeProvider.activeSessionPlaceId !=
-                                      null) {
-                                    placeProvider.registerExit(
-                                      visit.groupId.isNotEmpty
-                                          ? visit.groupId
-                                          : visit.id,
-                                    );
-                                  }
-                                }
-                                Navigator.pop(ctx);
-                              }
-                            : null,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: JalapaoTheme.ok,
+                        const SizedBox(height: 24),
+                        PaxSelector(
+                          maxPax: visit.paxQty,
+                          selectedCount: selected,
+                          activeColor: JalapaoTheme.ok,
+                          label: 'Saindo...',
+                          onChanged: (v) => setDialogState(() => selected = v),
                         ),
-                        child: const Text('CONFIRMAR SAÍDA'),
-                      ),
+                        const SizedBox(height: 24),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: TextButton(
+                                onPressed: () => Navigator.pop(ctx),
+                                child: Text(
+                                  'CANCELAR',
+                                  style: TextStyle(
+                                    color: JalapaoTheme.textSync.withValues(
+                                      alpha: 0.6,
+                                    ),
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: ElevatedButton(
+                                onPressed:
+                                    selected > 0
+                                        ? () {
+                                          context
+                                              .read<VisitProvider>()
+                                              .releasePartially(
+                                                visit,
+                                                selected,
+                                              );
+                                          // Fecha PlaceVisit quando todo o grupo sai
+                                          if (selected >= visit.paxQty) {
+                                            final placeProvider =
+                                                context.read<PlaceProvider>();
+                                            if (placeProvider
+                                                    .activeSessionPlaceId !=
+                                                null) {
+                                              placeProvider.registerExit(
+                                                visit.groupId.isNotEmpty
+                                                    ? visit.groupId
+                                                    : visit.id,
+                                              );
+                                            }
+                                          }
+                                          Navigator.pop(ctx);
+                                        }
+                                        : null,
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: JalapaoTheme.ok,
+                                ),
+                                child: const Text('CONFIRMAR SAÍDA'),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
-              ],
-            ),
           ),
-        ),
-      ),
     );
   }
 
   Future<void> _confirmChangeSession(PlaceProvider placeProvider) async {
     final confirmed = await showDialog<bool>(
       context: context,
-      builder: (_) => AlertDialog(
-        backgroundColor: JalapaoTheme.background,
-        title: const Text(
-          'Trocar local?',
-          style: TextStyle(color: JalapaoTheme.textSync),
-        ),
-        content: const Text(
-          'Dados locais são mantidos. Você será redirecionado para a seleção de local.',
-          style: TextStyle(color: JalapaoTheme.onPrimary),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancelar'),
+      builder:
+          (_) => AlertDialog(
+            backgroundColor: JalapaoTheme.background,
+            title: const Text(
+              'Trocar local?',
+              style: TextStyle(color: JalapaoTheme.textSync),
+            ),
+            content: const Text(
+              'Dados locais são mantidos. Você será redirecionado para a seleção de local.',
+              style: TextStyle(color: JalapaoTheme.onPrimary),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: const Text('Cancelar'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.pop(context, true),
+                child: Text(
+                  'Trocar',
+                  style: TextStyle(color: JalapaoTheme.error),
+                ),
+              ),
+            ],
           ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: Text('Trocar', style: TextStyle(color: JalapaoTheme.error)),
-          ),
-        ],
-      ),
     );
     if (confirmed == true && mounted) {
       await placeProvider.clearActiveSession();
@@ -609,11 +634,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
               // Botão Reservas de Locais
               IconButton(
-                onPressed: () => Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (_) => const PlaceReservationScreen(),
-                  ),
-                ),
+                onPressed:
+                    () => Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => const PlaceReservationScreen(),
+                      ),
+                    ),
                 icon: const Icon(
                   Icons.calendar_month,
                   color: JalapaoTheme.primary,
@@ -624,9 +650,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
               // Botão Rastreio de Visitantes
               IconButton(
-                onPressed: () => Navigator.of(context).push(
-                  MaterialPageRoute(builder: (_) => const PlaceVisitsScreen()),
-                ),
+                onPressed:
+                    () => Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => const PlaceVisitsScreen(),
+                      ),
+                    ),
                 icon: const Icon(
                   Icons.people_rounded,
                   color: JalapaoTheme.info,
@@ -637,9 +666,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
               // Botão Gestor
               Tooltip(
-                message: authService.isLoggedIn
-                    ? 'Painel do Gestor (${authService.gestorName})'
-                    : 'Acesso do Gestor',
+                message:
+                    authService.isLoggedIn
+                        ? 'Painel do Gestor (${authService.gestorName})'
+                        : 'Acesso do Gestor',
                 child: IconButton(
                   onPressed: () {
                     if (authService.isLoggedIn) {
@@ -656,18 +686,20 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   },
                   icon: Icon(
                     Icons.admin_panel_settings,
-                    color: authService.isLoggedIn
-                        ? JalapaoTheme.ok
-                        : JalapaoTheme.textFaint,
+                    color:
+                        authService.isLoggedIn
+                            ? JalapaoTheme.ok
+                            : JalapaoTheme.textFaint,
                   ),
                 ),
               ),
               const SizedBox(width: 4),
 
               IconButton(
-                onPressed: () => Navigator.of(context).push(
-                  MaterialPageRoute(builder: (_) => const HistoryScreen()),
-                ),
+                onPressed:
+                    () => Navigator.of(context).push(
+                      MaterialPageRoute(builder: (_) => const HistoryScreen()),
+                    ),
                 icon: const Icon(Icons.history, color: JalapaoTheme.primary),
                 tooltip: 'Histórico',
               ),
@@ -685,15 +717,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     onPressed: () => provider.forceSync(),
                     icon: Icon(
                       Icons.cloud_sync,
-                      color: hasSyncError
-                          ? JalapaoTheme.warn
-                          : JalapaoTheme.secondary,
+                      color:
+                          hasSyncError
+                              ? JalapaoTheme.warn
+                              : JalapaoTheme.secondary,
                     ),
-                    tooltip: hasSyncError
-                        ? (provider.lastSyncError ??
-                              placeProvider.lastSyncError ??
-                              'Erro de sync')
-                        : 'Sincronizar',
+                    tooltip:
+                        hasSyncError
+                            ? (provider.lastSyncError ??
+                                placeProvider.lastSyncError ??
+                                'Erro de sync')
+                            : 'Sincronizar',
                   ),
                   if (provider.unsyncedCount > 0)
                     Positioned(
@@ -816,18 +850,20 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ),
         ),
         Expanded(
-          child: queue.isEmpty
-              ? _buildEmptyState(
-                  'Fila Vazia',
-                  'Ninguém esperando na terra firme.',
-                  JalapaoTheme.primary,
-                )
-              : ListView.builder(
-                  padding: const EdgeInsets.symmetric(horizontal: 24),
-                  itemCount: queue.length,
-                  itemBuilder: (context, index) =>
-                      _buildQueueCard(queue[index], provider),
-                ),
+          child:
+              queue.isEmpty
+                  ? _buildEmptyState(
+                    'Fila Vazia',
+                    'Ninguém esperando na terra firme.',
+                    JalapaoTheme.primary,
+                  )
+                  : ListView.builder(
+                    padding: const EdgeInsets.symmetric(horizontal: 24),
+                    itemCount: queue.length,
+                    itemBuilder:
+                        (context, index) =>
+                            _buildQueueCard(queue[index], provider),
+                  ),
         ),
         Padding(
           padding: const EdgeInsets.all(24),
@@ -923,76 +959,79 @@ class _DashboardScreenState extends State<DashboardScreen> {
     int tempCap = provider.poolCapacity;
     showDialog(
       context: context,
-      builder: (ctx) => StatefulBuilder(
-        builder: (ctx, setDialogState) => AlertDialog(
-          backgroundColor: JalapaoTheme.background,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-          ),
-          title: Text(
-            'Capacidade do Fervedouro',
-            style: TextStyle(
-              color: JalapaoTheme.secondary,
-              fontWeight: FontWeight.w900,
-            ),
-          ),
-          content: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              IconButton(
-                onPressed: tempCap > 1
-                    ? () => setDialogState(() => tempCap--)
-                    : null,
-                icon: const Icon(Icons.remove_circle_outline),
-                color: JalapaoTheme.secondary,
-                iconSize: 32,
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Text(
-                  '$tempCap',
-                  style: const TextStyle(
-                    fontSize: 48,
-                    fontWeight: FontWeight.w900,
+      builder:
+          (ctx) => StatefulBuilder(
+            builder:
+                (ctx, setDialogState) => AlertDialog(
+                  backgroundColor: JalapaoTheme.background,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
                   ),
+                  title: Text(
+                    'Capacidade do Fervedouro',
+                    style: TextStyle(
+                      color: JalapaoTheme.secondary,
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
+                  content: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      IconButton(
+                        onPressed:
+                            tempCap > 1
+                                ? () => setDialogState(() => tempCap--)
+                                : null,
+                        icon: const Icon(Icons.remove_circle_outline),
+                        color: JalapaoTheme.secondary,
+                        iconSize: 32,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: Text(
+                          '$tempCap',
+                          style: const TextStyle(
+                            fontSize: 48,
+                            fontWeight: FontWeight.w900,
+                          ),
+                        ),
+                      ),
+                      IconButton(
+                        onPressed: () => setDialogState(() => tempCap++),
+                        icon: const Icon(Icons.add_circle_outline),
+                        color: JalapaoTheme.secondary,
+                        iconSize: 32,
+                      ),
+                    ],
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(ctx),
+                      child: Text(
+                        'CANCELAR',
+                        style: TextStyle(
+                          color: JalapaoTheme.textSync.withValues(alpha: 0.5),
+                        ),
+                      ),
+                    ),
+                    ElevatedButton(
+                      onPressed: () {
+                        provider.saveConfig(
+                          atrativo: provider.atrativo,
+                          tabletId: provider.tabletId,
+                          poolCapacity: tempCap,
+                          bathTimeMinutes: provider.bathTimeMinutes,
+                        );
+                        Navigator.pop(ctx);
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: JalapaoTheme.secondary,
+                      ),
+                      child: const Text('SALVAR'),
+                    ),
+                  ],
                 ),
-              ),
-              IconButton(
-                onPressed: () => setDialogState(() => tempCap++),
-                icon: const Icon(Icons.add_circle_outline),
-                color: JalapaoTheme.secondary,
-                iconSize: 32,
-              ),
-            ],
           ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(ctx),
-              child: Text(
-                'CANCELAR',
-                style: TextStyle(
-                  color: JalapaoTheme.textSync.withValues(alpha: 0.5),
-                ),
-              ),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                provider.saveConfig(
-                  atrativo: provider.atrativo,
-                  tabletId: provider.tabletId,
-                  poolCapacity: tempCap,
-                  bathTimeMinutes: provider.bathTimeMinutes,
-                );
-                Navigator.pop(ctx);
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: JalapaoTheme.secondary,
-              ),
-              child: const Text('SALVAR'),
-            ),
-          ],
-        ),
-      ),
     );
   }
 
@@ -1033,9 +1072,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         style: TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.w900,
-                          color: ratio >= 1.0
-                              ? JalapaoTheme.error
-                              : JalapaoTheme.secondary,
+                          color:
+                              ratio >= 1.0
+                                  ? JalapaoTheme.error
+                                  : JalapaoTheme.secondary,
                         ),
                       ),
                       SizedBox(
@@ -1067,18 +1107,20 @@ class _DashboardScreenState extends State<DashboardScreen> {
             ),
           ),
           Expanded(
-            child: water.isEmpty
-                ? _buildEmptyState(
-                    'Fervedouro Vazio',
-                    'Águas calmas e cristalinas.',
-                    JalapaoTheme.secondary,
-                  )
-                : ListView.builder(
-                    padding: const EdgeInsets.symmetric(horizontal: 24),
-                    itemCount: water.length,
-                    itemBuilder: (context, index) =>
-                        _buildWaterCard(water[index], provider),
-                  ),
+            child:
+                water.isEmpty
+                    ? _buildEmptyState(
+                      'Fervedouro Vazio',
+                      'Águas calmas e cristalinas.',
+                      JalapaoTheme.secondary,
+                    )
+                    : ListView.builder(
+                      padding: const EdgeInsets.symmetric(horizontal: 24),
+                      itemCount: water.length,
+                      itemBuilder:
+                          (context, index) =>
+                              _buildWaterCard(water[index], provider),
+                    ),
           ),
         ],
       ),
@@ -1097,9 +1139,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
         decoration: BoxDecoration(
           color: JalapaoTheme.cardWater, // Azul Turquesa
           borderRadius: BorderRadius.circular(20),
-          border: timer.isExpired
-              ? Border.all(color: JalapaoTheme.error, width: 3)
-              : Border.all(color: Colors.transparent, width: 0),
+          border:
+              timer.isExpired
+                  ? Border.all(color: JalapaoTheme.error, width: 3)
+                  : Border.all(color: Colors.transparent, width: 0),
           boxShadow: [
             BoxShadow(
               color: JalapaoTheme.secondary.withValues(alpha: 0.1),
@@ -1133,9 +1176,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.w900,
-                      color: timer.color == JalapaoTheme.danger
-                          ? JalapaoTheme.error
-                          : JalapaoTheme.textSync,
+                      color:
+                          timer.color == JalapaoTheme.danger
+                              ? JalapaoTheme.error
+                              : JalapaoTheme.textSync,
                     ),
                   ),
                 ),

@@ -1,6 +1,5 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:provider/provider.dart';
-
 import '../providers/visit_provider.dart';
 import '../theme/jalapao_theme.dart';
 
