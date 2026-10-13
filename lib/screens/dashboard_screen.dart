@@ -529,17 +529,20 @@ class _DashboardScreenState extends State<DashboardScreen> {
               overflow: TextOverflow.ellipsis,
             ),
           ),
-          GestureDetector(
-            onTap: () {
+          IconButton(
+            tooltip: 'Fechar aviso de sync',
+            onPressed: () {
               if (vp.lastSyncError != null) vp.clearSyncError();
               if (pp.lastSyncError != null) pp.clearSyncError();
               setState(() => _syncErrorSince = null);
             },
-            child: const SizedBox(
-              width: 48,
-              height: 48,
-              child: Icon(Icons.close, color: JalapaoTheme.onPrimary, size: 20),
+            iconSize: 20,
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints.tightFor(
+              width: JalapaoTheme.minTouch,
+              height: JalapaoTheme.minTouch,
             ),
+            icon: const Icon(Icons.close, color: JalapaoTheme.onPrimary),
           ),
         ],
       ),
