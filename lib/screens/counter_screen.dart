@@ -434,7 +434,10 @@ class _CounterScreenState extends State<CounterScreen> {
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context, false),
-                child: const Text('Cancelar'),
+                child: const Text(
+                  'Cancelar',
+                  style: TextStyle(color: JalapaoTheme.textPrimary),
+                ),
               ),
               TextButton(
                 onPressed: () => Navigator.pop(context, true),

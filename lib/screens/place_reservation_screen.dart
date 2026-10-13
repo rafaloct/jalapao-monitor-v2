@@ -691,7 +691,11 @@ class _PlaceReservationScreenState extends State<PlaceReservationScreen> {
                     ),
                     child: Row(
                       children: [
-                        const Text('', style: TextStyle(fontSize: 14)),
+                        const Icon(
+                          Icons.schedule,
+                          color: JalapaoTheme.warn,
+                          size: 16,
+                        ),
                         const SizedBox(width: 6),
                         Expanded(
                           child: Text(
