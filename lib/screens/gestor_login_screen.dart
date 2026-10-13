@@ -60,12 +60,16 @@ class _GestorLoginScreenState extends State<GestorLoginScreen> {
           // Hint técnico — visível APENAS com long press (invisível ao visitante)
           GestureDetector(
             onLongPress: () => setState(() => _showTechHint = !_showTechHint),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Icon(
-                Icons.info_outline,
-                color: JalapaoTheme.onPrimary.withValues(alpha: 0.4),
-                semanticLabel: 'Informatções técnicas',
+            behavior: HitTestBehavior.opaque,
+            child: const SizedBox(
+              width: JalapaoTheme.minTouch,
+              height: JalapaoTheme.minTouch,
+              child: Center(
+                child: Icon(
+                  Icons.info_outline,
+                  color: JalapaoTheme.onPrimary,
+                  semanticLabel: 'Informações técnicas',
+                ),
               ),
             ),
           ),

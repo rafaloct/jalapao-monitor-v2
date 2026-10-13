@@ -100,13 +100,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           'CHEGADA DE GRUPO',
                           textAlign: TextAlign.center,
                           style: Theme.of(context).textTheme.displayMedium
-                              ?.copyWith(color: JalapaoTheme.primary),
+                              ?.copyWith(color: JalapaoTheme.primaryDeep),
                         ),
                         const SizedBox(height: 24),
                         PaxSelector(
                           maxPax: maxPax,
                           selectedCount: selected,
-                          activeColor: JalapaoTheme.primary,
+                          activeColor: JalapaoTheme.primaryDeep,
                           label: 'Quantas Pessoas?',
                           onChanged:
                               (v) => setDialogState(() => selected = v),
@@ -142,7 +142,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                   child: Text(
                                     'CANCELAR',
                                     style: TextStyle(
-                                      color: JalapaoTheme.textSync.withValues(alpha: 0.6),
+                                      color: JalapaoTheme.textMuted,
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
@@ -166,7 +166,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                           }
                                           : null,
                                   style: ElevatedButton.styleFrom(
-                                    backgroundColor: JalapaoTheme.primary,
+                                    backgroundColor: JalapaoTheme.primaryDeep,
                                   ),
                                   child: const Text('CONFIRMAR FILA'),
                                 ),
@@ -208,7 +208,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           'ENTRAR NO FERVEDOURO',
                           textAlign: TextAlign.center,
                           style: Theme.of(context).textTheme.displayMedium
-                              ?.copyWith(color: JalapaoTheme.secondary),
+                              ?.copyWith(color: JalapaoTheme.secondaryDeep),
                         ),
                         const SizedBox(height: 8),
                         isOverCapacity
@@ -224,7 +224,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                               'Vagas disponíveis: $maxAllowed',
                               style: TextStyle(
                                 fontSize: 14,
-                                color: JalapaoTheme.textSync.withValues(alpha: 0.7),
+                                color: JalapaoTheme.textMuted,
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
@@ -232,7 +232,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         PaxSelector(
                           maxPax: maxSelectable,
                           selectedCount: selected,
-                          activeColor: JalapaoTheme.secondary,
+                          activeColor: JalapaoTheme.secondaryDeep,
                           label: 'Mergulhando',
                           onChanged: (v) => setDialogState(() => selected = v),
                         ),
@@ -245,9 +245,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 child: Text(
                                   'CANCELAR',
                                   style: TextStyle(
-                                    color: JalapaoTheme.textSync.withValues(
-                                      alpha: 0.6,
-                                    ),
+                                    color: JalapaoTheme.textMuted,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
@@ -285,7 +283,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                         }
                                         : null,
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: JalapaoTheme.secondary,
+                                  backgroundColor: JalapaoTheme.secondaryDeep,
                                 ),
                                 child: const Text('ENTRAR NA ÁGUA'),
                               ),
@@ -356,9 +354,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 child: Text(
                                   'CANCELAR',
                                   style: TextStyle(
-                                    color: JalapaoTheme.textSync.withValues(
-                                      alpha: 0.6,
-                                    ),
+                                    color: JalapaoTheme.textMuted,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
@@ -421,7 +417,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             ),
             content: const Text(
               'Dados locais são mantidos. Você será redirecionado para a seleção de local.',
-              style: TextStyle(color: JalapaoTheme.onPrimary),
+              style: TextStyle(color: JalapaoTheme.textPrimary),
             ),
             actions: [
               TextButton(
@@ -471,9 +467,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           decoration: BoxDecoration(
                             border: Border(
                               right: BorderSide(
-                                color: JalapaoTheme.primary.withValues(
-                                  alpha: 0.1,
-                                ),
+                                color: JalapaoTheme.outline,
                                 width: 2,
                               ),
                             ),
@@ -612,14 +606,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       Icon(
                         Icons.timer,
                         size: 14,
-                        color: JalapaoTheme.secondary,
+                        color: JalapaoTheme.secondaryDeep,
                       ),
                       const SizedBox(width: 4),
                       Text(
                         'Ciclo de Banho: ${provider.bathTimeMinutes}min',
                         style: TextStyle(
                           fontSize: 14,
-                          color: JalapaoTheme.textSync.withValues(alpha: 0.7),
+                          color: JalapaoTheme.textMuted,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -645,7 +639,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     ),
                 icon: const Icon(
                   Icons.calendar_month,
-                  color: JalapaoTheme.primary,
+                  color: JalapaoTheme.primaryDeep,
                 ),
                 tooltip: 'Reservas de Locais',
               ),
@@ -703,7 +697,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     () => Navigator.of(context).push(
                       MaterialPageRoute(builder: (_) => const HistoryScreen()),
                     ),
-                icon: const Icon(Icons.history, color: JalapaoTheme.primary),
+                icon: const Icon(Icons.history, color: JalapaoTheme.primaryDeep),
                 tooltip: 'Histórico',
               ),
               const SizedBox(width: 4),
@@ -723,7 +717,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       color:
                           hasSyncError
                               ? JalapaoTheme.warn
-                              : JalapaoTheme.secondary,
+                              : JalapaoTheme.secondaryDeep,
                     ),
                     tooltip:
                         hasSyncError
@@ -827,7 +821,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w900,
-                  color: JalapaoTheme.primary,
+                  color: JalapaoTheme.primaryDeep,
                   letterSpacing: 1.5,
                 ),
               ),
@@ -844,7 +838,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 child: Text(
                   '${queue.length} GRUPOS',
                   style: const TextStyle(
-                    color: JalapaoTheme.primary,
+                    color: JalapaoTheme.primaryDeep,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -858,7 +852,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   ? _buildEmptyState(
                     'Fila Vazia',
                     'Ninguém esperando na terra firme.',
-                    JalapaoTheme.primary,
+                    JalapaoTheme.primaryDeep,
                   )
                   : ListView.builder(
                     padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -876,7 +870,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             child: ElevatedButton.icon(
               onPressed: _showAddToQueueDialog,
               style: ElevatedButton.styleFrom(
-                backgroundColor: JalapaoTheme.primary,
+                backgroundColor: JalapaoTheme.primaryDeep,
                 foregroundColor: JalapaoTheme.onPrimary,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
@@ -937,7 +931,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   '${_elapsed(visit.arrivalTime)} de espera',
                   style: TextStyle(
                     fontSize: 14,
-                    color: JalapaoTheme.textSync.withValues(alpha: 0.6),
+                    color: JalapaoTheme.textMuted,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -948,7 +942,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               onPressed: () => provider.removeFromQueue(visit),
               icon: Icon(
                 Icons.close,
-                color: JalapaoTheme.error.withValues(alpha: 0.5),
+                color: JalapaoTheme.danger,
               ),
             ),
           ],
@@ -973,7 +967,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   title: Text(
                     'Capacidade do Fervedouro',
                     style: TextStyle(
-                      color: JalapaoTheme.secondary,
+                      color: JalapaoTheme.secondaryDeep,
                       fontWeight: FontWeight.w900,
                     ),
                   ),
@@ -986,7 +980,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 ? () => setDialogState(() => tempCap--)
                                 : null,
                         icon: const Icon(Icons.remove_circle_outline),
-                        color: JalapaoTheme.secondary,
+                        color: JalapaoTheme.secondaryDeep,
                         iconSize: 32,
                       ),
                       Padding(
@@ -1002,7 +996,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       IconButton(
                         onPressed: () => setDialogState(() => tempCap++),
                         icon: const Icon(Icons.add_circle_outline),
-                        color: JalapaoTheme.secondary,
+                        color: JalapaoTheme.secondaryDeep,
                         iconSize: 32,
                       ),
                     ],
@@ -1013,7 +1007,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       child: Text(
                         'CANCELAR',
                         style: TextStyle(
-                          color: JalapaoTheme.textSync.withValues(alpha: 0.5),
+                          color: JalapaoTheme.textMuted,
                         ),
                       ),
                     ),
@@ -1028,7 +1022,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         Navigator.pop(ctx);
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: JalapaoTheme.secondary,
+                        backgroundColor: JalapaoTheme.secondaryDeep,
                       ),
                       child: const Text('SALVAR'),
                     ),
@@ -1059,7 +1053,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w900,
-                    color: JalapaoTheme.secondary,
+                    color: JalapaoTheme.secondaryDeep,
                     letterSpacing: 1.5,
                   ),
                 ),
@@ -1078,7 +1072,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           color:
                               ratio >= 1.0
                                   ? JalapaoTheme.error
-                                  : JalapaoTheme.secondary,
+                                  : JalapaoTheme.secondaryDeep,
                         ),
                       ),
                       SizedBox(
@@ -1091,7 +1085,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           valueColor: AlwaysStoppedAnimation(
                             ratio >= 1.0
                                 ? JalapaoTheme.error
-                                : JalapaoTheme.secondary,
+                                : JalapaoTheme.secondaryDeep,
                           ),
                           borderRadius: BorderRadius.circular(4),
                         ),
@@ -1100,7 +1094,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         'segure para ajustar',
                         style: TextStyle(
                           fontSize: 9,
-                          color: JalapaoTheme.secondary.withValues(alpha: 0.5),
+                          color: JalapaoTheme.secondaryDeep,
                         ),
                       ),
                     ],
@@ -1115,7 +1109,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     ? _buildEmptyState(
                       'Fervedouro Vazio',
                       'Águas calmas e cristalinas.',
-                      JalapaoTheme.secondary,
+                      JalapaoTheme.secondaryDeep,
                     )
                     : ListView.builder(
                       padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -1159,7 +1153,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             Expanded(
               child: PaxCount(
                 count: visit.paxQty,
-                color: JalapaoTheme.onPrimary,
+                color: JalapaoTheme.textPrimary,
               ),
             ),
             Column(
@@ -1191,7 +1185,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.bold,
-                    color: JalapaoTheme.textSync.withValues(alpha: 0.5),
+                    color: JalapaoTheme.textMuted,
                   ),
                 ),
               ],
@@ -1212,7 +1206,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(Icons.eco, size: 42, color: color.withValues(alpha: 0.3)),
+              Icon(Icons.eco, size: 42, color: color),
               const SizedBox(height: 8),
               Text(
                 title,
@@ -1220,7 +1214,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
-                  color: color.withValues(alpha: 0.6),
+                  color: color,
                 ),
               ),
               const SizedBox(height: 4),
@@ -1229,7 +1223,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 12,
-                  color: JalapaoTheme.textSync.withValues(alpha: 0.4),
+                  color: JalapaoTheme.textMuted,
                 ),
               ),
             ],

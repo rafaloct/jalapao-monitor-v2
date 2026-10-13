@@ -136,7 +136,7 @@ class _SessionSelectorScreenState extends State<SessionSelectorScreen> {
           Text(
             'Toque no local onde você está posicionado hoje:',
             style: TextStyle(
-              color: JalapaoTheme.textSync.withValues(alpha: 0.5),
+              color: JalapaoTheme.textMuted,
               fontSize: 14,
             ),
           ),

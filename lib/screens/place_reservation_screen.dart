@@ -149,13 +149,13 @@ class _PlaceReservationScreenState extends State<PlaceReservationScreen> {
                         Text(
                           'ENTRADA RÁPIDA',
                             style: Theme.of(context).textTheme.displayMedium
-                                ?.copyWith(color: JalapaoTheme.secondary),
+                                ?.copyWith(color: JalapaoTheme.secondaryDeep),
                           ),
                           Text(
                             _selectedPlace!.name,
                             style: TextStyle(
                               fontSize: 13,
-                              color: JalapaoTheme.textSync.withValues(alpha: 0.6),
+                              color: JalapaoTheme.textFaint,
                             ),
                           ),
                           const SizedBox(height: 8),
@@ -172,7 +172,7 @@ class _PlaceReservationScreenState extends State<PlaceReservationScreen> {
                               'Sem reserva prévia — registra chegada imediata',
                               style: TextStyle(
                                 fontSize: 12,
-                                color: JalapaoTheme.secondary,
+                                color: JalapaoTheme.secondaryDeep,
                               ),
                               textAlign: TextAlign.center,
                             ),
@@ -181,7 +181,7 @@ class _PlaceReservationScreenState extends State<PlaceReservationScreen> {
                           PaxSelector(
                             selectedCount: paxCount,
                             maxPax: _selectedPlace!.capacityTotal,
-                            activeColor: JalapaoTheme.secondary,
+                            activeColor: JalapaoTheme.secondaryDeep,
                             label: _unitLabel(_selectedPlace!.type),
                             onChanged:
                                 (v) => setDialogState(() => paxCount = v),
@@ -217,7 +217,7 @@ class _PlaceReservationScreenState extends State<PlaceReservationScreen> {
                                   child: Text(
                                     'CANCELAR',
                                     style: TextStyle(
-                                      color: JalapaoTheme.textSync.withValues(alpha: 0.5),
+                                      color: JalapaoTheme.textFaint,
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
@@ -242,7 +242,7 @@ class _PlaceReservationScreenState extends State<PlaceReservationScreen> {
                                             }
                                             : null,
                                     style: ElevatedButton.styleFrom(
-                                      backgroundColor: JalapaoTheme.secondary,
+                                      backgroundColor: JalapaoTheme.secondaryDeep,
                                     ),
                                     icon: const Icon(Icons.login, size: 20),
                                     label: const Text(
@@ -303,13 +303,13 @@ class _PlaceReservationScreenState extends State<PlaceReservationScreen> {
                         Text(
                           'NOVA RESERVA',
                             style: Theme.of(context).textTheme.displayMedium
-                                ?.copyWith(color: JalapaoTheme.primary),
+                                ?.copyWith(color: JalapaoTheme.primaryDeep),
                           ),
                           Text(
                             _selectedPlace!.name,
                             style: TextStyle(
                               fontSize: 13,
-                              color: JalapaoTheme.textSync.withValues(alpha: 0.6),
+                              color: JalapaoTheme.textFaint,
                               fontWeight: FontWeight.w600,
                             ),
                           ),
@@ -390,7 +390,7 @@ class _PlaceReservationScreenState extends State<PlaceReservationScreen> {
                           PaxSelector(
                             selectedCount: paxCount,
                             maxPax: _selectedPlace!.capacityTotal,
-                            activeColor: JalapaoTheme.primary,
+                            activeColor: JalapaoTheme.primaryDeep,
                             label: _unitLabel(_selectedPlace!.type),
                             onChanged:
                                 (v) => setDialogState(() => paxCount = v),
@@ -432,12 +432,12 @@ class _PlaceReservationScreenState extends State<PlaceReservationScreen> {
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor:
                                         isAnonymous
-                                            ? JalapaoTheme.primary
-                                            : JalapaoTheme.primary.withValues(alpha: 0.15),
+                                            ? JalapaoTheme.primaryDeep
+                                            : JalapaoTheme.surface,
                                     foregroundColor:
                                         isAnonymous
                                             ? JalapaoTheme.onPrimary
-                                            : JalapaoTheme.primary,
+                                            : JalapaoTheme.primaryDeep,
                                     elevation: isAnonymous ? 4 : 0,
                                     padding: const EdgeInsets.symmetric(
                                       horizontal: 12,
@@ -514,7 +514,7 @@ class _PlaceReservationScreenState extends State<PlaceReservationScreen> {
                                   child: Text(
                                     'CANCELAR',
                                     style: TextStyle(
-                                      color: JalapaoTheme.textSync.withValues(alpha: 0.5),
+                                      color: JalapaoTheme.textFaint,
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
@@ -570,7 +570,7 @@ class _PlaceReservationScreenState extends State<PlaceReservationScreen> {
                                             }
                                             : null,
                                     style: ElevatedButton.styleFrom(
-                                      backgroundColor: JalapaoTheme.primary,
+                                      backgroundColor: JalapaoTheme.primaryDeep,
                                     ),
                                     child: const Text(
                                       'CONFIRMAR RESERVA',
@@ -684,7 +684,7 @@ class _PlaceReservationScreenState extends State<PlaceReservationScreen> {
                 if (stale.isNotEmpty)
                   Container(
                     width: double.infinity,
-                    color: JalapaoTheme.warn.withValues(alpha: 0.15),
+                    color: JalapaoTheme.warn.withValues(alpha: 0.1),
                     padding: const EdgeInsets.symmetric(
                       horizontal: 16,
                       vertical: 6,
@@ -732,9 +732,7 @@ class _PlaceReservationScreenState extends State<PlaceReservationScreen> {
                           decoration: BoxDecoration(
                             border: Border(
                               right: BorderSide(
-                                color: JalapaoTheme.primary.withValues(
-                                  alpha: 0.1,
-                                ),
+                                color: JalapaoTheme.outline,
                                 width: 2,
                               ),
                             ),
@@ -790,7 +788,7 @@ class _PlaceReservationScreenState extends State<PlaceReservationScreen> {
         children: [
           IconButton(
             onPressed: () => _confirmChangeSession(context),
-            icon: const Icon(Icons.swap_horiz, color: JalapaoTheme.primary),
+            icon: const Icon(Icons.swap_horiz, color: JalapaoTheme.primaryDeep),
             iconSize: 28,
             tooltip: 'Trocar local',
           ),
@@ -804,7 +802,7 @@ class _PlaceReservationScreenState extends State<PlaceReservationScreen> {
                     ? Text(
                       'Nenhum local ativo',
                       style: TextStyle(
-                        color: JalapaoTheme.textSync.withValues(alpha: 0.5),
+                        color: JalapaoTheme.textFaint,
                       ),
                     )
                     : PlaceSelectorButton(
@@ -915,7 +913,7 @@ class _PlaceReservationScreenState extends State<PlaceReservationScreen> {
                 style: TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.w900,
-                  color: JalapaoTheme.primary,
+                  color: JalapaoTheme.primaryDeep,
                   letterSpacing: 1.2,
                 ),
               ),
@@ -926,7 +924,7 @@ class _PlaceReservationScreenState extends State<PlaceReservationScreen> {
                     : DateFormat('dd/MM').format(_selectedDate),
                 style: TextStyle(
                   fontSize: 12,
-                  color: JalapaoTheme.primary.withValues(alpha: 0.6),
+                  color: JalapaoTheme.primaryDeep,
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -943,7 +941,7 @@ class _PlaceReservationScreenState extends State<PlaceReservationScreen> {
                 child: Text(
                   '${reservations.length}',
                   style: const TextStyle(
-                    color: JalapaoTheme.primary,
+                    color: JalapaoTheme.primaryDeep,
                     fontWeight: FontWeight.w900,
                     fontSize: 15,
                   ),
@@ -960,7 +958,7 @@ class _PlaceReservationScreenState extends State<PlaceReservationScreen> {
                   ? _buildEmptyState(
                     'Sem Reservas',
                     'Nenhuma reserva para este dia.',
-                    JalapaoTheme.primary,
+                    JalapaoTheme.primaryDeep,
                   )
                   : () {
                     final now = DateTime.now();
@@ -996,14 +994,14 @@ class _PlaceReservationScreenState extends State<PlaceReservationScreen> {
               // Entrada Rápida — destaque máximo
               SizedBox(
                 width: double.infinity,
-                height: 44,
+                height: JalapaoTheme.minTouch,
                 child: ElevatedButton.icon(
                   onPressed:
                       _selectedPlace != null
                           ? () => _showQuickEntryDialog(provider)
                           : null,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: JalapaoTheme.secondary,
+                    backgroundColor: JalapaoTheme.secondaryDeep,
                     foregroundColor: JalapaoTheme.onPrimary,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
@@ -1029,10 +1027,10 @@ class _PlaceReservationScreenState extends State<PlaceReservationScreen> {
                           : null,
                   style: OutlinedButton.styleFrom(
                     side: BorderSide(
-                      color: JalapaoTheme.primary.withValues(alpha: 0.6),
+                      color: JalapaoTheme.primaryDeep,
                       width: 2,
                     ),
-                    foregroundColor: JalapaoTheme.primary,
+                    foregroundColor: JalapaoTheme.primaryDeep,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(14),
                     ),
@@ -1082,10 +1080,10 @@ class _PlaceReservationScreenState extends State<PlaceReservationScreen> {
         borderRadius: BorderRadius.circular(16),
         border:
             isNext
-                ? Border.all(color: JalapaoTheme.secondary, width: 3)
+                ? Border.all(color: JalapaoTheme.secondaryDeep, width: 3)
                 : (isLate
                     ? Border.all(
-                      color: JalapaoTheme.error.withValues(alpha: 0.5),
+                      color: JalapaoTheme.error,
                       width: 2,
                     )
                     : Border.all(color: Colors.transparent)),
@@ -1112,7 +1110,7 @@ class _PlaceReservationScreenState extends State<PlaceReservationScreen> {
                   vertical: 6,
                 ),
                 decoration: BoxDecoration(
-                  color: timeColor.withValues(alpha: 0.12),
+                  color: JalapaoTheme.surface,
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Row(
@@ -1150,7 +1148,7 @@ class _PlaceReservationScreenState extends State<PlaceReservationScreen> {
                         '${r.contactPhone}',
                         style: TextStyle(
                           fontSize: 11,
-                          color: JalapaoTheme.textSync.withValues(alpha: 0.5),
+                          color: JalapaoTheme.textMuted,
                         ),
                       ),
                   ],
@@ -1175,7 +1173,7 @@ class _PlaceReservationScreenState extends State<PlaceReservationScreen> {
                         vertical: 2,
                       ),
                       decoration: BoxDecoration(
-                        color: JalapaoTheme.secondary,
+                        color: JalapaoTheme.secondaryDeep,
                         borderRadius: BorderRadius.circular(4),
                       ),
                       child: const Text(
@@ -1197,7 +1195,7 @@ class _PlaceReservationScreenState extends State<PlaceReservationScreen> {
               '${r.notes}',
               style: TextStyle(
                 fontSize: 11,
-                color: JalapaoTheme.textSync.withValues(alpha: 0.5),
+                color: JalapaoTheme.textMuted,
                 fontStyle: FontStyle.italic,
               ),
             ),
@@ -1213,7 +1211,7 @@ class _PlaceReservationScreenState extends State<PlaceReservationScreen> {
                     onPressed: () => provider.cancelReservation(r.id),
                     style: OutlinedButton.styleFrom(
                       side: BorderSide(
-                        color: JalapaoTheme.error.withValues(alpha: 0.4),
+                        color: JalapaoTheme.error,
                       ),
                       foregroundColor: JalapaoTheme.error,
                     ),
@@ -1279,7 +1277,7 @@ class _PlaceReservationScreenState extends State<PlaceReservationScreen> {
                   style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w900,
-                    color: JalapaoTheme.secondary,
+                    color: JalapaoTheme.secondaryDeep,
                     letterSpacing: 1.2,
                   ),
                 ),
@@ -1296,7 +1294,7 @@ class _PlaceReservationScreenState extends State<PlaceReservationScreen> {
                   child: Text(
                     '$occupancy ${_unitLabel(_selectedPlace?.type ?? '').toLowerCase()}',
                     style: const TextStyle(
-                      color: JalapaoTheme.secondary,
+                      color: JalapaoTheme.secondaryDeep,
                       fontWeight: FontWeight.w900,
                       fontSize: 14,
                     ),
@@ -1311,7 +1309,7 @@ class _PlaceReservationScreenState extends State<PlaceReservationScreen> {
                     ? _buildEmptyState(
                       'Ninguém no Local',
                       'Aguardando check-ins.',
-                      JalapaoTheme.secondary,
+                      JalapaoTheme.secondaryDeep,
                     )
                     : ListView.builder(
                       padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -1370,7 +1368,7 @@ class _PlaceReservationScreenState extends State<PlaceReservationScreen> {
                       'Reserva: ${DateFormat('HH:mm').format(r.scheduledTime)}  •  Entrada: ${DateFormat('HH:mm').format(checkInTime)}',
                       style: TextStyle(
                         fontSize: 11,
-                        color: JalapaoTheme.textSync.withValues(alpha: 0.5),
+                        color: JalapaoTheme.textMuted,
                       ),
                     ),
                   ],
@@ -1394,7 +1392,7 @@ class _PlaceReservationScreenState extends State<PlaceReservationScreen> {
                       color:
                           isLongStay
                               ? JalapaoTheme.warn
-                              : JalapaoTheme.secondary,
+                              : JalapaoTheme.secondaryDeep,
                       fontWeight: FontWeight.w700,
                     ),
                   ),
@@ -1452,7 +1450,7 @@ class _PlaceReservationScreenState extends State<PlaceReservationScreen> {
             Icon(
               Icons.event_available,
               size: 56,
-              color: color.withValues(alpha: 0.3),
+              color: color,
             ),
             const SizedBox(height: 12),
             Text(
@@ -1460,14 +1458,14 @@ class _PlaceReservationScreenState extends State<PlaceReservationScreen> {
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w900,
-                color: color.withValues(alpha: 0.6),
+                color: color,
               ),
             ),
             Text(
               subtitle,
               style: TextStyle(
                 fontSize: 13,
-                color: JalapaoTheme.textSync.withValues(alpha: 0.4),
+                color: JalapaoTheme.textFaint,
               ),
             ),
           ],

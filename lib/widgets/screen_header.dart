@@ -36,11 +36,7 @@ class ScreenHeader extends StatelessWidget implements PreferredSizeWidget {
       padding: const EdgeInsets.symmetric(horizontal: 8),
       decoration: BoxDecoration(
         color: JalapaoTheme.background,
-        border: Border(
-          bottom: BorderSide(
-            color: JalapaoTheme.outline.withValues(alpha: 0.5),
-          ),
-        ),
+        border: Border(bottom: BorderSide(color: JalapaoTheme.outline)),
       ),
       child: Row(
         children: [

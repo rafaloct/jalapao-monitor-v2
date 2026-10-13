@@ -104,7 +104,7 @@ class _CounterScreenState extends State<CounterScreen> {
                 child: Text(
                   'CANCELAR',
                   style: TextStyle(
-                    color: JalapaoTheme.textSync.withValues(alpha: 0.5),
+                    color: JalapaoTheme.textMuted,
                   ),
                 ),
               ),
@@ -119,7 +119,7 @@ class _CounterScreenState extends State<CounterScreen> {
                   );
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: JalapaoTheme.primary,
+                  backgroundColor: JalapaoTheme.primaryDeep,
                 ),
                 child: const Text('CONFIRMAR'),
               ),
@@ -290,7 +290,7 @@ class _CounterScreenState extends State<CounterScreen> {
                 Text(
                   'REGISTRAR CHEGADA',
                   style: TextStyle(
-                    color: JalapaoTheme.textSync.withValues(alpha: 0.5),
+                    color: JalapaoTheme.textMuted,
                     fontSize: 11,
                     fontWeight: FontWeight.w700,
                     letterSpacing: 1.5,
@@ -311,7 +311,7 @@ class _CounterScreenState extends State<CounterScreen> {
                 Text(
                   'HOJE',
                   style: TextStyle(
-                    color: JalapaoTheme.textSync.withValues(alpha: 0.5),
+                    color: JalapaoTheme.textMuted,
                     fontSize: 11,
                     letterSpacing: 1.5,
                   ),
@@ -347,7 +347,7 @@ class _CounterScreenState extends State<CounterScreen> {
                 ),
               ),
               style: ElevatedButton.styleFrom(
-                backgroundColor: JalapaoTheme.primary,
+                backgroundColor: JalapaoTheme.primaryDeep,
                 foregroundColor: JalapaoTheme.onPrimary,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
@@ -413,7 +413,7 @@ class _CounterScreenState extends State<CounterScreen> {
     return Text(
       text,
       style: TextStyle(
-        color: JalapaoTheme.textSync.withValues(alpha: 0.5),
+        color: JalapaoTheme.textMuted,
         fontSize: 11,
         fontWeight: FontWeight.w700,
         letterSpacing: 1.5,
@@ -526,7 +526,7 @@ class _VisitTile extends StatelessWidget {
                       Icons.login,
                       'Chegada',
                       fmt(visit.arrivalTime),
-                      JalapaoTheme.textSync.withValues(alpha: 0.5),
+                      JalapaoTheme.textMuted,
                     ),
                     if (hasEntry) ...[
                       const SizedBox(width: 8),
@@ -534,7 +534,7 @@ class _VisitTile extends StatelessWidget {
                         Icons.directions_walk,
                         'Entrou',
                         fmt(visit.entryTime),
-                        JalapaoTheme.secondary,
+                        JalapaoTheme.secondaryDeep,
                       ),
                     ],
                     if (isExited) ...[
@@ -543,7 +543,7 @@ class _VisitTile extends StatelessWidget {
                         Icons.logout,
                         'Saiu',
                         fmt(visit.exitTime),
-                        JalapaoTheme.textSync.withValues(alpha: 0.4),
+                        JalapaoTheme.textMuted,
                       ),
                     ],
                   ],
