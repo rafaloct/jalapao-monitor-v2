@@ -1,0 +1,23 @@
+{
+  "total_records": 80,
+  "map_numbered_records": 62,
+  "additional_records": 18,
+  "municipality_pending": 40,
+  "geo_verified": 0,
+  "photos_license_claim_candidates": 16,
+  "official_gallery_candidates": 5,
+  "operationally_importable": 0,
+  "publication_approved": 0,
+  "warning_counts": {
+    "municipality_unverified": 40,
+    "coordinates_missing": 80,
+    "institutional_evidence_missing": 42,
+    "media_missing": 59,
+    "visitation_authorization_unknown": 80,
+    "category_unverified": 6,
+    "possible_alias_collision": 1,
+    "media_subject_mismatch_risk": 3
+  },
+  "source_sha256": "8000419b79b040b7c934a4eb059d7991f4878ad85290db29336ef741272d5a23",
+  "backend_writes": 0
+}

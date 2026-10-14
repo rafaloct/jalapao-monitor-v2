@@ -57,5 +57,6 @@ a substitui.
 ## Arquivos do contrato
 
 - `catalog_review_v1.schema.json` — schema do dataset (envelope + registro).
+- `BACKEND_INTEGRATION.md` — proposta de integração backend preservada verbatim do pacote de revisão original; os comandos da seção G referem-se às ferramentas internas do pacote (`tools/`), equivalentes no repo a `tooling/catalog/`.
 - Dataset: `data/catalog/jalapao_serras_2026/` (fonte + `catalog_review_v1`).
 - Enforcement: `tooling/catalog/validate_catalog.py` (fail-closed).

@@ -1,0 +1,731 @@
+{
+  "read_only": true,
+  "network_calls": 0,
+  "writes": 0,
+  "existing_places_in_export": 0,
+  "name_match_candidates": 0,
+  "proposed_auto_links": 0,
+  "proposed_auto_creates": 0,
+  "records": [
+    {
+      "external_key": "jalapao-inventario-20261013:morro-do-gorgulho",
+      "display_name": "Morro do Gorgulho",
+      "candidate_existing_places": [],
+      "decision": "no_name_match",
+      "link_automatically": false,
+      "create_operational_place": false,
+      "reason": "Name equality alone does not prove same POI, location, operator, or right to operate"
+    },
+    {
+      "external_key": "jalapao-inventario-20261013:fazenda-rio-vermelho",
+      "display_name": "Fazenda Rio Vermelho",
+      "candidate_existing_places": [],
+      "decision": "no_name_match",
+      "link_automatically": false,
+      "create_operational_place": false,
+      "reason": "Name equality alone does not prove same POI, location, operator, or right to operate"
+    },
+    {
+      "external_key": "jalapao-inventario-20261013:mirante-do-sol",
+      "display_name": "Mirante do Sol",
+      "candidate_existing_places": [],
+      "decision": "no_name_match",
+      "link_automatically": false,
+      "create_operational_place": false,
+      "reason": "Name equality alone does not prove same POI, location, operator, or right to operate"
+    },
+    {
+      "external_key": "jalapao-inventario-20261013:cachoeira-do-brejo-da-cama",
+      "display_name": "Cachoeira do Brejo da Cama",
+      "candidate_existing_places": [],
+      "decision": "no_name_match",
+      "link_automatically": false,
+      "create_operational_place": false,
+      "reason": "Name equality alone does not prove same POI, location, operator, or right to operate"
+    },
+    {
+      "external_key": "jalapao-inventario-20261013:serra-da-muricoca",
+      "display_name": "Serra da Muriçoca",
+      "candidate_existing_places": [],
+      "decision": "no_name_match",
+      "link_automatically": false,
+      "create_operational_place": false,
+      "reason": "Name equality alone does not prove same POI, location, operator, or right to operate"
+    },
+    {
+      "external_key": "jalapao-inventario-20261013:cachoeira-do-lajeado",
+      "display_name": "Cachoeira do Lajeado",
+      "candidate_existing_places": [],
+      "decision": "no_name_match",
+      "link_automatically": false,
+      "create_operational_place": false,
+      "reason": "Name equality alone does not prove same POI, location, operator, or right to operate"
+    },
+    {
+      "external_key": "jalapao-inventario-20261013:canion-sussuapara",
+      "display_name": "Cânion Sussuapara",
+      "candidate_existing_places": [],
+      "decision": "no_name_match",
+      "link_automatically": false,
+      "create_operational_place": false,
+      "reason": "Name equality alone does not prove same POI, location, operator, or right to operate"
+    },
+    {
+      "external_key": "jalapao-inventario-20261013:cachoeira-da-pedra-furada",
+      "display_name": "Cachoeira da Pedra Furada",
+      "candidate_existing_places": [],
+      "decision": "no_name_match",
+      "link_automatically": false,
+      "create_operational_place": false,
+      "reason": "Name equality alone does not prove same POI, location, operator, or right to operate"
+    },
+    {
+      "external_key": "jalapao-inventario-20261013:morro-da-pedra-furada",
+      "display_name": "Morro da Pedra Furada",
+      "candidate_existing_places": [],
+      "decision": "no_name_match",
+      "link_automatically": false,
+      "create_operational_place": false,
+      "reason": "Name equality alone does not prove same POI, location, operator, or right to operate"
+    },
+    {
+      "external_key": "jalapao-inventario-20261013:parque-encantado",
+      "display_name": "Parque Encantado",
+      "candidate_existing_places": [],
+      "decision": "no_name_match",
+      "link_automatically": false,
+      "create_operational_place": false,
+      "reason": "Name equality alone does not prove same POI, location, operator, or right to operate"
+    },
+    {
+      "external_key": "jalapao-inventario-20261013:nascente-do-peixinho",
+      "display_name": "Nascente do Peixinho",
+      "candidate_existing_places": [],
+      "decision": "no_name_match",
+      "link_automatically": false,
+      "create_operational_place": false,
+      "reason": "Name equality alone does not prove same POI, location, operator, or right to operate"
+    },
+    {
+      "external_key": "jalapao-inventario-20261013:praia-dos-rios",
+      "display_name": "Praia dos Rios",
+      "candidate_existing_places": [],
+      "decision": "no_name_match",
+      "link_automatically": false,
+      "create_operational_place": false,
+      "reason": "Name equality alone does not prove same POI, location, operator, or right to operate"
+    },
+    {
+      "external_key": "jalapao-inventario-20261013:serra-catedral",
+      "display_name": "Serra da Catedral",
+      "candidate_existing_places": [],
+      "decision": "no_name_match",
+      "link_automatically": false,
+      "create_operational_place": false,
+      "reason": "Name equality alone does not prove same POI, location, operator, or right to operate"
+    },
+    {
+      "external_key": "jalapao-inventario-20261013:prainha-rio-novo",
+      "display_name": "Prainha do Rio Novo",
+      "candidate_existing_places": [],
+      "decision": "no_name_match",
+      "link_automatically": false,
+      "create_operational_place": false,
+      "reason": "Name equality alone does not prove same POI, location, operator, or right to operate"
+    },
+    {
+      "external_key": "jalapao-inventario-20261013:cachoeira-velha",
+      "display_name": "Cachoeira da Velha",
+      "candidate_existing_places": [],
+      "decision": "no_name_match",
+      "link_automatically": false,
+      "create_operational_place": false,
+      "reason": "Name equality alone does not prove same POI, location, operator, or right to operate"
+    },
+    {
+      "external_key": "jalapao-inventario-20261013:dunas-jalapao",
+      "display_name": "Dunas do Jalapão",
+      "candidate_existing_places": [],
+      "decision": "no_name_match",
+      "link_automatically": false,
+      "create_operational_place": false,
+      "reason": "Name equality alone does not prove same POI, location, operator, or right to operate"
+    },
+    {
+      "external_key": "jalapao-inventario-20261013:serra-espirito-santo",
+      "display_name": "Serra do Espírito Santo",
+      "candidate_existing_places": [],
+      "decision": "no_name_match",
+      "link_automatically": false,
+      "create_operational_place": false,
+      "reason": "Name equality alone does not prove same POI, location, operator, or right to operate"
+    },
+    {
+      "external_key": "jalapao-inventario-20261013:quilombo-mumbuca",
+      "display_name": "Comunidade Quilombola Mumbuca",
+      "candidate_existing_places": [],
+      "decision": "no_name_match",
+      "link_automatically": false,
+      "create_operational_place": false,
+      "reason": "Name equality alone does not prove same POI, location, operator, or right to operate"
+    },
+    {
+      "external_key": "jalapao-inventario-20261013:cachoeira-formiga",
+      "display_name": "Cachoeira do Formiga",
+      "candidate_existing_places": [],
+      "decision": "no_name_match",
+      "link_automatically": false,
+      "create_operational_place": false,
+      "reason": "Name equality alone does not prove same POI, location, operator, or right to operate"
+    },
+    {
+      "external_key": "jalapao-inventario-20261013:cachoeira-do-prata",
+      "display_name": "Cachoeira do Prata",
+      "candidate_existing_places": [],
+      "decision": "no_name_match",
+      "link_automatically": false,
+      "create_operational_place": false,
+      "reason": "Name equality alone does not prove same POI, location, operator, or right to operate"
+    },
+    {
+      "external_key": "jalapao-inventario-20261013:morro-do-sereno",
+      "display_name": "Morro do Sereno",
+      "candidate_existing_places": [],
+      "decision": "no_name_match",
+      "link_automatically": false,
+      "create_operational_place": false,
+      "reason": "Name equality alone does not prove same POI, location, operator, or right to operate"
+    },
+    {
+      "external_key": "jalapao-inventario-20261013:arco-do-sol",
+      "display_name": "Arco do Sol",
+      "candidate_existing_places": [],
+      "decision": "no_name_match",
+      "link_automatically": false,
+      "create_operational_place": false,
+      "reason": "Name equality alone does not prove same POI, location, operator, or right to operate"
+    },
+    {
+      "external_key": "jalapao-inventario-20261013:cachoeira-do-pau-d-arco",
+      "display_name": "Cachoeira do Pau D'arco",
+      "candidate_existing_places": [],
+      "decision": "no_name_match",
+      "link_automatically": false,
+      "create_operational_place": false,
+      "reason": "Name equality alone does not prove same POI, location, operator, or right to operate"
+    },
+    {
+      "external_key": "jalapao-inventario-20261013:lagoa-japones",
+      "display_name": "Lagoa do Japonês",
+      "candidate_existing_places": [],
+      "decision": "no_name_match",
+      "link_automatically": false,
+      "create_operational_place": false,
+      "reason": "Name equality alone does not prove same POI, location, operator, or right to operate"
+    },
+    {
+      "external_key": "jalapao-inventario-20261013:cachoeira-da-lagoa",
+      "display_name": "Cachoeira da Lagoa",
+      "candidate_existing_places": [],
+      "decision": "no_name_match",
+      "link_automatically": false,
+      "create_operational_place": false,
+      "reason": "Name equality alone does not prove same POI, location, operator, or right to operate"
+    },
+    {
+      "external_key": "jalapao-inventario-20261013:cachoeira-da-usina",
+      "display_name": "Cachoeira da Usina",
+      "candidate_existing_places": [],
+      "decision": "no_name_match",
+      "link_automatically": false,
+      "create_operational_place": false,
+      "reason": "Name equality alone does not prove same POI, location, operator, or right to operate"
+    },
+    {
+      "external_key": "jalapao-inventario-20261013:cachoeira-do-urubu-rei",
+      "display_name": "Cachoeira do Urubu Rei",
+      "candidate_existing_places": [],
+      "decision": "no_name_match",
+      "link_automatically": false,
+      "create_operational_place": false,
+      "reason": "Name equality alone does not prove same POI, location, operator, or right to operate"
+    },
+    {
+      "external_key": "jalapao-inventario-20261013:cachoeira-do-piao",
+      "display_name": "Cachoeira do Pião",
+      "candidate_existing_places": [],
+      "decision": "no_name_match",
+      "link_automatically": false,
+      "create_operational_place": false,
+      "reason": "Name equality alone does not prove same POI, location, operator, or right to operate"
+    },
+    {
+      "external_key": "jalapao-inventario-20261013:cachoeira-do-sobrado",
+      "display_name": "Cachoeira do Sobrado",
+      "candidate_existing_places": [],
+      "decision": "no_name_match",
+      "link_automatically": false,
+      "create_operational_place": false,
+      "reason": "Name equality alone does not prove same POI, location, operator, or right to operate"
+    },
+    {
+      "external_key": "jalapao-inventario-20261013:cachoeira-da-cortina",
+      "display_name": "Cachoeira da Cortina",
+      "candidate_existing_places": [],
+      "decision": "no_name_match",
+      "link_automatically": false,
+      "create_operational_place": false,
+      "reason": "Name equality alone does not prove same POI, location, operator, or right to operate"
+    },
+    {
+      "external_key": "jalapao-inventario-20261013:cachoeira-dos-pelados",
+      "display_name": "Cachoeira dos Pelados",
+      "candidate_existing_places": [],
+      "decision": "no_name_match",
+      "link_automatically": false,
+      "create_operational_place": false,
+      "reason": "Name equality alone does not prove same POI, location, operator, or right to operate"
+    },
+    {
+      "external_key": "jalapao-inventario-20261013:cidade-de-pedra",
+      "display_name": "Cidade de Pedra",
+      "candidate_existing_places": [],
+      "decision": "no_name_match",
+      "link_automatically": false,
+      "create_operational_place": false,
+      "reason": "Name equality alone does not prove same POI, location, operator, or right to operate"
+    },
+    {
+      "external_key": "jalapao-inventario-20261013:canion-encantado",
+      "display_name": "Cânion Encantado",
+      "candidate_existing_places": [],
+      "decision": "no_name_match",
+      "link_automatically": false,
+      "create_operational_place": false,
+      "reason": "Name equality alone does not prove same POI, location, operator, or right to operate"
+    },
+    {
+      "external_key": "jalapao-inventario-20261013:cachoeira-da-fumaca",
+      "display_name": "Cachoeira da Fumaça",
+      "candidate_existing_places": [],
+      "decision": "no_name_match",
+      "link_automatically": false,
+      "create_operational_place": false,
+      "reason": "Name equality alone does not prove same POI, location, operator, or right to operate"
+    },
+    {
+      "external_key": "jalapao-inventario-20261013:cachoeira-do-pote",
+      "display_name": "Cachoeira do Pote",
+      "candidate_existing_places": [],
+      "decision": "no_name_match",
+      "link_automatically": false,
+      "create_operational_place": false,
+      "reason": "Name equality alone does not prove same POI, location, operator, or right to operate"
+    },
+    {
+      "external_key": "jalapao-inventario-20261013:cachoeira-da-capivara",
+      "display_name": "Cachoeira da Capivara",
+      "candidate_existing_places": [],
+      "decision": "no_name_match",
+      "link_automatically": false,
+      "create_operational_place": false,
+      "reason": "Name equality alone does not prove same POI, location, operator, or right to operate"
+    },
+    {
+      "external_key": "jalapao-inventario-20261013:cachoeira-das-tres-quedas",
+      "display_name": "Cachoeira das Três Quedas",
+      "candidate_existing_places": [],
+      "decision": "no_name_match",
+      "link_automatically": false,
+      "create_operational_place": false,
+      "reason": "Name equality alone does not prove same POI, location, operator, or right to operate"
+    },
+    {
+      "external_key": "jalapao-inventario-20261013:trilha-aquatica-das-17-travessias-do-rio-limpo",
+      "display_name": "Trilha Aquática das 17 Travessias do Rio Limpo",
+      "candidate_existing_places": [],
+      "decision": "no_name_match",
+      "link_automatically": false,
+      "create_operational_place": false,
+      "reason": "Name equality alone does not prove same POI, location, operator, or right to operate"
+    },
+    {
+      "external_key": "jalapao-inventario-20261013:morro-da-bigorna",
+      "display_name": "Morro da Bigorna",
+      "candidate_existing_places": [],
+      "decision": "no_name_match",
+      "link_automatically": false,
+      "create_operational_place": false,
+      "reason": "Name equality alone does not prove same POI, location, operator, or right to operate"
+    },
+    {
+      "external_key": "jalapao-inventario-20261013:mirante-do-cerrado",
+      "display_name": "Mirante do Cerrado",
+      "candidate_existing_places": [],
+      "decision": "no_name_match",
+      "link_automatically": false,
+      "create_operational_place": false,
+      "reason": "Name equality alone does not prove same POI, location, operator, or right to operate"
+    },
+    {
+      "external_key": "jalapao-inventario-20261013:cachoeira-vai-quem-tem",
+      "display_name": "Cachoeira Vai Quem Tem",
+      "candidate_existing_places": [],
+      "decision": "no_name_match",
+      "link_automatically": false,
+      "create_operational_place": false,
+      "reason": "Name equality alone does not prove same POI, location, operator, or right to operate"
+    },
+    {
+      "external_key": "jalapao-inventario-20261013:farinhada-do-preto",
+      "display_name": "Farinhada do Preto",
+      "candidate_existing_places": [],
+      "decision": "no_name_match",
+      "link_automatically": false,
+      "create_operational_place": false,
+      "reason": "Name equality alone does not prove same POI, location, operator, or right to operate"
+    },
+    {
+      "external_key": "jalapao-inventario-20261013:lagoa-da-serra",
+      "display_name": "Lagoa da Serra",
+      "candidate_existing_places": [],
+      "decision": "no_name_match",
+      "link_automatically": false,
+      "create_operational_place": false,
+      "reason": "Name equality alone does not prove same POI, location, operator, or right to operate"
+    },
+    {
+      "external_key": "jalapao-inventario-20261013:paredao-do-rio-de-areia",
+      "display_name": "Paredão do Rio de Areia",
+      "candidate_existing_places": [],
+      "decision": "no_name_match",
+      "link_automatically": false,
+      "create_operational_place": false,
+      "reason": "Name equality alone does not prove same POI, location, operator, or right to operate"
+    },
+    {
+      "external_key": "jalapao-inventario-20261013:fortaleza-dos-guardioes",
+      "display_name": "Fortaleza dos Guardiões",
+      "candidate_existing_places": [],
+      "decision": "no_name_match",
+      "link_automatically": false,
+      "create_operational_place": false,
+      "reason": "Name equality alone does not prove same POI, location, operator, or right to operate"
+    },
+    {
+      "external_key": "jalapao-inventario-20261013:cachoeira-do-cavalo-queimado",
+      "display_name": "Cachoeira do Cavalo Queimado",
+      "candidate_existing_places": [],
+      "decision": "no_name_match",
+      "link_automatically": false,
+      "create_operational_place": false,
+      "reason": "Name equality alone does not prove same POI, location, operator, or right to operate"
+    },
+    {
+      "external_key": "jalapao-inventario-20261013:cachoeira-das-orquideas",
+      "display_name": "Cachoeira das Orquídeas",
+      "candidate_existing_places": [],
+      "decision": "no_name_match",
+      "link_automatically": false,
+      "create_operational_place": false,
+      "reason": "Name equality alone does not prove same POI, location, operator, or right to operate"
+    },
+    {
+      "external_key": "jalapao-inventario-20261013:vale-encantado",
+      "display_name": "Vale Encantado",
+      "candidate_existing_places": [],
+      "decision": "no_name_match",
+      "link_automatically": false,
+      "create_operational_place": false,
+      "reason": "Name equality alone does not prove same POI, location, operator, or right to operate"
+    },
+    {
+      "external_key": "jalapao-inventario-20261013:gruta-do-sabao",
+      "display_name": "Gruta do Sabão",
+      "candidate_existing_places": [],
+      "decision": "no_name_match",
+      "link_automatically": false,
+      "create_operational_place": false,
+      "reason": "Name equality alone does not prove same POI, location, operator, or right to operate"
+    },
+    {
+      "external_key": "jalapao-inventario-20261013:azuis",
+      "display_name": "Rio Azuis",
+      "candidate_existing_places": [],
+      "decision": "no_name_match",
+      "link_automatically": false,
+      "create_operational_place": false,
+      "reason": "Name equality alone does not prove same POI, location, operator, or right to operate"
+    },
+    {
+      "external_key": "jalapao-inventario-20261013:escorrega-do-betim",
+      "display_name": "Escorrega do Betim",
+      "candidate_existing_places": [],
+      "decision": "no_name_match",
+      "link_automatically": false,
+      "create_operational_place": false,
+      "reason": "Name equality alone does not prove same POI, location, operator, or right to operate"
+    },
+    {
+      "external_key": "jalapao-inventario-20261013:praia-do-pequizeiro",
+      "display_name": "Praia do Pequizeiro",
+      "candidate_existing_places": [],
+      "decision": "no_name_match",
+      "link_automatically": false,
+      "create_operational_place": false,
+      "reason": "Name equality alone does not prove same POI, location, operator, or right to operate"
+    },
+    {
+      "external_key": "jalapao-inventario-20261013:cachoeira-do-sombra",
+      "display_name": "Cachoeira do Sombra",
+      "candidate_existing_places": [],
+      "decision": "no_name_match",
+      "link_automatically": false,
+      "create_operational_place": false,
+      "reason": "Name equality alone does not prove same POI, location, operator, or right to operate"
+    },
+    {
+      "external_key": "jalapao-inventario-20261013:poco-paraiso",
+      "display_name": "Poço Paraíso",
+      "candidate_existing_places": [],
+      "decision": "no_name_match",
+      "link_automatically": false,
+      "create_operational_place": false,
+      "reason": "Name equality alone does not prove same POI, location, operator, or right to operate"
+    },
+    {
+      "external_key": "jalapao-inventario-20261013:praia-do-puca",
+      "display_name": "Praia do Puçá",
+      "candidate_existing_places": [],
+      "decision": "no_name_match",
+      "link_automatically": false,
+      "create_operational_place": false,
+      "reason": "Name equality alone does not prove same POI, location, operator, or right to operate"
+    },
+    {
+      "external_key": "jalapao-inventario-20261013:terra-ronca",
+      "display_name": "Terra Ronca",
+      "candidate_existing_places": [],
+      "decision": "no_name_match",
+      "link_automatically": false,
+      "create_operational_place": false,
+      "reason": "Name equality alone does not prove same POI, location, operator, or right to operate"
+    },
+    {
+      "external_key": "jalapao-inventario-20261013:cachoeira-do-bartolomeu",
+      "display_name": "Cachoeira do Bartolomeu",
+      "candidate_existing_places": [],
+      "decision": "no_name_match",
+      "link_automatically": false,
+      "create_operational_place": false,
+      "reason": "Name equality alone does not prove same POI, location, operator, or right to operate"
+    },
+    {
+      "external_key": "jalapao-inventario-20261013:cachoeira-das-andorinhas",
+      "display_name": "Cachoeira das Andorinhas",
+      "candidate_existing_places": [],
+      "decision": "no_name_match",
+      "link_automatically": false,
+      "create_operational_place": false,
+      "reason": "Name equality alone does not prove same POI, location, operator, or right to operate"
+    },
+    {
+      "external_key": "jalapao-inventario-20261013:balneario-douradas",
+      "display_name": "Balneário Douradas",
+      "candidate_existing_places": [],
+      "decision": "no_name_match",
+      "link_automatically": false,
+      "create_operational_place": false,
+      "reason": "Name equality alone does not prove same POI, location, operator, or right to operate"
+    },
+    {
+      "external_key": "jalapao-inventario-20261013:producao-de-cachaca-e-licores",
+      "display_name": "Produção de Cachaça e Licores",
+      "candidate_existing_places": [],
+      "decision": "no_name_match",
+      "link_automatically": false,
+      "create_operational_place": false,
+      "reason": "Name equality alone does not prove same POI, location, operator, or right to operate"
+    },
+    {
+      "external_key": "jalapao-inventario-20261013:chapada-da-tartaruga",
+      "display_name": "Chapada da Tartaruga",
+      "candidate_existing_places": [],
+      "decision": "no_name_match",
+      "link_automatically": false,
+      "create_operational_place": false,
+      "reason": "Name equality alone does not prove same POI, location, operator, or right to operate"
+    },
+    {
+      "external_key": "jalapao-inventario-20261013:cachoeira-paraiso",
+      "display_name": "Cachoeira Paraíso",
+      "candidate_existing_places": [],
+      "decision": "no_name_match",
+      "link_automatically": false,
+      "create_operational_place": false,
+      "reason": "Name equality alone does not prove same POI, location, operator, or right to operate"
+    },
+    {
+      "external_key": "jalapao-inventario-20261013:cachoeira-escorrega-macaco",
+      "display_name": "Cachoeira Escorrega Macaco",
+      "candidate_existing_places": [],
+      "decision": "no_name_match",
+      "link_automatically": false,
+      "create_operational_place": false,
+      "reason": "Name equality alone does not prove same POI, location, operator, or right to operate"
+    },
+    {
+      "external_key": "jalapao-inventario-20261013:cachoeira-roncadeira",
+      "display_name": "Cachoeira da Roncadeira",
+      "candidate_existing_places": [],
+      "decision": "no_name_match",
+      "link_automatically": false,
+      "create_operational_place": false,
+      "reason": "Name equality alone does not prove same POI, location, operator, or right to operate"
+    },
+    {
+      "external_key": "jalapao-inventario-20261013:cachoeira-araras-sao-felix",
+      "display_name": "Cachoeira das Araras",
+      "candidate_existing_places": [],
+      "decision": "no_name_match",
+      "link_automatically": false,
+      "create_operational_place": false,
+      "reason": "Name equality alone does not prove same POI, location, operator, or right to operate"
+    },
+    {
+      "external_key": "jalapao-inventario-20261013:cachoeira-evilson",
+      "display_name": "Cachoeira do Evilson",
+      "candidate_existing_places": [],
+      "decision": "no_name_match",
+      "link_automatically": false,
+      "create_operational_place": false,
+      "reason": "Name equality alone does not prove same POI, location, operator, or right to operate"
+    },
+    {
+      "external_key": "jalapao-inventario-20261013:quilombo-prata",
+      "display_name": "Comunidade Quilombola do Prata",
+      "candidate_existing_places": [],
+      "decision": "no_name_match",
+      "link_automatically": false,
+      "create_operational_place": false,
+      "reason": "Name equality alone does not prove same POI, location, operator, or right to operate"
+    },
+    {
+      "external_key": "jalapao-inventario-20261013:quilombo-rio-novo",
+      "display_name": "Comunidade Quilombola do Rio Novo",
+      "candidate_existing_places": [],
+      "decision": "no_name_match",
+      "link_automatically": false,
+      "create_operational_place": false,
+      "reason": "Name equality alone does not prove same POI, location, operator, or right to operate"
+    },
+    {
+      "external_key": "jalapao-inventario-20261013:fervedouro-bela-vista",
+      "display_name": "Fervedouro Bela Vista",
+      "candidate_existing_places": [],
+      "decision": "no_name_match",
+      "link_automatically": false,
+      "create_operational_place": false,
+      "reason": "Name equality alone does not prove same POI, location, operator, or right to operate"
+    },
+    {
+      "external_key": "jalapao-inventario-20261013:fervedouro-buritizinho",
+      "display_name": "Fervedouro Buritizinho",
+      "candidate_existing_places": [],
+      "decision": "no_name_match",
+      "link_automatically": false,
+      "create_operational_place": false,
+      "reason": "Name equality alone does not prove same POI, location, operator, or right to operate"
+    },
+    {
+      "external_key": "jalapao-inventario-20261013:fervedouro-jatoba",
+      "display_name": "Fervedouro Jatobá",
+      "candidate_existing_places": [],
+      "decision": "no_name_match",
+      "link_automatically": false,
+      "create_operational_place": false,
+      "reason": "Name equality alone does not prove same POI, location, operator, or right to operate"
+    },
+    {
+      "external_key": "jalapao-inventario-20261013:fervedouro-lagoa-encantada",
+      "display_name": "Fervedouro Lagoa Encantada",
+      "candidate_existing_places": [],
+      "decision": "no_name_match",
+      "link_automatically": false,
+      "create_operational_place": false,
+      "reason": "Name equality alone does not prove same POI, location, operator, or right to operate"
+    },
+    {
+      "external_key": "jalapao-inventario-20261013:fervedouro-por-enquanto",
+      "display_name": "Fervedouro Por Enquanto",
+      "candidate_existing_places": [],
+      "decision": "no_name_match",
+      "link_automatically": false,
+      "create_operational_place": false,
+      "reason": "Name equality alone does not prove same POI, location, operator, or right to operate"
+    },
+    {
+      "external_key": "jalapao-inventario-20261013:fervedouro-rio-sono",
+      "display_name": "Fervedouro Rio Sono",
+      "candidate_existing_places": [],
+      "decision": "no_name_match",
+      "link_automatically": false,
+      "create_operational_place": false,
+      "reason": "Name equality alone does not prove same POI, location, operator, or right to operate"
+    },
+    {
+      "external_key": "jalapao-inventario-20261013:fervedouro-macaubas",
+      "display_name": "Fervedouro das Macaúbas",
+      "candidate_existing_places": [],
+      "decision": "no_name_match",
+      "link_automatically": false,
+      "create_operational_place": false,
+      "reason": "Name equality alone does not prove same POI, location, operator, or right to operate"
+    },
+    {
+      "external_key": "jalapao-inventario-20261013:fervedouro-alecrim",
+      "display_name": "Fervedouro do Alecrim",
+      "candidate_existing_places": [],
+      "decision": "no_name_match",
+      "link_automatically": false,
+      "create_operational_place": false,
+      "reason": "Name equality alone does not prove same POI, location, operator, or right to operate"
+    },
+    {
+      "external_key": "jalapao-inventario-20261013:fervedouro-ceica",
+      "display_name": "Fervedouro do Ceiça",
+      "candidate_existing_places": [],
+      "decision": "no_name_match",
+      "link_automatically": false,
+      "create_operational_place": false,
+      "reason": "Name equality alone does not prove same POI, location, operator, or right to operate"
+    },
+    {
+      "external_key": "jalapao-inventario-20261013:morro-cruz",
+      "display_name": "Morro da Cruz",
+      "candidate_existing_places": [],
+      "decision": "no_name_match",
+      "link_automatically": false,
+      "create_operational_place": false,
+      "reason": "Name equality alone does not prove same POI, location, operator, or right to operate"
+    },
+    {
+      "external_key": "jalapao-inventario-20261013:morro-sacatrapo",
+      "display_name": "Morro do Saca Trapo",
+      "candidate_existing_places": [],
+      "decision": "no_name_match",
+      "link_automatically": false,
+      "create_operational_place": false,
+      "reason": "Name equality alone does not prove same POI, location, operator, or right to operate"
+    },
+    {
+      "external_key": "jalapao-inventario-20261013:pedra-furada",
+      "display_name": "Pedra Furada",
+      "candidate_existing_places": [],
+      "decision": "no_name_match",
+      "link_automatically": false,
+      "create_operational_place": false,
+      "reason": "Name equality alone does not prove same POI, location, operator, or right to operate"
+    }
+  ]
+}

@@ -10,23 +10,27 @@ usado com foto antes de revisão humana e do gate da arquitetura (#2).
 | Item | Valor |
 |---|---|
 | Pacote | `pacote_jalapao_serras_62_catalogo_atualizado.zip` (branch `rafaloct-patch-1` @ 92d4344) |
-| Fonte canônica | `source/jalapao_catalogo_62_mais_anteriores.json` |
+| Pacote de revisão | `jalapao_monitor_v2_catalogo_backend_80_review.zip` (branch `rafaloct-patch-2` @ 7d58c09), SHA-256 `137ebfe12e74c6a14a698b6b162d0831fc57f7d2b110d25995de9c23778dcb81` |
+| Fonte canônica | `source/original_80_review_2026-10-13.json` (idêntica a `jalapao_catalogo_62_mais_anteriores.json`) |
 | SHA-256 da fonte | `8000419b79b040b7c934a4eb059d7991f4878ad85290db29336ef741272d5a23` |
 | Versão da fonte | `0.2.0-review` (2026-10-13), status `rascunho_verificavel_nao_publicar_automaticamente` |
 | Registros | 80 = 62 pontos transcritos do mapa + 28 do catálogo anterior − 10 sobreposições |
 
-O nome do arquivo fonte diverge do citado na issue (`original_80_review_2026-10-13.json`),
-mas o SHA-256 é idêntico — conteúdo comprovadamente o mesmo. O pacote completo é
-preservado em `source/`, incluindo o zip de transporte e as visões derivadas de
+A fonte é preservada em `source/` também com o nome citado na issue
+(`original_80_review_2026-10-13.json`): conteúdo byte a byte idêntico a
+`jalapao_catalogo_62_mais_anteriores.json`, mesmo SHA-256. O pacote completo é
+preservado em `source/`, incluindo os zips de transporte e as visões derivadas de
 revisão (`*.csv`, `*.xlsx`, `galeria_*.html`); o JSON é a fonte canônica e os
 demais são evidências regeneráveis. `SHA256SUMS.txt` cobre todos os artefatos
-(`sha256sum -c source/SHA256SUMS.txt` → 6 OK).
+(`sha256sum -c source/SHA256SUMS.txt` → 8 OK).
 
 ## Arquivos
 
 - `source/` — pacote original completo + manifesto de checksums.
 - `catalog_review_v1.json` — dataset normalizado (envelope + 80 registros draft).
 - `catalog_review_v1.jsonl` — um registro por linha, mesma ordem e conteúdo do JSON.
+- `editorial_review_queue.csv` — fila de trabalho editorial (80 registros, verbatim do pacote de revisão).
+- `reports/` — evidências da validação do pacote original: `preflight.json`, `operational_linkage_preview.json`, `tests_stdout.txt`, `tests_stderr.txt`.
 - Schema: `docs/contracts/catalog/catalog_review_v1.schema.json`.
 
 ## Regras editoriais (resumo; enforcement em `tooling/catalog/validate_catalog.py`)
