@@ -819,7 +819,7 @@ class _PlaceReservationScreenState extends State<PlaceReservationScreen> {
 
           // Seletor de data (touch friendly)
           SizedBox(
-            height: 44,
+            height: JalapaoTheme.minTouch,
             child: OutlinedButton.icon(
               onPressed: () async {
                 final picked = await showDatePicker(
