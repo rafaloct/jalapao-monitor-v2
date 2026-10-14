@@ -7,7 +7,7 @@ Leia a issue completa e as decisões vinculadas antes de editar qualquer arquivo
 ## Limites imediatos
 
 - Uma execução atende uma única tarefa: uma branch/worktree isolada e um draft PR.
-- `MERGE_ALLOWED=NO` e `PRODUCTION_ALLOWED=NO` para o agente.
+- `MERGE_ALLOWED=NO` e `PRODUCTION_ALLOWED=NO` para o agente, com exceção restrita de docs/dados definida na seção de PR (ver `MERGE_ALLOWED=DOCS_DATA`).
 - Não fazer push direto em `main`, force-push, auto-merge ou bypass de proteção.
 - Não alterar rulesets, permissões, secrets, assinatura, infraestrutura ou ambiente operacional para destravar uma tarefa. A preparação administrativa #16 foi uma solicitação específica, não uma autorização permanente.
 - Não executar migrações, integração em dados reais ou ações em tablets de campo sem autorização específica.
@@ -84,6 +84,7 @@ Para documentação, validar links locais, YAML/JSON, campos dos templates e aus
 - `PASS` exige execução comprovada; usar `NOT_RUN` ou `BLOCKED` quando apropriado.
 - Mover para `agent:review` ao entregar. Não fechar a issue por concluir o código local; fechamento exige evidência e integração aceita.
 - `agent:merge-candidate` não permite merge. A integração continua sob decisão humana de Rafael.
+- Exceção `MERGE_ALLOWED=DOCS_DATA` (issue #69): o agente pode integrar o próprio PR quando **todas** as condições forem atendidas — diff 100% dentro de `docs/**` e `data/**` (nada em `lib/`, `hub/`, `tooling/`, `ops/`, `.github/`, `android/`, dependências ou workflows), todos os checks exigidos do CI verdes, e a issue da tarefa declarando `MERGE_ALLOWED=DOCS_DATA` explicitamente (padrão continua `NO`). O merge só acontece quando a proteção de branch permitir legitimamente: proibido `--admin`, bypass de requisito, force-push ou alteração de rulesets/permissões. Se a proteção exigir aprovação que a conta do agente não pode dar, a integração segue humana. Código, infraestrutura e schema operacional permanecem sempre com merge humano.
 
 ## Segurança e identidade do executor
 

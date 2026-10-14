@@ -21,7 +21,7 @@ Uma issue aberta possui exatamente um label de estado da tabela.
 Labels complementares não substituem o estado:
 
 - `human-gate`: decisão humana pendente, com pergunta exata, responsável e origem do requisito.
-- `agent:merge-candidate`: indicação de prontidão técnica/revisão, sem autorizar integração.
+- `agent:merge-candidate`: indicação de prontidão técnica/revisão, sem autorizar integração. A única exceção de merge pelo agente é `MERGE_ALLOWED=DOCS_DATA`, definida no AGENTS.md e concedida por issue.
 - `agent:executor:any`: tarefa sem executor escolhido; depois do claim pode virar `agent:executor:devin`, `agent:executor:cursor` ou `agent:executor:codex`.
 
 Coordenação multi-agente (Codex cloud, relay de entregas, invocação por `@codex`):
