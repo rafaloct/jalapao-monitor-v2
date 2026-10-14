@@ -1,0 +1,6 @@
+[
+  {"id": "pl-sintetico-1", "name": "Cachoeira da Formiga", "status": "active"},
+  {"id": "pl-sintetico-2", "name": "Dunas do Jalapão", "status": "active"},
+  {"id": "pl-sintetico-3", "name": "Fervedouro do Buriti Sintético", "status": "inactive"},
+  {"id": "pl-sintetico-4", "name": "Ponto Inexistente XPTO", "status": "active"}
+]
