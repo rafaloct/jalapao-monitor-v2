@@ -70,3 +70,20 @@ ATTRIBUTION=<commits preservados | squash com crédito no corpo>
 - **Devin:** tarefas com hardware, tailnet, VPS, secrets, E2E de tablet,
   relay e integração.
 - **Nunca simultâneos no mesmo arquivo** (regra de claim exclusivo).
+
+## 6. Execução pesada na máquina LARGEO
+
+Trabalho pesado (build Gradle/Flutter longo, ciclo de emulador, análises de
+grande volume) pode ser executado na máquina `LARGEO` do mantenedor — acessível
+por remote desktop ou pela tailnet — seguindo o contrato de
+[LARGEO_REMOTE.md](LARGEO_REMOTE.md): kit v2 como único caminho, perfis de
+concorrência, exit codes verificáveis e evidência mínima no handoff.
+
+Limites que permanecem:
+
+- Execução no LARGEO não cria tarefa nem autorização: vale o claim da issue
+  (AGENT_COORDINATION §Claim) e `MERGE_ALLOWED=NO` / `PRODUCTION_ALLOWED=NO`.
+- Resultado é evidência de apoio; gates de CI e toolchain canônica
+  (Flutter 3.47.7, issue #52) não são substituídos pelo SDK do LARGEO
+  (3.44.9 — divergência registrada em LARGEO_REMOTE §2.1).
+- Nenhuma credencial de acesso remoto (RDP, tailnet) entra no repo.
