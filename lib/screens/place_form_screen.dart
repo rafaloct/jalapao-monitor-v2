@@ -1,8 +1,10 @@
 import 'dart:io';
+
 import 'package:material_ui/material_ui.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
+
 import '../models/place.dart';
 import '../providers/place_provider.dart';
 import '../theme/jalapao_theme.dart';
@@ -43,14 +45,14 @@ class _PlaceFormScreenState extends State<PlaceFormScreen> {
   ];
 
   static const Map<String, String> typeLabels = {
-    'fervedouro': '🌊 Fervedouro',
-    'cachoeira': '💧 Cachoeira',
-    'restaurante': '🍽️ Restaurante',
-    'pousada': '🏨 Pousada',
-    'fazenda': '🌾 Fazenda',
-    'chacaras': '🏡 Chácara',
-    'loja': '🏪 Loja',
-    'atrativo_cultural': '🎭 Atrativo Cultural',
+    'fervedouro': 'Fervedouro',
+    'cachoeira': 'Cachoeira',
+    'restaurante': 'Restaurante',
+    'pousada': 'Pousada',
+    'fazenda': 'Fazenda',
+    'chacaras': 'Chácara',
+    'loja': 'Loja',
+    'atrativo_cultural': 'Atrativo Cultural',
   };
 
   @override
@@ -296,8 +298,8 @@ class _PlaceFormScreenState extends State<PlaceFormScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Novo Local'),
-        backgroundColor: JalapaoTheme.primaryColor,
-        foregroundColor: Colors.white,
+        backgroundColor: JalapaoTheme.primaryDeep,
+        foregroundColor: JalapaoTheme.onPrimary,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -406,7 +408,7 @@ class _PlaceFormScreenState extends State<PlaceFormScreen> {
                                   borderRadius: BorderRadius.circular(8),
                                 ),
                                 filled: true,
-                                fillColor: Colors.white,
+                                fillColor: JalapaoTheme.onPrimary,
                               ),
                               keyboardType:
                                   const TextInputType.numberWithOptions(
@@ -425,7 +427,7 @@ class _PlaceFormScreenState extends State<PlaceFormScreen> {
                                   borderRadius: BorderRadius.circular(8),
                                 ),
                                 filled: true,
-                                fillColor: Colors.white,
+                                fillColor: JalapaoTheme.onPrimary,
                               ),
                               keyboardType:
                                   const TextInputType.numberWithOptions(
@@ -530,10 +532,10 @@ class _PlaceFormScreenState extends State<PlaceFormScreen> {
                                   child: GestureDetector(
                                     onTap: () => _removePhoto(entry.key),
                                     child: Container(
-                                      color: Colors.red,
+                                      color: JalapaoTheme.danger,
                                       child: const Icon(
                                         Icons.close,
-                                        color: Colors.white,
+                                        color: JalapaoTheme.onPrimary,
                                         size: 20,
                                       ),
                                     ),
@@ -558,12 +560,12 @@ class _PlaceFormScreenState extends State<PlaceFormScreen> {
               ElevatedButton(
                 onPressed: _savePlace,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: JalapaoTheme.primaryColor,
+                  backgroundColor: JalapaoTheme.primaryDeep,
                   minimumSize: const Size.fromHeight(48),
                 ),
                 child: const Text(
                   'Salvar Local Offline',
-                  style: TextStyle(color: Colors.white, fontSize: 16),
+                  style: TextStyle(color: JalapaoTheme.onPrimary, fontSize: 16),
                 ),
               ),
             ],

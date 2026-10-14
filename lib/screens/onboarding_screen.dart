@@ -1,6 +1,7 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:provider/provider.dart';
 import '../providers/visit_provider.dart';
+import '../theme/jalapao_theme.dart';
 
 /// Tela de configuração inicial — identifica o tablet com um ID único.
 /// NÃO cria places: essa é responsabilidade exclusiva do gestor via Hub.
@@ -35,7 +36,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Digite o ID deste Tablet (ex: TAB-01)'),
-          backgroundColor: Colors.redAccent,
+          backgroundColor: JalapaoTheme.danger,
         ),
       );
       return;
@@ -53,7 +54,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0D1117),
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -62,21 +62,28 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               constraints: const BoxConstraints(maxWidth: 480),
               child: Column(
                 children: [
-                  const Icon(Icons.water, size: 80, color: Color(0xFF58A6FF)),
+                  const Icon(
+                    Icons.water,
+                    size: 80,
+                    color: JalapaoTheme.primaryDeep,
+                  ),
                   const SizedBox(height: 12),
                   const Text(
                     'Jalapão Monitor',
                     style: TextStyle(
                       fontSize: 36,
                       fontWeight: FontWeight.w900,
-                      color: Colors.white,
+                      color: JalapaoTheme.textPrimary,
                       letterSpacing: -1,
                     ),
                   ),
                   const SizedBox(height: 4),
                   Text(
                     'Configuração do Tablet',
-                    style: TextStyle(fontSize: 18, color: Colors.grey.shade500),
+                    style: TextStyle(
+                      fontSize: 18,
+                      color: JalapaoTheme.textMuted,
+                    ),
                   ),
                   const SizedBox(height: 48),
 
@@ -85,9 +92,12 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     width: double.infinity,
                     padding: const EdgeInsets.all(24),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF161B22),
+                      color: JalapaoTheme.surface,
                       borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: Colors.grey.shade800),
+                      border: Border.all(
+                        color: JalapaoTheme.outline,
+                        width: 1.5,
+                      ),
                     ),
                     child: Column(
                       children: [
@@ -96,7 +106,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           children: [
                             const Icon(
                               Icons.tablet_android,
-                              color: Color(0xFF58A6FF),
+                              color: JalapaoTheme.primaryDeep,
                               size: 24,
                             ),
                             const SizedBox(width: 8),
@@ -105,7 +115,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                               style: TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w700,
-                                color: Colors.grey.shade400,
+                                color: JalapaoTheme.textMuted,
                                 letterSpacing: 1.5,
                               ),
                             ),
@@ -115,21 +125,12 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         TextField(
                           controller: _tabletIdController,
                           style: const TextStyle(
-                            color: Colors.white,
+                            color: JalapaoTheme.textPrimary,
                             fontSize: 22,
                           ),
                           textAlign: TextAlign.center,
-                          decoration: InputDecoration(
+                          decoration: const InputDecoration(
                             hintText: 'Ex: TAB-01',
-                            hintStyle: TextStyle(color: Colors.grey.shade600),
-                            filled: true,
-                            fillColor: const Color(0xFF0D1117),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(16),
-                              borderSide: BorderSide(
-                                color: Colors.grey.shade800,
-                              ),
-                            ),
                           ),
                         ),
                         const SizedBox(height: 16),
@@ -138,7 +139,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             fontSize: 13,
-                            color: Colors.grey.shade600,
+                            color: JalapaoTheme.textMuted,
                             height: 1.5,
                           ),
                         ),
@@ -154,8 +155,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     child: ElevatedButton.icon(
                       onPressed: _save,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF238636),
-                        foregroundColor: Colors.white,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(16),
                         ),

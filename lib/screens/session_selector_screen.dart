@@ -1,11 +1,14 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:provider/provider.dart';
+
 import '../models/place.dart';
 import '../providers/place_provider.dart';
 import '../providers/visit_provider.dart';
 import '../services/auth_service.dart';
 import 'gestor_login_screen.dart';
-import 'package:jalapao_monitor/theme/jalapao_theme.dart';
+import '../theme/jalapao_theme.dart';
+import '../theme/place_type_style.dart';
+import '../widgets/screen_header.dart';
 
 /// Exibida após o onboarding. O agente seleciona o local ativo
 /// onde está posicionado. A sessão persiste até troca manual.
@@ -18,42 +21,6 @@ class SessionSelectorScreen extends StatefulWidget {
 
 class _SessionSelectorScreenState extends State<SessionSelectorScreen> {
   bool _loading = false;
-
-  static const _typeLabels = {
-    'fervedouro': 'Fervedouro',
-    'cachoeira': 'Cachoeira',
-    'atrativo_cultural': 'Atrativo Cultural',
-    'camping': 'Camping',
-    'loja': 'Loja',
-    'restaurante': 'Restaurante',
-    'pousada': 'Pousada',
-    'fazenda': 'Fazenda',
-    'chacaras': 'Chácaras',
-  };
-
-  static const _typeIcons = {
-    'fervedouro': Icons.water,
-    'cachoeira': Icons.waterfall_chart,
-    'atrativo_cultural': Icons.museum,
-    'camping': Icons.cabin,
-    'loja': Icons.store,
-    'restaurante': Icons.restaurant,
-    'pousada': Icons.hotel,
-    'fazenda': Icons.agriculture,
-    'chacaras': Icons.park,
-  };
-
-  static const _typeColors = {
-    'fervedouro': JalapaoTheme.secondary,
-    'cachoeira': Color(0xFF2E7D32), // verde
-    'atrativo_cultural': Color(0xFF795548), // marrom
-    'camping': Color(0xFF455A64), // cinza
-    'loja': Color(0xFFE65100), // laranja escuro
-    'restaurante': JalapaoTheme.primary,
-    'pousada': Color(0xFFF9A825), // ambar
-    'fazenda': Color(0xFF33691E), // verde oliva
-    'chacaras': Color(0xFF689F38), // verde claro
-  };
 
   Future<void> _selectPlace(BuildContext context, Place place) async {
     setState(() => _loading = true);
@@ -76,11 +43,7 @@ class _SessionSelectorScreenState extends State<SessionSelectorScreen> {
             Expanded(
               child:
                   _loading
-                      ? const Center(
-                        child: CircularProgressIndicator(
-                          color: Color(0xFF58A6FF),
-                        ),
-                      )
+                      ? const Center(child: CircularProgressIndicator())
                       : activePlaces.isEmpty
                       ? _buildEmptyState(placeProvider)
                       : _buildPlaceGrid(context, activePlaces, placeProvider),
@@ -92,64 +55,40 @@ class _SessionSelectorScreenState extends State<SessionSelectorScreen> {
   }
 
   Widget _buildHeader(String tabletId) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-      decoration: BoxDecoration(
-        color: JalapaoTheme.background,
-        border: Border(
-          bottom: BorderSide(
-            color: JalapaoTheme.textSync.withValues(alpha: 0.1),
-          ),
+    return ScreenHeader(
+      leading: const Padding(
+        padding: EdgeInsets.symmetric(horizontal: 8),
+        child: Icon(
+          Icons.location_on,
+          color: JalapaoTheme.primaryDeep,
+          size: 28,
         ),
       ),
-      child: Row(
-        children: [
-          const Icon(Icons.location_on, color: Color(0xFF58A6FF), size: 28),
-          const SizedBox(width: 12),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                'SELECIONAR LOCAL DE MONITORAMENTO',
-                style: TextStyle(
-                  color: JalapaoTheme.textSync,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: 1.2,
-                ),
-              ),
-              Text(
-                'Tablet: ${tabletId.isEmpty ? "não configurado" : tabletId}',
-                style: TextStyle(
-                  color: JalapaoTheme.textSync.withValues(alpha: 0.5),
-                  fontSize: 13,
-                ),
-              ),
-            ],
-          ),
-          const Spacer(),
-          Consumer<AuthService>(
-            builder:
-                (context, authService, _) => IconButton(
-                  onPressed:
-                      () => Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (_) => const GestorLoginScreen(),
-                        ),
-                      ),
-                  icon: Icon(
-                    Icons.admin_panel_settings,
-                    color:
-                        authService.isLoggedIn
-                            ? Colors.green
-                            : Colors.grey[500],
-                  ),
-                  tooltip: 'Gestor',
-                ),
-          ),
-        ],
+      title: const Text('SELECIONAR LOCAL DE MONITORAMENTO'),
+      subtitle: Text(
+        'Tablet: ${tabletId.isEmpty ? "não configurado" : tabletId}',
       ),
+      actions: [
+        Consumer<AuthService>(
+          builder:
+              (context, authService, _) => IconButton(
+                onPressed:
+                    () => Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => const GestorLoginScreen(),
+                      ),
+                    ),
+                icon: Icon(
+                  Icons.admin_panel_settings,
+                  color:
+                      authService.isLoggedIn
+                          ? JalapaoTheme.ok
+                          : JalapaoTheme.textFaint,
+                ),
+                tooltip: 'Gestor',
+              ),
+        ),
+      ],
     );
   }
 
@@ -158,12 +97,12 @@ class _SessionSelectorScreenState extends State<SessionSelectorScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.cloud_off, color: Colors.grey.shade600, size: 64),
+          const Icon(Icons.cloud_off, color: JalapaoTheme.textFaint, size: 64),
           const SizedBox(height: 16),
           Text(
             'Nenhum local ativo encontrado',
             style: TextStyle(
-              color: Colors.grey.shade400,
+              color: JalapaoTheme.textPrimary,
               fontSize: 18,
               fontWeight: FontWeight.w600,
             ),
@@ -171,17 +110,13 @@ class _SessionSelectorScreenState extends State<SessionSelectorScreen> {
           const SizedBox(height: 8),
           Text(
             'Verifique a conexão ou aguarde aprovação do gestor',
-            style: TextStyle(color: Colors.grey.shade600, fontSize: 14),
+            style: TextStyle(color: JalapaoTheme.textMuted, fontSize: 14),
           ),
           const SizedBox(height: 24),
           OutlinedButton.icon(
             onPressed: () => placeProvider.syncDownActivePlaces(),
             icon: const Icon(Icons.refresh),
             label: const Text('Tentar novamente'),
-            style: OutlinedButton.styleFrom(
-              foregroundColor: const Color(0xFF58A6FF),
-              side: const BorderSide(color: Color(0xFF58A6FF)),
-            ),
           ),
         ],
       ),
@@ -201,7 +136,7 @@ class _SessionSelectorScreenState extends State<SessionSelectorScreen> {
           Text(
             'Toque no local onde você está posicionado hoje:',
             style: TextStyle(
-              color: JalapaoTheme.textSync.withValues(alpha: 0.5),
+              color: JalapaoTheme.textMuted,
               fontSize: 14,
             ),
           ),
@@ -222,9 +157,9 @@ class _SessionSelectorScreenState extends State<SessionSelectorScreen> {
                 );
                 return _PlaceCard(
                   place: place,
-                  typeLabel: _typeLabels[place.type] ?? place.type,
-                  icon: _typeIcons[place.type] ?? Icons.place,
-                  color: _typeColors[place.type] ?? const Color(0xFF8B949E),
+                  typeLabel: PlaceTypeStyle.label(place.type),
+                  icon: PlaceTypeStyle.icon(place.type),
+                  color: PlaceTypeStyle.color(place.type),
                   onTap: () => _selectPlace(context, place),
                   currentOccupancy: occupancy,
                 );
@@ -258,8 +193,9 @@ class _PlaceCard extends StatelessWidget {
   Color _borderColor() {
     if (place.capacityTotal <= 0) return color.withValues(alpha: 0.4);
     final ratio = currentOccupancy / place.capacityTotal;
-    if (ratio >= 1.0) return const Color(0xFFFF7B72); // vermelho: lotado
-    if (ratio >= 0.8) return const Color(0xFFD29922); // amarelo: 80%+
+    if (ratio >= 0.8) {
+      return JalapaoTheme.occupancyColor(currentOccupancy, place.capacityTotal);
+    }
     return color.withValues(alpha: 0.4);
   }
 
@@ -271,7 +207,7 @@ class _PlaceCard extends StatelessWidget {
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 120),
         decoration: BoxDecoration(
-          color: Colors.white, // Card branco sobre fundo terra
+          color: JalapaoTheme.surface,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
             color: borderColor,
@@ -298,7 +234,7 @@ class _PlaceCard extends StatelessWidget {
                     color: color.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: Icon(icon, color: color, size: 20),
+                  child: Icon(icon, color: color, size: 24),
                 ),
                 const Spacer(),
                 Container(
@@ -307,14 +243,14 @@ class _PlaceCard extends StatelessWidget {
                     vertical: 3,
                   ),
                   decoration: BoxDecoration(
-                    color: color.withValues(alpha: 0.15),
+                    color: color.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
                     typeLabel,
                     style: TextStyle(
                       color: color,
-                      fontSize: 10,
+                      fontSize: 11,
                       fontWeight: FontWeight.w700,
                       letterSpacing: 0.5,
                     ),
@@ -344,12 +280,18 @@ class _PlaceCard extends StatelessWidget {
                 else if (currentOccupancy > 0)
                   Text(
                     '$currentOccupancy agora',
-                    style: TextStyle(color: Colors.grey.shade400, fontSize: 12),
+                    style: const TextStyle(
+                      color: JalapaoTheme.textMuted,
+                      fontSize: 12,
+                    ),
                   )
                 else
                   Text(
                     'Sem limite de cap.',
-                    style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
+                    style: const TextStyle(
+                      color: JalapaoTheme.textMuted,
+                      fontSize: 12,
+                    ),
                   ),
               ],
             ),
@@ -370,29 +312,28 @@ class _OccupancyBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ratio = total > 0 ? current / total : 0.0;
-    final Color badgeColor;
-    final String label;
-
-    if (ratio >= 1.0) {
-      badgeColor = const Color(0xFFFF7B72);
-      label = '⚠️ $current / $total — LOTADO';
-    } else if (ratio >= 0.8) {
-      badgeColor = const Color(0xFFD29922);
-      label = '⚠️ $current / $total agora';
-    } else {
-      badgeColor = const Color(0xFF3FB950);
-      label = '$current / $total agora';
-    }
+    final badgeColor = JalapaoTheme.occupancyColor(current, total);
+    final label =
+        ratio >= 1.0 ? '$current / $total — LOTADO' : '$current / $total agora';
 
     return Padding(
       padding: const EdgeInsets.only(top: 4),
-      child: Text(
-        label,
-        style: TextStyle(
-          color: badgeColor,
-          fontSize: 12,
-          fontWeight: FontWeight.w600,
-        ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (ratio >= 0.8) ...[
+            Icon(Icons.warning_amber_rounded, size: 16, color: badgeColor),
+            const SizedBox(width: 4),
+          ],
+          Text(
+            label,
+            style: TextStyle(
+              color: badgeColor,
+              fontSize: 12,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ],
       ),
     );
   }

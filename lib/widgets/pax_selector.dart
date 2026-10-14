@@ -14,7 +14,7 @@ class PaxSelector extends StatefulWidget {
     this.maxPax = 30,
     required this.selectedCount,
     required this.onChanged,
-    this.activeColor = JalapaoTheme.primary,
+    this.activeColor = JalapaoTheme.primaryDeep,
     this.label = 'Pessoas',
   });
 
@@ -61,14 +61,14 @@ class _PaxSelectorState extends State<PaxSelector> {
               color:
                   widget.selectedCount > 0
                       ? widget.activeColor
-                      : JalapaoTheme.textSync.withOpacity(0.5),
+                      : JalapaoTheme.textFaint,
             ),
           ),
         ),
         Text(
           widget.label,
           style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-            color: JalapaoTheme.textSync.withOpacity(0.7),
+            color: JalapaoTheme.textMuted,
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -96,7 +96,7 @@ class _PaxSelectorState extends State<PaxSelector> {
                 '${widget.selectedCount} / ${widget.maxPax}',
                 style: TextStyle(
                   fontSize: 13,
-                  color: JalapaoTheme.textSync.withOpacity(0.5),
+                  color: JalapaoTheme.textFaint,
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -134,11 +134,12 @@ class _PaxSelectorState extends State<PaxSelector> {
           borderRadius: BorderRadius.circular(20),
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 150),
+            constraints: const BoxConstraints(minHeight: JalapaoTheme.minTouch),
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
             decoration: BoxDecoration(
               color:
                   selected
-                      ? widget.activeColor.withOpacity(0.15)
+                      ? JalapaoTheme.surface
                       : JalapaoTheme.textSync.withOpacity(0.06),
               borderRadius: BorderRadius.circular(20),
               border: Border.all(
@@ -157,7 +158,7 @@ class _PaxSelectorState extends State<PaxSelector> {
                 color:
                     selected
                         ? widget.activeColor
-                        : JalapaoTheme.textSync.withOpacity(0.7),
+                        : JalapaoTheme.textMuted,
               ),
             ),
           ),
@@ -196,7 +197,7 @@ class _HoldButton extends StatelessWidget {
         decoration: BoxDecoration(
           color: color.withOpacity(0.12),
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: color.withOpacity(0.35), width: 2),
+          border: Border.all(color: color, width: 2),
         ),
         child: Icon(icon, color: color, size: 30),
       ),
