@@ -29,7 +29,7 @@ demais são evidências regeneráveis. `SHA256SUMS.txt` cobre todos os artefatos
 - `source/` — pacote original completo + manifesto de checksums.
 - `catalog_review_v1.json` — dataset normalizado (envelope + 80 registros draft).
 - `catalog_review_v1.jsonl` — um registro por linha, mesma ordem e conteúdo do JSON.
-- `editorial_review_queue.csv` — fila de trabalho editorial (80 registros, verbatim do pacote de revisão).
+- `editorial_review_queue.csv` — fila de trabalho editorial (80 registros derivados do pacote de revisão; correções de curadoria são registradas na fila — ex.: fonte institucional de `pedra-furada`).
 - `reports/` — evidências da validação do pacote original: `preflight.json`, `operational_linkage_preview.json`, `tests_stdout.txt`, `tests_stderr.txt`.
 - Schema: `docs/contracts/catalog/catalog_review_v1.schema.json`.
 
