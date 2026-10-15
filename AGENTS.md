@@ -11,7 +11,7 @@ Leia a issue completa e as decisões vinculadas antes de editar qualquer arquivo
 - Não fazer push direto em `main`, force-push, auto-merge ou bypass de proteção.
 - Não alterar rulesets, permissões, secrets, assinatura, infraestrutura ou ambiente operacional para destravar uma tarefa. A preparação administrativa #16 foi uma solicitação específica, não uma autorização permanente.
 - Não executar migrações, integração em dados reais ou ações em tablets de campo sem autorização específica.
-- Não abrir outra frente nem assumir automaticamente a próxima issue ao terminar.
+- Não abrir outra frente nem assumir automaticamente a próxima issue ao terminar, salvo com `AUTONOMY_ALLOWED=IDEATION` declarado pelo mantenedor para a sessão (ver exceção em "Antes do claim").
 
 ## Fonte de verdade
 
@@ -35,6 +35,21 @@ Leia [coordenação](docs/operations/AGENT_COORDINATION.md), [roadmap](docs/oper
 6. Registrar claim conforme o protocolo, reler a issue e confirmar exclusividade antes de editar.
 
 Epics #4 a #14 e o roadmap #1 não são tarefas executáveis. Não se autopromover de backlog/blocked para ready, nem remover um gate. Se não houver tarefa elegível, informar o bloqueio concreto e parar.
+
+### Exceção AUTONOMY_ALLOWED=IDEATION (issue #76)
+
+Quando o mantenedor declara `AUTONOMY_ALLOWED=IDEATION` para uma sessão interativa específica (comentário em issue, mensagem inicial da sessão ou registro de handoff), o executor dispensa o claim por tarefa e o requisito `type:task` + `agent:ready` para trabalho de ideação:
+
+- explorar o checkout, abrir issues de proposta/documentação e registrar análises;
+- abrir branches `agent/idea-<slug>` e draft PRs com documentação, ADRs, análises ou protótipos de código;
+- executar validação local e registrar evidências nos próprios PRs.
+
+Limites que a exceção **não** remove:
+
+- Merge segue a regra de PR: `MERGE_ALLOWED=NO` por padrão; `DOCS_DATA` somente quando a issue do PR o declarar e todas as condições da exceção forem atendidas — inclusive issues de ideação criadas pelo próprio agente, válidas apenas para diffs 100% `docs/**`/`data/**`.
+- `PRODUCTION_ALLOWED=NO` sempre. Permanecem proibidos: rulesets, permissões, secrets, assinatura, infraestrutura, dados reais, hardware de campo e ações com efeito externo.
+- PRs com código ou workflow ficam draft + `agent:review`; a integração continua decisão humana. Ideação não conclui issues de terceiros, não promove epics e não altera este contrato sem PR próprio.
+- O grant vale para a sessão declarada, é revogado com `AUTONOMY_ALLOWED=NO` e expira ao fim da sessão. Cada entrega registra no handoff a declaração que a autorizou.
 
 ## Arquitetura atual e alvo
 
