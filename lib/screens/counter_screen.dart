@@ -70,32 +70,35 @@ class _CounterScreenState extends State<CounterScreen> {
               style: TextStyle(color: JalapaoTheme.textSync),
             ),
             content: SingleChildScrollView(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  TextField(
-                    controller: groupNameCtrl,
-                    autofocus: false,
-                    decoration: InputDecoration(
-                      labelText: 'Nome do grupo (opcional)',
-                      hintText: 'Ex: Grupo Ipê',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
+              child: SizedBox(
+                width: 440,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextField(
+                      controller: groupNameCtrl,
+                      autofocus: false,
+                      decoration: InputDecoration(
+                        labelText: 'Nome do grupo (opcional)',
+                        hintText: 'Ex: Grupo Ipê',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 12),
-                  TextField(
-                    controller: originCityCtrl,
-                    decoration: InputDecoration(
-                      labelText: 'Cidade de origem (opcional)',
-                      hintText: 'Ex: Palmas, Brasília...',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
+                    const SizedBox(height: 12),
+                    TextField(
+                      controller: originCityCtrl,
+                      decoration: InputDecoration(
+                        labelText: 'Cidade de origem (opcional)',
+                        hintText: 'Ex: Palmas, Brasília...',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
             actions: [
@@ -609,6 +612,11 @@ class _VisitTile extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
+        constraints: const BoxConstraints(
+          minWidth: JalapaoTheme.minTouch,
+          minHeight: JalapaoTheme.minTouch,
+        ),
+        alignment: Alignment.center,
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
         decoration: BoxDecoration(
           color: color.withValues(alpha: 0.15),

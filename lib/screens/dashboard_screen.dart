@@ -910,9 +910,28 @@ class _DashboardScreenState extends State<DashboardScreen> {
         child: Row(
           children: [
             Expanded(
-              child: PaxCount(
-                count: visit.paxQty,
-                color: JalapaoTheme.textPrimary,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  PaxCount(
+                    count: visit.paxQty,
+                    color: JalapaoTheme.textPrimary,
+                  ),
+                  if (visit.groupName != null && visit.groupName!.isNotEmpty)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 4),
+                      child: Text(
+                        visit.groupName!,
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w700,
+                          color: JalapaoTheme.textSync,
+                        ),
+                      ),
+                    ),
+                ],
               ),
             ),
             const SizedBox(width: 16),

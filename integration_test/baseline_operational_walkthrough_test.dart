@@ -456,9 +456,24 @@ void main() {
         await tester.ensureVisible(entrarBtn.first);
         await tester.pump(const Duration(milliseconds: 300));
         await tester.tap(entrarBtn.first, warnIfMissed: false);
-        await tester.pumpAndSettle(const Duration(seconds: 4));
-
-        final pendentesTab = find.text('PENDENTES');
+        // Poll limitado em vez de espera fixa: em runner lento o login
+        // legítimo pode exceder 4s; encerra ao ver PENDENTES (sucesso) ou
+        // SnackBar de erro, e mantém fail() quando nenhum dos dois aparece.
+        var pendentesTab = find.text('PENDENTES');
+        for (
+          int i = 0;
+          i < 40 &&
+              pendentesTab.evaluate().isEmpty &&
+              find.byType(SnackBar).evaluate().isEmpty;
+          i++
+        ) {
+          await tester.pump(const Duration(milliseconds: 500));
+          pendentesTab = find.text('PENDENTES');
+        }
+        debugPrint(
+          '[GESTOR] pos-login pendentes=${pendentesTab.evaluate().length} '
+          'snackbar=${find.byType(SnackBar).evaluate().length}',
+        );
         if (pendentesTab.evaluate().isNotEmpty) {
           await snap(tester, '33_gestor_tab_pendentes');
 
