@@ -31,7 +31,7 @@ import {
 import type { LegacyVisit } from '@/lib/places-service';
 import type { Place, PlaceVisit, Reservation, PlaceWithStats, PlaceType } from '@/lib/types';
 import { PLACE_TYPE_CONFIG } from '@/lib/types';
-import { todayBRT, fmtTimeBRT } from '@/lib/tz';
+import { todayBRT, fmtTimeBRT, dateBRTRange } from '@/lib/tz';
 
 function occupancyColor(ratio: number): string {
   if (ratio >= 1.0) return '#D32F2F';
@@ -121,12 +121,13 @@ export function PlacesTab() {
   }, []);
 
   const fetchHistory = useCallback(async (date: string) => {
+    const [start, end] = dateBRTRange(date);
     const [visits, reservations, legacy] = await Promise.all([
       fetchAllPlaceVisits(false, date),
       fetchTodayReservations(date),
       // Reutiliza fetchTodayLegacyVisits com filtro de data manual via PB
       pb.collection('visits').getFullList({
-        filter: `arrival_time >= "${date} 00:00:00.000Z" && arrival_time <= "${date} 23:59:59.999Z"`,
+        filter: `arrival_time >= "${start}" && arrival_time <= "${end}"`,
         sort: '-arrival_time',
       }).catch(() => [] as LegacyVisit[]),
     ]);
