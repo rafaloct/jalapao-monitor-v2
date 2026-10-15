@@ -7,7 +7,7 @@ import { PlacesTab } from '@/components/PlacesTab';
 import pb from '@/lib/pb';
 import type { PlaceVisit, Reservation } from '@/lib/types';
 import type { LegacyVisit } from '@/lib/places-service';
-import { fmtTimeBRT, fmtDateBRT, todayBRT } from '@/lib/tz';
+import { dateBRTRange, fmtTimeBRT, fmtDateBRT, todayBRT } from '@/lib/tz';
 
 interface BackupRow {
   data: string;
@@ -53,8 +53,10 @@ function toCsv(rows: BackupRow[]): string {
 }
 
 async function fetchBackupData(startDate: string, endDate: string): Promise<BackupRow[]> {
+  const [start] = dateBRTRange(startDate);
+  const [, end] = dateBRTRange(endDate);
   const filter = (field: string) =>
-    `${field} >= "${startDate} 00:00:00.000Z" && ${field} <= "${endDate} 23:59:59.999Z"`;
+    `${field} >= "${start}" && ${field} <= "${end}"`;
 
   const [placeVisits, reservations, legacyVisits, places] = await Promise.all([
     pb.collection('place_visits').getFullList<PlaceVisit>({ filter: filter('arrival_time'), sort: 'arrival_time' }).catch(() => [] as PlaceVisit[]),
